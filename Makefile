@@ -3,10 +3,8 @@
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
 
-install:  ## create the venv and install dev dependencies
-	uv venv
-	uv pip install -e .
-	uv pip install pytest pytest-asyncio ruff mypy respx
+install:  ## create the venv and install locked dependencies
+	uv sync
 
 test:  ## run the test suite
 	.venv/bin/python -m pytest

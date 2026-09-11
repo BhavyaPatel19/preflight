@@ -308,9 +308,10 @@ def _parse_icao(raw: str, header: re.Match[str]) -> NotamRecord:
     decoded_q = decode_qcode(qcode) if qcode else None
     entities = extract_entities(body)
 
+    a_field = fields.get("A", "").split()
     return NotamRecord(
         id=notam_id,
-        icao=(fields.get("A", "").split() or [None])[0],
+        icao=a_field[0] if a_field else None,
         fir=fir,
         raw=raw.strip(),
         kind=kind,  # type: ignore[arg-type]

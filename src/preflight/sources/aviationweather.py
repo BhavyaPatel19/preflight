@@ -70,8 +70,10 @@ def _ceiling(clouds: list[dict[str, Any]] | None) -> int | None:
     """Ceiling is the lowest broken or overcast layer."""
     if not clouds:
         return None
-    bases = [c.get("base") for c in clouds if c.get("cover") in {"BKN", "OVC", "OVX"}]
-    bases = [b for b in bases if isinstance(b, int)]
+    bases: list[int] = [
+        c["base"] for c in clouds
+        if c.get("cover") in {"BKN", "OVC", "OVX"} and isinstance(c.get("base"), int)
+    ]
     return min(bases) if bases else None
 
 

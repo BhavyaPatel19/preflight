@@ -20,10 +20,7 @@ jobs:
         run: uv python install 3.13
 
       - name: Install
-        run: |
-          uv venv
-          uv pip install -e .
-          uv pip install pytest pytest-asyncio ruff mypy respx
+        run: uv sync --locked
 
       - name: Lint
         run: .venv/bin/ruff check src tests

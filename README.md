@@ -163,8 +163,7 @@ briefing survives a crash and latency is the slowest agent rather than the sum.
 git clone git@github.com:BhavyaPatel19/preflight.git
 cd preflight
 
-uv venv && source .venv/bin/activate
-uv pip install -e . && uv pip install pytest ruff mypy
+uv sync                     # creates .venv from the lockfile
 
 pytest                      # decoder tests — no API keys, no network
 cp .env.example .env        # fill in only what you need

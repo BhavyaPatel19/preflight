@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.13
+
+      - name: Install
+        run: |
+          uv venv
+          uv pip install -e .
+          uv pip install pytest pytest-asyncio ruff mypy respx
+
+      - name: Lint
+        run: .venv/bin/ruff check src tests
+
+      - name: Type check
+        run: .venv/bin/mypy
+
+      - name: Test
+        run: .venv/bin/python -m pytest
+
+  # Sprint 5 replaces this placeholder with the real gate: the 60-case smoke
+  # subset of the time-travel golden set, failing the build when hazard recall
+  # drops more than 2 points or p50 cost rises more than 15%.
+  eval-gate:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Eval regression gate
+        run: echo "Not yet implemented — lands in Sprint 5."

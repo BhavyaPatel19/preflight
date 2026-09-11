@@ -1,0 +1,51 @@
+"""``preflight`` command line."""
+
+from __future__ import annotations
+
+import argparse
+import sys
+
+from preflight import __version__
+from preflight.decode.notam import DEMO_NOTAMS, NotamParseError, parse_notam
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(prog="preflight", description="Route-risk briefing tools.")
+    ap.add_argument("--version", action="version", version=f"preflight {__version__}")
+    sub = ap.add_subparsers(dest="cmd", required=True)
+
+    d = sub.add_parser("decode", help="decode a NOTAM to JSON")
+    d.add_argument("text", nargs="?", help="raw NOTAM text (reads stdin if omitted)")
+
+    sub.add_parser("demo", help="decode the bundled example NOTAMs")
+
+    s = sub.add_parser("serve", help="run the HTTP API")
+    s.add_argument("--port", type=int, default=8000)
+
+    args = ap.parse_args(argv)
+
+    if args.cmd == "decode":
+        text = args.text or sys.stdin.read()
+        try:
+            print(parse_notam(text).model_dump_json(indent=2))
+        except NotamParseError as e:
+            print(f"error: {e}", file=sys.stderr)
+            return 2
+        return 0
+
+    if args.cmd == "demo":
+        for raw in DEMO_NOTAMS:
+            print(parse_notam(raw).model_dump_json(indent=2))
+        return 0
+
+    if args.cmd == "serve":
+        import uvicorn
+
+        uvicorn.run("preflight.api.main:app", port=args.port, reload=True)
+        return 0
+
+    return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

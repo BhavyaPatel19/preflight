@@ -1,0 +1,52 @@
+name: preflight
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: preflight
+      POSTGRES_PASSWORD: preflight
+      POSTGRES_DB: preflight
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U preflight"]
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    command: redis-server --save 60 1 --loglevel warning
+    volumes: [redisdata:/data]
+
+  # Raw NOTAM/weather payloads and, later, ATC audio.
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: preflight
+      MINIO_ROOT_PASSWORD: preflight
+    ports: ["9000:9000", "9001:9001"]
+    volumes: [miniodata:/data]
+
+  # Tracing and eval datasets. Brought up in Sprint 5, declared now so the
+  # local stack matches what CI and prod will run.
+  langfuse:
+    image: langfuse/langfuse:2
+    depends_on:
+      postgres: {condition: service_healthy}
+    environment:
+      DATABASE_URL: postgresql://preflight:preflight@postgres:5432/preflight
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: dev-only-not-a-secret
+      SALT: dev-only-not-a-secret
+      TELEMETRY_ENABLED: "false"
+    ports: ["3000:3000"]
+
+volumes:
+  pgdata:
+  redisdata:
+  miniodata:

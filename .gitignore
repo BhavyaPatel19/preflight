@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+dist/
+build/
+
+# Env & secrets
+.env
+.env.local
+*.pem
+
+# Data — never commit corpora or model weights
+data/raw/
+data/interim/
+data/processed/
+models/
+*.parquet
+*.duckdb
+*.sqlite3
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Eval artifacts (published deliberately, not incidentally)
+evals/runs/
+evals/*.local.json
+
+# macOS / editors
+.DS_Store
+.idea/
+.vscode/

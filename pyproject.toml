@@ -1,0 +1,51 @@
+[project]
+name = "preflight"
+version = "0.1.0"
+description = "Agentic route-risk briefing for flight operations — cited, evaluated, and honest about what it doesn't know."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Bhavya Patel", email = "bhavyampatel19@gmail.com" }]
+
+dependencies = [
+    "pydantic>=2.9",
+    "pydantic-settings>=2.5",
+    "httpx>=0.27",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "sse-starlette>=2.1",
+    "python-dotenv>=1.0",
+    "structlog>=24.4",
+]
+
+[project.optional-dependencies]
+db = ["psycopg[binary,pool]>=3.2", "pgvector>=0.3"]
+ml = ["torch>=2.4", "transformers>=4.45", "sentence-transformers>=3.1", "datasets>=3.0"]
+dev = ["pytest>=8.3", "pytest-asyncio>=0.24", "ruff>=0.7", "mypy>=1.11", "respx>=0.21"]
+
+[project.scripts]
+preflight = "preflight.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/preflight"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-q"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src/preflight"]

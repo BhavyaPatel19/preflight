@@ -28,7 +28,7 @@ down:  ## stop the stack
 	docker compose down
 
 db:  ## apply the schema
-	psql "$${DATABASE_URL:-postgresql://preflight:preflight@localhost:5432/preflight}" -f db/001_init.sql
+	for f in db/*.sql; do psql "$${DATABASE_URL:-postgresql://preflight:preflight@localhost:5432/preflight}" -v ON_ERROR_STOP=1 -f $$f; done
 
 demo:  ## decode the bundled example NOTAMs
 	.venv/bin/python -m preflight.decode.notam --demo

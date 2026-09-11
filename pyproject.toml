@@ -16,10 +16,11 @@ dependencies = [
     "sse-starlette>=2.1",
     "python-dotenv>=1.0",
     "structlog>=24.4",
+    "psycopg[binary,pool]>=3.2",
+    "pgvector>=0.3",
 ]
 
 [project.optional-dependencies]
-db = ["psycopg[binary,pool]>=3.2", "pgvector>=0.3"]
 ml = ["torch>=2.4", "transformers>=4.45", "sentence-transformers>=3.1", "datasets>=3.0"]
 
 [dependency-groups]
@@ -47,7 +48,10 @@ testpaths = ["tests"]
 pythonpath = ["src"]
 addopts = "-q -m 'not live'"
 asyncio_mode = "auto"
-markers = ["live: hits real external APIs; opt in with -m live"]
+markers = [
+    "live: hits real external APIs; opt in with -m live",
+    "db: needs Postgres at DATABASE_URL; auto-skips when unreachable",
+]
 
 [tool.mypy]
 python_version = "3.12"

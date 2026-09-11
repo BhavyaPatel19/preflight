@@ -1546,6 +1546,8 @@ source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
     { name = "httpx" },
+    { name = "pgvector" },
+    { name = "psycopg", extra = ["binary", "pool"] },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "python-dotenv" },
@@ -1555,10 +1557,6 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
-db = [
-    { name = "pgvector" },
-    { name = "psycopg", extra = ["binary", "pool"] },
-]
 ml = [
     { name = "datasets" },
     { name = "sentence-transformers" },
@@ -1580,8 +1578,8 @@ requires-dist = [
     { name = "datasets", marker = "extra == 'ml'", specifier = ">=3.0" },
     { name = "fastapi", specifier = ">=0.115" },
     { name = "httpx", specifier = ">=0.27" },
-    { name = "pgvector", marker = "extra == 'db'", specifier = ">=0.3" },
-    { name = "psycopg", extras = ["binary", "pool"], marker = "extra == 'db'", specifier = ">=3.2" },
+    { name = "pgvector", specifier = ">=0.3" },
+    { name = "psycopg", extras = ["binary", "pool"], specifier = ">=3.2" },
     { name = "pydantic", specifier = ">=2.9" },
     { name = "pydantic-settings", specifier = ">=2.5" },
     { name = "python-dotenv", specifier = ">=1.0" },
@@ -1592,7 +1590,7 @@ requires-dist = [
     { name = "transformers", marker = "extra == 'ml'", specifier = ">=4.45" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.32" },
 ]
-provides-extras = ["db", "ml"]
+provides-extras = ["ml"]
 
 [package.metadata.requires-dev]
 dev = [

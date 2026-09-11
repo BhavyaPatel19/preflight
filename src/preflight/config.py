@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -17,9 +18,13 @@ class Settings(BaseSettings):
     model_fast: str = Field(default="claude-haiku-4-5-20251001", alias="PREFLIGHT_MODEL_FAST")
 
     # Sources
-    faa_notam_client_id: str | None = None
-    faa_notam_client_secret: str | None = None
     aviationweather_base: str = "https://aviationweather.gov/api/data"
+    # NASA DIP redistributes the FAA NOTAM feed; access by request (ADR 0002).
+    nasa_dip_base_url: str | None = Field(default=None, alias="PREFLIGHT_NASA_DIP_BASE_URL")
+    nasa_dip_token: str | None = Field(default=None, alias="PREFLIGHT_NASA_DIP_TOKEN")
+
+    # Raw-payload archive root (see preflight.archive).
+    archive_dir: Path = Path("data/raw")
 
     # Infra
     database_url: str = "postgresql://preflight:preflight@localhost:5432/preflight"

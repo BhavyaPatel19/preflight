@@ -186,7 +186,7 @@ make db                       # apply db/*.sql migrations to an existing databas
 
 preflight dbcheck             # round-trips the database, confirms pgvector
 preflight ingest weather KSFO KJFK
-preflight ingest notams data/samples/notams-demo.txt
+preflight ingest notams --file data/samples/notams-demo.txt
 pytest                        # the db-marked tests now run instead of skipping
 ```
 
@@ -201,7 +201,8 @@ src/preflight/
     qcode.py            ICAO Q-code taxonomy (145 subjects × 79 conditions)
     contractions.py     FAA/ICAO contraction dictionary
     notam.py            rule-based parser: raw NOTAM → NotamRecord
-  sources/              API clients (aviationweather, FAA NOTAM, OpenSky)
+  sources/              aviationweather client; NotamSource protocol + providers
+  archive.py            raw-payload archive — every fetch, timestamped, before decode
   db/                   plain-SQL persistence: notams, weather, pool
   ingest/               idempotent fetch → decode → store jobs
   api/                  FastAPI service, SSE briefing endpoint
@@ -214,11 +215,17 @@ tests/                  decoder tests against real NOTAM text
 
 ## Data sources
 
-All public, all free. Nothing in this repo is scraped.
+All public. Nothing in this repo is scraped.
+
+> **On NOTAMs:** the FAA's NOTAM API is not open to the public, and its public search site refuses
+> programmatic requests. The data is public domain; access to it is not. Ingestion is written against
+> a provider interface so this doesn't leak into the rest of the system, and every fetch is archived
+> raw so the project builds its own history for the time-travel evaluation. Details and what was
+> tried: [ADR 0002](docs/adr/0002-notam-access-and-the-provider-abstraction.md).
 
 | Source | Provides | Access |
 |---|---|---|
-| FAA NOTAM API | live NOTAMs, ICAO + US domestic format | free registration |
+| FAA NOTAMs via **NASA DIP** | live NOTAMs, structured from the FAA SWIM feed | request access — see [ADR 0002](docs/adr/0002-notam-access-and-the-provider-abstraction.md) |
 | aviationweather.gov | METAR, TAF, PIREP, SIGMET, AIRMET | free, no key |
 | NASA ASRS | ~200k de-identified incident narratives | free bulk export |
 | NTSB CAROL | accident/incident records with findings | free export |

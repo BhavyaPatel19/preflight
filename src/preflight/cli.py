@@ -28,8 +28,10 @@ def main(argv: list[str] | None = None) -> int:
     w = isub.add_parser("weather", help="METAR/TAF from aviationweather.gov")
     w.add_argument("icao", nargs="+", help="airports, e.g. KSFO KJFK")
     w.add_argument("--hours", type=int, default=3)
-    n = isub.add_parser("notams", help="NOTAMs from a text dump (FAA API in step 3)")
-    n.add_argument("file", type=Path)
+    n = isub.add_parser("notams", help="NOTAMs from a dump file or a provider")
+    n.add_argument("--file", type=Path, action="append", help="text dump; repeatable")
+    n.add_argument("--source", choices=["nasa-dip"], help="live provider (needs credentials)")
+    n.add_argument("icao", nargs="*", help="airports for a live provider")
 
     sub.add_parser("dbcheck", help="round-trip the database")
 
@@ -66,9 +68,31 @@ def main(argv: list[str] | None = None) -> int:
 
                 print(asyncio.run(ingest_weather(args.icao, hours=args.hours)))
             else:
-                from preflight.ingest.notams import ingest_file
+                import asyncio
 
-                print(ingest_file(args.file))
+                from preflight.ingest.notams import ingest_notams
+                from preflight.sources.notams import (
+                    FileSource,
+                    NasaDipSource,
+                    NotamSource,
+                    SourceUnavailable,
+                )
+
+                src: NotamSource
+                if args.file:
+                    src = FileSource(*args.file)
+                elif args.source == "nasa-dip":
+                    from preflight.config import settings
+
+                    src = NasaDipSource(settings().nasa_dip_base_url, settings().nasa_dip_token)
+                else:
+                    print("error: give --file PATH or --source nasa-dip ICAO...", file=sys.stderr)
+                    return 2
+                try:
+                    print(asyncio.run(ingest_notams(src, args.icao)))
+                except SourceUnavailable as e:
+                    print(f"source unavailable: {e}", file=sys.stderr)
+                    return 3
         finally:
             close_pool()
         return 0

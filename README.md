@@ -99,7 +99,9 @@ Built in the open, six sprints over twelve weeks.
 | 6 | Delay forecasting, cost/latency, UI, MCP server | ⬜ not started |
 
 **Working today:** ICAO Q-code taxonomy (145 subjects × 79 conditions), FAA/ICAO contraction
-expansion, rule-based NOTAM parser producing typed records, strict briefing schemas.
+expansion, rule-based NOTAM parser producing typed records, strict briefing schemas, Postgres +
+pgvector persistence with an "in force at this instant" query, METAR/TAF ingestion from
+aviationweather.gov, and a low-confidence escalation queue for the Sprint 2 extractor.
 
 ---
 
@@ -178,8 +180,14 @@ python -m preflight.decode.notam --demo
 Infrastructure (Postgres + pgvector, Redis, MinIO, Langfuse) comes up with:
 
 ```bash
-docker compose up -d
-psql "$DATABASE_URL" -f db/001_init.sql
+# Docker Desktop, or on macOS without it:  brew install colima docker docker-compose && colima start
+make up                       # docker compose up -d — schema auto-applies on first boot
+make db                       # apply db/*.sql migrations to an existing database
+
+preflight dbcheck             # round-trips the database, confirms pgvector
+preflight ingest weather KSFO KJFK
+preflight ingest notams data/samples/notams-demo.txt
+pytest                        # the db-marked tests now run instead of skipping
 ```
 
 ---
@@ -194,8 +202,10 @@ src/preflight/
     contractions.py     FAA/ICAO contraction dictionary
     notam.py            rule-based parser: raw NOTAM → NotamRecord
   sources/              API clients (aviationweather, FAA NOTAM, OpenSky)
+  db/                   plain-SQL persistence: notams, weather, pool
+  ingest/               idempotent fetch → decode → store jobs
   api/                  FastAPI service, SSE briefing endpoint
-db/001_init.sql         Postgres schema with pgvector + full-text indexes
+db/*.sql                Postgres schema + migrations (pgvector, full-text, HNSW)
 docs/adr/               architecture decision records
 tests/                  decoder tests against real NOTAM text
 ```

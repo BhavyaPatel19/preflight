@@ -8,6 +8,21 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: preflight
+          POSTGRES_PASSWORD: preflight
+          POSTGRES_DB: preflight
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U preflight"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://preflight:preflight@localhost:5432/preflight
     steps:
       - uses: actions/checkout@v4
 
@@ -27,6 +42,9 @@ jobs:
 
       - name: Type check
         run: .venv/bin/mypy
+
+      - name: Apply schema
+        run: for f in db/*.sql; do psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"; done
 
       - name: Test
         run: .venv/bin/python -m pytest

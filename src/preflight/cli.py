@@ -78,6 +78,8 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--off-block", required=True, help="ISO-8601 UTC, e.g. 2026-09-11T02:30Z")
     b.add_argument("--type", dest="aircraft_type", help="e.g. A320")
     b.add_argument("--json", action="store_true", help="emit JSON instead of text")
+    b.add_argument("--no-precedent", action="store_true",
+                   help="skip the prior-report search (faster; no model load)")
 
     args = ap.parse_args(argv)
 
@@ -144,7 +146,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "brief":
         from datetime import datetime
 
-        from preflight.brief import build_briefing, render_text
+        from preflight.brief import build_briefing, load_retriever, render_text, with_precedent
         from preflight.db import close_pool, get_pool
         from preflight.schemas import FlightRequest
 
@@ -157,6 +159,8 @@ def main(argv: list[str] | None = None) -> int:
         try:
             with get_pool().connection() as conn:
                 briefing = build_briefing(conn, req)
+                if not args.no_precedent:
+                    briefing = with_precedent(conn, briefing, load_retriever())
         finally:
             close_pool()
         print(briefing.model_dump_json(indent=2) if args.json else render_text(briefing))

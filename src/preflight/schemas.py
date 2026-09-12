@@ -152,7 +152,10 @@ class Citation(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    kind: Literal["notam", "metar", "taf", "pirep", "sigmet", "asrs", "ntsb", "forecast", "far_aim"]
+    kind: Literal[
+        "notam", "metar", "taf", "pirep", "sigmet", "asrs", "ntsb", "forecast", "far_aim",
+        "ops_note",
+    ]
     ref: str
     issued_at: datetime | None = None
     quote: str | None = Field(default=None, description="Verbatim span the claim rests on")
@@ -181,6 +184,7 @@ class Finding(BaseModel):
     phases: tuple[Phase, ...] = ()
     headline: str
     claims: tuple[Claim, ...] = Field(min_length=1)
+    airport: str | None = Field(default=None, description="ICAO this finding is about")
 
     @property
     def sort_key(self) -> tuple[int, int]:

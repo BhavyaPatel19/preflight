@@ -90,7 +90,8 @@ def windows(req: FlightRequest) -> list[tuple[str, Role, datetime, datetime]]:
 # --------------------------------------------------------------------------
 
 def _fmt(dt: datetime | None) -> str:
-    return f"{dt:%d %b %H%M}Z" if dt else "?"
+    """Always UTC with a Z — the driver may hand back the session timezone."""
+    return f"{_utc(dt):%d %b %H%M}Z" if dt else "?"
 
 
 def headline(rec: NotamRecord) -> str:
@@ -139,6 +140,7 @@ def notam_findings(icao: str, role: Role, records: list[NotamRecord]) -> list[Fi
                 phases=phases,
                 headline=f"{icao}: {headline(rec)}",
                 claims=(_claim(rec, f"{icao} — {headline(rec)}."),),
+                airport=icao,
             ))
         else:
             minor.append(rec)
@@ -149,6 +151,7 @@ def notam_findings(icao: str, role: Role, records: list[NotamRecord]) -> list[Fi
             category="notam",
             severity=Severity.INFO,
             phases=_PHASES_BY_ROLE[role],
+            airport=icao,
             headline=f"{icao}: {len(minor)} further NOTAM{'s' if len(minor) != 1 else ''} "
                      "in the window",
             claims=(Claim(
@@ -224,6 +227,7 @@ def weather_findings(
             category="weather",
             severity=sev,
             phases=_PHASES_BY_ROLE[role],
+            airport=icao,
             headline=f"{icao}: {label}" + (f" — {summary}" if summary else ""),
             claims=(Claim(
                 text=f"{icao} is reporting {label} at {_fmt(_utc(metar.issued_at))}"
@@ -253,6 +257,7 @@ def weather_findings(
                 category="forecast",
                 severity=Severity.INFO,
                 phases=_PHASES_BY_ROLE[role],
+                airport=icao,
                 headline=f"{icao}: TAF valid {valid}",
                 claims=(Claim(
                     text=f"A TAF for {icao} issued {_fmt(_utc(taf.issued_at))} covers "

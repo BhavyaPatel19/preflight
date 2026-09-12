@@ -1,5 +1,6 @@
 import psycopg
 import pytest
+from pgvector.psycopg import register_vector
 
 from preflight.config import settings
 
@@ -23,5 +24,6 @@ def db(_db_reachable):
     if not _db_reachable:
         pytest.skip("no database at DATABASE_URL — `make up` to run these")
     with psycopg.connect(settings().database_url, autocommit=False) as conn:
+        register_vector(conn)
         yield conn
         conn.rollback()

@@ -97,7 +97,7 @@ Built in the open, six sprints over twelve weeks.
 |---|---|---|
 | 1 | Foundation — schemas, rule decoder, ingestion, infra, deterministic briefing | 🟢 done (parser tuning waits on real NOTAM data) |
 | 2 | Fine-tuned NOTAM entity extractor → HF Hub | ⬜ not started |
-| 3 | Hybrid retrieval over ASRS/NTSB + reranking | ⬜ not started |
+| 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟡 retrieval core done; corpus + golden set next |
 | 4 | LangGraph agent graph, grounding, abstention | ⬜ not started |
 | 5 | Time-travel eval harness + CI regression gate | ⬜ not started |
 | 6 | Delay forecasting, cost/latency, UI, MCP server | ⬜ not started |
@@ -107,7 +107,8 @@ expansion, rule-based NOTAM parser producing typed records, strict briefing sche
 pgvector persistence with an "in force at this instant" query, METAR/TAF ingestion from
 aviationweather.gov, a low-confidence escalation queue for the Sprint 2 extractor, a raw-payload
 archive of every fetch, and a deterministic briefing (`preflight brief`, `POST /brief`) that turns
-what's in the database into ranked, cited findings and explicit abstentions.
+what's in the database into ranked, cited findings and explicit abstentions, and hybrid retrieval
+(pgvector + tsvector fused with RRF, cross-encoder reranked) over the precedent corpus.
 
 ---
 
@@ -197,6 +198,19 @@ preflight brief KSFO KJFK --alt KBOS --off-block 2026-09-12T08:00Z --type A320
 pytest                        # the db-marked tests now run instead of skipping
 ```
 
+### Retrieval
+
+```bash
+uv sync --extra ml          # torch + sentence-transformers; ~1.5 GB of model weights on first use
+preflight corpus add --source ops_note --id note-1 --file note.txt --icao KSFO
+preflight search "lined up with a taxiway at night, parallel runway closed" --icao KSFO
+preflight search "28R closed" --mode lexical --no-rerank     # ablation switches
+pytest -m ml                # opt-in: runs the real models
+```
+
+Dense and lexical candidates are fused inside Postgres and reranked by a cross-encoder —
+[ADR 0003](docs/adr/0003-hybrid-retrieval.md) has the reasoning and the model choices.
+
 ### Keeping the archive current
 
 The time-travel evaluation replays what the system knew at a given instant, so the project keeps
@@ -227,7 +241,8 @@ src/preflight/
   sources/              aviationweather client; NotamSource protocol + providers
   archive.py            raw-payload archive — every fetch, timestamped, before decode
   brief/                deterministic briefing core + text renderer
-  db/                   plain-SQL persistence: notams, weather, pool
+  retrieval/            chunker, Embedder/Reranker protocols, Retriever (hybrid + rerank)
+  db/                   plain-SQL persistence: notams, weather, corpus (hybrid search SQL), runs
   ingest/               idempotent fetch → archive → decode → store jobs
   scheduler.py          hourly jobs + run log; `preflight schedule` / compose `scheduler`
   api/                  FastAPI service, SSE briefing endpoint

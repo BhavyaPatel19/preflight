@@ -94,8 +94,24 @@ sources considered: 9 · 19 ms
 
 Those two abstentions are correct, not a bug: the flight was yesterday and the only TAFs on record
 were issued today. In a safety-adjacent system "I don't know" is a first-class output and an
-evaluated behaviour. The precedent (ASRS) and delay-forecast findings arrive in Sprints 3 and 6; the
-Sprint 4 agent layer *enriches* this core rather than replacing it.
+evaluated behaviour.
+
+With the retrieval models installed, each actionable finding also carries **precedent** from the
+75,000-report corpus:
+
+```
+[HIGH] APPROACH AIDS KJFK: ILS 22L unserviceable (maintenance) until 11 Sep 1600Z (est)
+       [notam:A0912/26]
+       3 prior reports with no airport recorded describe similar conditions: “A319 flight crew
+       reported a CFIT event during visual approach shortly after being assigned a late runway
+       change. Flight crew utilized an INOP…”; …
+       [asrs:1851101] [asrs:1223351] [asrs:1180257]
+```
+
+The query is the *operational consequence* of the NOTAM, not its wording — that framing is what
+turned an irrelevant maintenance case into the report above — and the claim says plainly whether
+the precedent happened at this airport or somewhere unrecorded. The delay forecast arrives in
+Sprint 6; the Sprint 4 agent layer *enriches* this core rather than replacing it.
 
 ---
 
@@ -122,7 +138,8 @@ Built in the open, six sprints over twelve weeks.
 - **Ingest** — METAR/TAF from aviationweather.gov; NOTAMs through a provider interface (text dumps
   today, NASA DIP when access lands); hourly scheduler with a run log.
 - **Brief** — `preflight brief` / `POST /brief` / `POST /brief/stream`: ranked, cited findings and
-  explicit abstentions.
+  explicit abstentions, with **precedent**: for each actionable finding, prior ASRS/NTSB reports
+  describing what went wrong for crews in those conditions, each citing the verbatim passage.
 - **Retrieve** — hybrid search (pgvector + tsvector fused with RRF, cross-encoder reranked) over
   47,723 ASRS incident reports and 27,986 NTSB accident/incident investigations, with ablation
   switches for the eval.
@@ -294,7 +311,7 @@ src/preflight/
   ingest/               idempotent fetch → archive → decode → store jobs; resumable corpus ingest
   scheduler.py          hourly jobs + run log; `preflight schedule` / compose `scheduler`
   db/                   plain-SQL persistence: notams, weather, corpus (hybrid search), runs, pool
-  brief/                deterministic briefing core + text renderer
+  brief/                deterministic briefing core, precedent attachment, text renderer
   retrieval/            chunker, Embedder/Reranker protocols, Retriever (hybrid + rerank)
   evals/retrieval.py    golden-set builder, metrics, runner → evals/retrieval/RESULTS.md
   api/                  FastAPI: /decode, /brief, /brief/stream

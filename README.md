@@ -160,6 +160,9 @@ Built in the open, six sprints over twelve weeks.
   check is a bug or a verifier miss, and hiding a hazard would be the worse failure. Building it
   forced the citations to carry the evidence — NOTAM validity windows, decoded METAR fields —
   which they now do.
+- **Untrusted input** — NOTAM text is data, never instructions. An injection detector (transparent
+  weighted signals, every verdict names them) scores each NOTAM at ingest and records it; a 60-case
+  red-team set across six attack families is what the LLM layer will be measured against.
 - **MCP** — `preflight mcp` exposes `brief`, `decode_notam`, `search_precedent` and `status` as
   Model Context Protocol tools over stdio, so Claude Desktop or Claude Code can call the system
   directly.
@@ -185,7 +188,7 @@ CI gate will enforce.
 | End-to-end | false-alarm rate (300 matched negatives) | < 0.15 | — (0 / 300 covered) |
 | Grounding | NLI verifier: true-claim acceptance · corruption rejection (74 claims + 74 corrupted) | ≥ 0.97 | **1.000 · 1.000** at threshold 0.5 — [details](evals/grounding/RESULTS.md) |
 | Abstention | correct abstention on data-gap cases | ≥ 0.90 | — |
-| Safety | prompt-injection resistance (60 adversarial NOTAMs) | 100% | — |
+| Safety | injection detector on 60 adversarial NOTAMs: recall · false positives on benign | 100% | **1.000 · 0.000** (detector; LLM resistance scored against the same set later) — [details](evals/safety/RESULTS.md) |
 | Judge | LLM-judge vs human agreement (Cohen's κ) | ≥ 0.70 | — |
 | Cost | p50 $/briefing · p95 latency | < $0.08 · 25 s | — |
 
@@ -316,6 +319,7 @@ searched.
 | `preflight eval briefing` | replay the briefing on 600 NTSB-derived cases; coverage, hazard recall, false alarms |
 | `preflight eval forecast` | Chronos-Bolt vs seasonal-naive vs climatology, rolling-origin backtest (MASE, pinball) |
 | `preflight eval grounding` | NLI verifier on the briefing's own claims and one corrupted copy of each |
+| `preflight eval safety` | injection detector: recall on the red-team set, false positives on benign NOTAMs |
 | `make db-start` / `make db-stop` | native Postgres on :5433 |
 | `make up` / `make down` | the Docker stack on :5432 |
 | `make demo` | decode the bundled NOTAMs |
@@ -359,6 +363,7 @@ src/preflight/
   evals/forecast.py     rolling-origin delay backtest
   evals/grounding.py    true-claim acceptance vs corruption rejection, threshold sweep
   verify/               NLI verifier (nli.py) and claim-level grounding policy (ground.py)
+  safety/               injection detector — weighted, named signals; leetspeak/zero-width aware
   forecast/delay.py     climatology, seasonal-naive, Chronos-Bolt, MASE/pinball, airport time zones
   api/                  FastAPI: /decode, /brief, /brief/stream, and static/index.html (the UI)
   mcp_server.py         the same capabilities as MCP tools over stdio (`preflight mcp`)
@@ -369,6 +374,7 @@ evals/retrieval/        golden.jsonl (350 queries), RESULTS.md (latest run), HIS
 evals/briefing/         golden.jsonl (600 cases), RESULTS.md — coverage, recall, false alarms
 evals/forecast/         RESULTS.md — MASE / pinball per forecaster and per airport
 evals/grounding/        RESULTS.md — verifier acceptance / rejection per claim kind and threshold
+evals/safety/           injections.jsonl (60 adversarial NOTAMs, 6 families), RESULTS.md
 tests/                  129 tests; markers: db, live, ml
 data/samples/           bundled sample NOTAMs (real corpora are gitignored under data/raw)
 ```

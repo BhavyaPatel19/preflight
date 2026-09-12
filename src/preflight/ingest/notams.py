@@ -9,6 +9,7 @@ from preflight.archive import archive_raw
 from preflight.db import get_pool
 from preflight.db import notams as ndb
 from preflight.decode.notam import NotamParseError, parse_notam
+from preflight.safety.injection import detect
 from preflight.schemas import NotamRecord
 from preflight.sources.notams import NotamSource
 
@@ -40,16 +41,24 @@ async def ingest_notams(source: NotamSource, icaos: Sequence[str] = ()) -> dict[
     )
 
     records, failed = decode_many([r.text for r in raws])
+    verdicts = {r.id: detect(r.body) for r in records}
+    flagged = [rid for rid, v in verdicts.items() if v.suspicious]
     with get_pool().connection() as conn:
         stored = ndb.upsert_many(conn, records)
+        for rid, v in verdicts.items():
+            conn.execute("UPDATE notams SET injection_score = %s WHERE id = %s", (v.score, rid))
         conn.commit()
 
     low = sum(1 for r in records if r.decode_confidence < 0.6)
+    if flagged:
+        log.warning("notams.suspicious", ids=flagged,
+                    signals={rid: list(verdicts[rid].signals) for rid in flagged})
     log.info(
         "notams.ingested", source=source.name, fetched=len(raws), stored=stored,
-        unparseable=len(failed), low_confidence=low, archive=str(archived),
+        unparseable=len(failed), low_confidence=low, suspicious=len(flagged),
+        archive=str(archived),
     )
     return {
         "fetched": len(raws), "stored": stored, "unparseable": len(failed),
-        "low_confidence": low, "archive": str(archived),
+        "low_confidence": low, "suspicious": len(flagged), "archive": str(archived),
     }

@@ -38,6 +38,12 @@ class Settings(BaseSettings):
     # Decoder routing: below this the rule parse is escalated to the model.
     decode_escalation_threshold: float = 0.6
 
+    # Briefing: a METAR older than this is stale — the system abstains rather than cite it.
+    metar_stale_after_minutes: int = 120
+    # Without a flight time, destination/alternate hazards are checked across a
+    # conservative window after off-block. Sprint 6 replaces this with a real ETE.
+    default_ete_window_hours: int = 8
+
 
 @lru_cache
 def settings() -> Settings:

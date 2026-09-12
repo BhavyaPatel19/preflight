@@ -83,6 +83,10 @@ KSFO → KJFK  ·  A320  ·  off-block 0230Z            3 findings · 1 abstenti
 The abstention is deliberate. In a safety-adjacent system "I don't know" is a first-class output and
 an evaluated behaviour, not a fallback.
 
+Today the **deterministic core** produces the NOTAM and weather findings and the abstentions above,
+with every claim cited, and no model in the loop. The precedent (ASRS) and delay-forecast rows are
+Sprints 3 and 6; the agent layer in Sprint 4 enriches this core rather than replacing it.
+
 ---
 
 ## Status
@@ -91,7 +95,7 @@ Built in the open, six sprints over twelve weeks.
 
 | Sprint | Focus | State |
 |---|---|---|
-| 1 | Foundation — schemas, rule decoder, ingestion, infra | 🟡 in progress |
+| 1 | Foundation — schemas, rule decoder, ingestion, infra, deterministic briefing | 🟢 done (parser tuning waits on real NOTAM data) |
 | 2 | Fine-tuned NOTAM entity extractor → HF Hub | ⬜ not started |
 | 3 | Hybrid retrieval over ASRS/NTSB + reranking | ⬜ not started |
 | 4 | LangGraph agent graph, grounding, abstention | ⬜ not started |
@@ -101,7 +105,9 @@ Built in the open, six sprints over twelve weeks.
 **Working today:** ICAO Q-code taxonomy (145 subjects × 79 conditions), FAA/ICAO contraction
 expansion, rule-based NOTAM parser producing typed records, strict briefing schemas, Postgres +
 pgvector persistence with an "in force at this instant" query, METAR/TAF ingestion from
-aviationweather.gov, and a low-confidence escalation queue for the Sprint 2 extractor.
+aviationweather.gov, a low-confidence escalation queue for the Sprint 2 extractor, a raw-payload
+archive of every fetch, and a deterministic briefing (`preflight brief`, `POST /brief`) that turns
+what's in the database into ranked, cited findings and explicit abstentions.
 
 ---
 
@@ -187,6 +193,7 @@ make db                       # apply db/*.sql migrations to an existing databas
 preflight dbcheck             # round-trips the database, confirms pgvector
 preflight ingest weather KSFO KJFK
 preflight ingest notams --file data/samples/notams-demo.txt
+preflight brief KSFO KJFK --alt KBOS --off-block 2026-09-12T08:00Z --type A320
 pytest                        # the db-marked tests now run instead of skipping
 ```
 
@@ -203,6 +210,7 @@ src/preflight/
     notam.py            rule-based parser: raw NOTAM → NotamRecord
   sources/              aviationweather client; NotamSource protocol + providers
   archive.py            raw-payload archive — every fetch, timestamped, before decode
+  brief/                deterministic briefing core + text renderer
   db/                   plain-SQL persistence: notams, weather, pool
   ingest/               idempotent fetch → decode → store jobs
   api/                  FastAPI service, SSE briefing endpoint

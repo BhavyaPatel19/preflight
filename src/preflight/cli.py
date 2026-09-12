@@ -35,6 +35,14 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("dbcheck", help="round-trip the database")
 
+    b = sub.add_parser("brief", help="build a briefing from what is in the database")
+    b.add_argument("departure")
+    b.add_argument("destination")
+    b.add_argument("--alt", action="append", default=[], help="alternate; repeatable")
+    b.add_argument("--off-block", required=True, help="ISO-8601 UTC, e.g. 2026-09-11T02:30Z")
+    b.add_argument("--type", dest="aircraft_type", help="e.g. A320")
+    b.add_argument("--json", action="store_true", help="emit JSON instead of text")
+
     args = ap.parse_args(argv)
 
     if args.cmd == "decode":
@@ -95,6 +103,27 @@ def main(argv: list[str] | None = None) -> int:
                     return 3
         finally:
             close_pool()
+        return 0
+
+    if args.cmd == "brief":
+        from datetime import datetime
+
+        from preflight.brief import build_briefing, render_text
+        from preflight.db import close_pool, get_pool
+        from preflight.schemas import FlightRequest
+
+        req = FlightRequest(
+            departure=args.departure.upper(), destination=args.destination.upper(),
+            alternates=tuple(a.upper() for a in args.alt),
+            off_block=datetime.fromisoformat(args.off_block.replace("Z", "+00:00")),
+            aircraft_type=args.aircraft_type,
+        )
+        try:
+            with get_pool().connection() as conn:
+                briefing = build_briefing(conn, req)
+        finally:
+            close_pool()
+        print(briefing.model_dump_json(indent=2) if args.json else render_text(briefing))
         return 0
 
     if args.cmd == "dbcheck":

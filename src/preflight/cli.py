@@ -28,6 +28,9 @@ def main(argv: list[str] | None = None) -> int:
     w = isub.add_parser("weather", help="METAR/TAF from aviationweather.gov")
     w.add_argument("icao", nargs="+", help="airports, e.g. KSFO KJFK")
     w.add_argument("--hours", type=int, default=3)
+    dl = isub.add_parser("delays", help="BTS on-time performance → hourly arrival delays")
+    dl.add_argument("--months", type=int, default=12)
+    dl.add_argument("--latest", help="YYYY-MM of the newest month (default: 3 months ago)")
     n = isub.add_parser("notams", help="NOTAMs from a dump file or a provider")
     n.add_argument("--file", type=Path, action="append", help="text dump; repeatable")
     n.add_argument("--source", choices=["nasa-dip"], help="live provider (needs credentials)")
@@ -43,6 +46,9 @@ def main(argv: list[str] | None = None) -> int:
     er.add_argument("--no-rerank", action="store_true", help="skip the reranker config")
     er.add_argument("--candidates", type=int, default=40)
     er.add_argument("--kind", choices=["synopsis", "identifier"], help="run only one query set")
+    ef = evsub.add_parser("forecast", help="Chronos-Bolt vs seasonal-naive vs climatology backtest")
+    ef.add_argument("--days", type=int, default=14)
+    ef.add_argument("--airports", nargs="*")
     eb = evsub.add_parser("briefing", help="time-travel briefing eval on NTSB-derived cases")
     eb.add_argument("--build", action="store_true", help="(re)build evals/briefing/golden.jsonl")
     eb.add_argument("--limit", type=int)
@@ -82,6 +88,7 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--alt", action="append", default=[], help="alternate; repeatable")
     b.add_argument("--off-block", required=True, help="ISO-8601 UTC, e.g. 2026-09-11T02:30Z")
     b.add_argument("--type", dest="aircraft_type", help="e.g. A320")
+    b.add_argument("--ete", type=int, help="estimated time en route, minutes (default 180)")
     b.add_argument("--json", action="store_true", help="emit JSON instead of text")
     b.add_argument("--no-precedent", action="store_true",
                    help="skip the prior-report search (faster; no model load)")
@@ -118,6 +125,11 @@ def main(argv: list[str] | None = None) -> int:
                 from preflight.ingest.weather import ingest_weather
 
                 print(asyncio.run(ingest_weather(args.icao, hours=args.hours)))
+            elif args.source == "delays":
+                from preflight.ingest.delays import ingest_delays
+
+                latest = tuple(int(x) for x in args.latest.split("-")) if args.latest else None
+                print(ingest_delays(months=args.months, latest=latest))  # type: ignore[arg-type]
             else:
                 import asyncio
 
@@ -159,7 +171,7 @@ def main(argv: list[str] | None = None) -> int:
             departure=args.departure.upper(), destination=args.destination.upper(),
             alternates=tuple(a.upper() for a in args.alt),
             off_block=datetime.fromisoformat(args.off_block.replace("Z", "+00:00")),
-            aircraft_type=args.aircraft_type,
+            aircraft_type=args.aircraft_type, ete_minutes=args.ete,
         )
         try:
             with get_pool().connection() as conn:
@@ -260,6 +272,20 @@ def main(argv: list[str] | None = None) -> int:
             ch = ("D" if h.in_dense else "-") + ("L" if h.in_lexical else "-")
             print(f"[{ch}] {h.ref:<28} fused={h.fused_score:.4f}{rr}")
             print(f"     {h.text[:160]}{'…' if len(h.text) > 160 else ''}")
+        return 0
+
+    if args.cmd == "eval" and args.suite == "forecast":
+        from preflight.db import close_pool, get_pool
+        from preflight.evals import forecast as F
+
+        try:
+            with get_pool().connection() as conn:
+                res = F.run(conn, airports=args.airports or None, days=args.days)
+            run_path, md_path = F.save_run(res)
+            print(F.to_markdown(res))
+            print(f"written: {run_path}  {md_path}")
+        finally:
+            close_pool()
         return 0
 
     if args.cmd == "eval" and args.suite == "briefing":

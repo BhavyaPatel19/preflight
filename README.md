@@ -133,7 +133,7 @@ Built in the open, six sprints over twelve weeks.
 | 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟢 done — corpus, golden set, measured |
 | 4 | LangGraph agent graph, grounding, abstention | ⬜ not started |
 | 5 | Time-travel eval harness + CI regression gate | 🟡 600-case set built from NTSB (300 + 300 matched); scorer reports coverage honestly; judge + gate wait on an LLM key |
-| 6 | Delay forecasting, cost/latency, UI, MCP server | 🟡 UI and MCP server done (pulled forward) |
+| 6 | Delay forecasting, cost/latency, UI, MCP server | 🟡 forecasting, UI and MCP server done; cost/latency waits on the LLM layer |
 
 **Working today**
 
@@ -150,6 +150,11 @@ Built in the open, six sprints over twelve weeks.
 - **UI** — `preflight serve` → http://localhost:8000: findings stream in over SSE, citations click
   open to the source passage, abstentions shown as their own block. URL parameters make a briefing
   shareable. One HTML file, no build step.
+- **Delay climatology** — for each destination and alternate, the typical arrival delay at that
+  weekday and hour from a year of BTS On-Time Performance data, cited as climatology. The
+  foundation-model forecaster (Chronos-Bolt) is *evaluated* against it and seasonal-naive on a real
+  holdout — `evals/forecast/RESULTS.md` — but not cited: BTS lands with a ~3-month lag, and a
+  flight next week is beyond any honest horizon.
 - **MCP** — `preflight mcp` exposes `brief`, `decode_notam`, `search_precedent` and `status` as
   Model Context Protocol tools over stdio, so Claude Desktop or Claude Code can call the system
   directly.
@@ -170,7 +175,7 @@ CI gate will enforce.
 | Retrieval | Recall@20 / nDCG@10 — synopsis→narrative, 300 queries | ≥ 0.90 / 0.65 | 0.61 / 0.41 — [details](evals/retrieval/RESULTS.md) |
 | Retrieval | P@10 on exact-identifier queries (`runway 28R` at an airport) | ≥ 0.80 | 0.77 |
 | Rerank | nDCG@10 lift over dense-only | +0.12 | +0.09 |
-| Forecast | MASE vs seasonal-naive | < 0.85 | — |
+| Forecast | MASE, 24 h arrival delay, rolling-origin backtest | < 0.85 | **0.715** Chronos-Bolt · 0.751 climatology · 1.067 seasonal-naive — [details](evals/forecast/RESULTS.md) |
 | End-to-end | implicated-hazard recall (300 NTSB positives) | ≥ 0.85 | — (0 / 300 covered: archive began 2026-09-11 — [details](evals/briefing/RESULTS.md)) |
 | End-to-end | false-alarm rate (300 matched negatives) | < 0.15 | — (0 / 300 covered) |
 | Grounding | claim-level citation accuracy | ≥ 0.97 | — |
@@ -181,7 +186,7 @@ CI gate will enforce.
 
 The κ row matters as much as the rest: an LLM judge nobody validated is a number nobody should trust.
 
-The retrieval numbers are below target and that is the point of having them: the first run of the
+The forecast row is the first target met. The retrieval numbers are below target and that is the point of having them: the first run of the
 harness found the lexical ranking function was both slow and bad, and fixing it moved hybrid from
 *worse* than dense to better (`evals/retrieval/HISTORY.md`). Candidate-pool size is the next knob.
 
@@ -270,6 +275,7 @@ first use):
 uv sync --extra ml
 preflight corpus ingest asrs --limit 2000      # ~20 reports/s on Apple Silicon; drop --limit for all 47.7k
 preflight corpus ingest ntsb --limit 500       # needs `brew install mdbtools`; downloads the 96 MB NTSB database
+preflight ingest delays --months 12            # BTS on-time data, ~30 MB/month → hourly arrival delays per airport
 preflight corpus add --source ops_note --id note-1 --file note.txt --icao KSFO
 preflight search "lined up with a taxiway instead of the runway at night"
 preflight search "28R closed" --mode lexical --no-rerank      # ablation switches
@@ -302,6 +308,7 @@ searched.
 | `pytest -m ml` | loads the real embedding and reranker models |
 | `preflight eval retrieval` | Recall/nDCG/P@10 per config on the 350-query golden set (~30 min) |
 | `preflight eval briefing` | replay the briefing on 600 NTSB-derived cases; coverage, hazard recall, false alarms |
+| `preflight eval forecast` | Chronos-Bolt vs seasonal-naive vs climatology, rolling-origin backtest (MASE, pinball) |
 | `make db-start` / `make db-stop` | native Postgres on :5433 |
 | `make up` / `make down` | the Docker stack on :5432 |
 | `make demo` | decode the bundled NOTAMs |
@@ -333,6 +340,7 @@ src/preflight/
     notams.py           NotamSource protocol; FileSource, NasaDipSource
     asrs.py             ASRS export download + row parsing (locale→ICAO, phase taxonomy)
     ntsb.py             NTSB avall.mdb via mdbtools: events + narratives + findings + sequence
+    bts.py              BTS On-Time Performance monthly zips → hourly arrival-delay aggregates
   archive.py            raw-payload archive — every fetch, timestamped, before decode
   ingest/               idempotent fetch → archive → decode → store jobs; resumable corpus ingest
   scheduler.py          hourly jobs + run log; `preflight schedule` / compose `scheduler`
@@ -341,6 +349,8 @@ src/preflight/
   retrieval/            chunker, Embedder/Reranker protocols, Retriever (hybrid + rerank)
   evals/retrieval.py    golden-set builder, metrics, runner → evals/retrieval/RESULTS.md
   evals/briefing.py     NTSB-derived cases (positives + matched negatives), time-travel scorer
+  evals/forecast.py     rolling-origin delay backtest
+  forecast/delay.py     climatology, seasonal-naive, Chronos-Bolt, MASE/pinball, airport time zones
   api/                  FastAPI: /decode, /brief, /brief/stream, and static/index.html (the UI)
   mcp_server.py         the same capabilities as MCP tools over stdio (`preflight mcp`)
   cli.py                the `preflight` command
@@ -348,6 +358,7 @@ db/*.sql                schema + migrations (pgvector, full-text, HNSW)
 docs/adr/               architecture decision records
 evals/retrieval/        golden.jsonl (350 queries), RESULTS.md (latest run), HISTORY.md (what each run changed)
 evals/briefing/         golden.jsonl (600 cases), RESULTS.md — coverage, recall, false alarms
+evals/forecast/         RESULTS.md — MASE / pinball per forecaster and per airport
 tests/                  129 tests; markers: db, live, ml
 data/samples/           bundled sample NOTAMs (real corpora are gitignored under data/raw)
 ```
@@ -364,7 +375,7 @@ All public. Nothing in this repo is scraped.
 | aviationweather.gov | METAR, TAF, PIREP, SIGMET, AIRMET | free, no key |
 | NASA ASRS | 47,723 de-identified incident reports with the full ASRS taxonomy, via [`elihoole/asrs-aviation-reports`](https://huggingface.co/datasets/elihoole/asrs-aviation-reports) | HF Hub, Apache-2.0 packaging over public-domain data |
 | NTSB aviation database | 27,986 investigations 2008→ with date, nearest airport, weather, light, phase and cause-flagged findings — the golden-set raw material | free bulk download (`avall.zip`) |
-| BTS On-Time Performance | flight-level delay history | free bulk CSV |
+| BTS On-Time Performance | flight-level delay history, aggregated to airport-hour | free monthly zips, ~3-month lag |
 | FAA NASR | airports, runways, navaids (gazetteer) | free, 28-day cycle |
 | OpenSky Network | ADS-B traffic | free tier |
 

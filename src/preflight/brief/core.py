@@ -10,6 +10,7 @@ from preflight.config import settings
 from preflight.db import notams as ndb
 from preflight.db import weather as wdb
 from preflight.decode.contractions import expand
+from preflight.forecast.delay import climatology, local_time
 from preflight.schemas import (
     Abstention,
     Briefing,
@@ -284,6 +285,53 @@ def weather_findings(
 
 
 # --------------------------------------------------------------------------
+# Delay climatology
+# --------------------------------------------------------------------------
+
+def delay_finding(
+    conn: Connection[Any], icao: str, role: Role, arrival_utc: datetime
+) -> Finding | None:
+    """Typical arrival delay for this airport at this weekday and hour, from BTS history.
+
+    Climatology, and labelled as such: BTS data lands with a ~3-month lag, so a
+    model forecast for a flight next week would be theater. The eval compares
+    the model against this baseline; the briefing cites what it can stand behind.
+    """
+    if role == "departure":
+        return None
+    local = local_time(icao, arrival_utc)
+    if local is None:
+        return None
+    c = climatology(conn, icao, local)
+    if c is None:
+        return None
+    if c.p50 >= 60 or c.p90 >= 120:
+        sev = Severity.MEDIUM
+    elif c.p50 >= 30 or c.p90 >= 60:
+        sev = Severity.LOW
+    else:
+        sev = Severity.INFO
+    day = local.strftime("%a")
+    summary = (f"typical arrival delay {day} {local:%H}:00 local — median {c.p50:.0f} min, "
+               f"80% within {c.p10:.0f}…{c.p90:.0f}")
+    return Finding(
+        category="delay", severity=sev, phases=(Phase.APPROACH, Phase.LANDING),
+        headline=f"{icao}: {summary}", airport=icao,
+        claims=(Claim(
+            text=f"Over {c.samples} {day} {local:%H}:00 hours in the BTS record "
+                 f"({c.history_from:%b %Y}–{c.history_to:%b %Y}), median arrival delay at {icao} "
+                 f"was {c.p50:.0f} min and 80% of hours fell within {c.p10:.0f}…{c.p90:.0f} min "
+                 f"(~{c.flights_per_hour:.0f} arrivals/h). Climatology, not a forecast.",
+            citations=(Citation(
+                kind="forecast", ref=f"climatology:{icao}:{day}{local:%H}",
+                quote=f"BTS On-Time Performance, {c.samples} weekday-hour samples, "
+                      f"{c.history_from:%Y-%m-%d}→{c.history_to:%Y-%m-%d}",
+            ),),
+        ),),
+    )
+
+
+# --------------------------------------------------------------------------
 # Assembly
 # --------------------------------------------------------------------------
 
@@ -310,6 +358,12 @@ def build_briefing(
         )
         findings.extend(wx)
         abstentions.extend(gaps)
+
+        ete = timedelta(minutes=req.ete_minutes) if req.ete_minutes else timedelta(hours=3)
+        delay = delay_finding(conn, icao, role, _utc(req.off_block) + ete)
+        if delay is not None:
+            findings.append(delay)
+            considered += 1
 
     return Briefing(
         request=req,

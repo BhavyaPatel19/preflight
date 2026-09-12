@@ -211,6 +211,7 @@ class FlightRequest(BaseModel):
     off_block: datetime
     aircraft_type: str | None = None
     route: str | None = None
+    ete_minutes: int | None = Field(default=None, ge=1, description="Estimated time en route")
 
 
 class Briefing(BaseModel):

@@ -133,7 +133,7 @@ Built in the open, six sprints over twelve weeks.
 | 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟢 done — corpus, golden set, measured |
 | 4 | LangGraph agent graph, grounding, abstention | ⬜ not started |
 | 5 | Time-travel eval harness + CI regression gate | 🟡 600-case set built from NTSB (300 + 300 matched); scorer reports coverage honestly; judge + gate wait on an LLM key |
-| 6 | Delay forecasting, cost/latency, UI, MCP server | 🟡 UI done (pulled forward) |
+| 6 | Delay forecasting, cost/latency, UI, MCP server | 🟡 UI and MCP server done (pulled forward) |
 
 **Working today**
 
@@ -150,6 +150,9 @@ Built in the open, six sprints over twelve weeks.
 - **UI** — `preflight serve` → http://localhost:8000: findings stream in over SSE, citations click
   open to the source passage, abstentions shown as their own block. URL parameters make a briefing
   shareable. One HTML file, no build step.
+- **MCP** — `preflight mcp` exposes `brief`, `decode_notam`, `search_precedent` and `status` as
+  Model Context Protocol tools over stdio, so Claude Desktop or Claude Code can call the system
+  directly.
 - **Retrieve** — hybrid search (pgvector + tsvector fused with RRF, cross-encoder reranked) over
   47,723 ASRS incident reports and 27,986 NTSB accident/incident investigations, with ablation
   switches for the eval.
@@ -273,6 +276,15 @@ preflight search "28R closed" --mode lexical --no-rerank      # ablation switche
 preflight corpus stats
 ```
 
+**MCP** — add to Claude Desktop's `claude_desktop_config.json` (or `claude mcp add` in Claude Code):
+
+```json
+{"mcpServers": {"preflight": {"command": "/ABSOLUTE/PATH/preflight/.venv/bin/preflight", "args": ["mcp"]}}}
+```
+
+Then ask: *"Brief KSFO to KJFK departing 0230Z tomorrow, alternate KBOS."* The models load on the
+first call that needs them.
+
 **API and UI** — `preflight serve`, then open http://localhost:8000. Endpoints: `POST /decode`,
 `POST /brief`, `GET|POST /brief/stream` (SSE), `GET /health`. The retrieval models load once at
 startup when the ML extras are installed; without them the briefing states that precedent was not
@@ -330,6 +342,7 @@ src/preflight/
   evals/retrieval.py    golden-set builder, metrics, runner → evals/retrieval/RESULTS.md
   evals/briefing.py     NTSB-derived cases (positives + matched negatives), time-travel scorer
   api/                  FastAPI: /decode, /brief, /brief/stream, and static/index.html (the UI)
+  mcp_server.py         the same capabilities as MCP tools over stdio (`preflight mcp`)
   cli.py                the `preflight` command
 db/*.sql                schema + migrations (pgvector, full-text, HNSW)
 docs/adr/               architecture decision records

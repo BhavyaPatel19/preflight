@@ -130,12 +130,18 @@ def with_precedent(
         if q is None:
             findings.append(f)
             continue
-        hits = retriever.search(conn, q, k=k, icao=f.airport, rerank=True)
+        # Ask for more than k: several chunks of one report can rank together, and a
+        # report is cited once per briefing.
+        hits = retriever.search(conn, q, k=k * 3, icao=f.airport, rerank=True)
         considered += len(hits)
-        keep = [h for h in hits
-                if (h.rerank_score or 0.0) >= min_score and h.external_id not in seen]
-        for h in keep:
+        keep: list[Hit] = []
+        for h in hits:
+            if (h.rerank_score or 0.0) < min_score or h.external_id in seen:
+                continue
             seen.add(h.external_id)
+            keep.append(h)
+            if len(keep) == k:
+                break
         claim = precedent_claim(keep, f.airport)
         findings.append(f.model_copy(update={"claims": (*f.claims, claim)}) if claim else f)
 

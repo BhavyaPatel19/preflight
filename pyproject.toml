@@ -36,6 +36,7 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/preflight"]
+include = ["src/preflight/api/static/*"]
 
 [tool.ruff]
 line-length = 100

@@ -32,6 +32,21 @@ services:
     ports: ["9000:9000", "9001:9001"]
     volumes: [miniodata:/data]
 
+  # Hourly weather + NOTAM ingest for the watchlist; archives every fetch to ./data/raw.
+  scheduler:
+    build: .
+    command: schedule
+    environment:
+      DATABASE_URL: postgresql://preflight:preflight@postgres:5432/preflight
+      PREFLIGHT_WATCHLIST: ${PREFLIGHT_WATCHLIST:-}
+      PREFLIGHT_NASA_DIP_BASE_URL: ${PREFLIGHT_NASA_DIP_BASE_URL:-}
+      PREFLIGHT_NASA_DIP_TOKEN: ${PREFLIGHT_NASA_DIP_TOKEN:-}
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      postgres: {condition: service_healthy}
+    restart: unless-stopped
+
   # Tracing and eval datasets. Brought up in Sprint 5, declared now so the
   # local stack matches what CI and prod will run.
   langfuse:

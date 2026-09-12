@@ -197,6 +197,22 @@ preflight brief KSFO KJFK --alt KBOS --off-block 2026-09-12T08:00Z --type A320
 pytest                        # the db-marked tests now run instead of skipping
 ```
 
+### Keeping the archive current
+
+The time-travel evaluation replays what the system knew at a given instant, so the project keeps
+its own history. `docker compose up -d scheduler` builds the app image and runs an hourly ingest
+for the watchlist (default: the 30 busiest US airports; override with `PREFLIGHT_WATCHLIST`),
+archiving every fetch under `data/raw/` and logging each run:
+
+```
+$ preflight status
+notams   nasa-dip         2026-09-12 06:31Z  skipped  NASA DIP is not configured (...) — see docs/adr/0002.
+weather  aviationweather  2026-09-12 06:31Z  ok       tafs=4 metars=7
+```
+
+The NOTAM job reports `skipped` until a source is configured, then starts filling the archive with
+no code change. `preflight schedule` runs the same loop outside Docker.
+
 ---
 
 ## Repo layout
@@ -212,7 +228,8 @@ src/preflight/
   archive.py            raw-payload archive — every fetch, timestamped, before decode
   brief/                deterministic briefing core + text renderer
   db/                   plain-SQL persistence: notams, weather, pool
-  ingest/               idempotent fetch → decode → store jobs
+  ingest/               idempotent fetch → archive → decode → store jobs
+  scheduler.py          hourly jobs + run log; `preflight schedule` / compose `scheduler`
   api/                  FastAPI service, SSE briefing endpoint
 db/*.sql                Postgres schema + migrations (pgvector, full-text, HNSW)
 docs/adr/               architecture decision records

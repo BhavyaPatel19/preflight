@@ -25,11 +25,17 @@ parameters each, ~2.2 GB each). On a laptop those turn a test run into a coffee 
    the reranker separated the right one at 0.62 from the others at 0.08 and 0.02. The rerank lift
    is a number the eval will report, not an assumption.
 
-3. **Lexical is Postgres `tsvector` + `ts_rank_cd`, OR-joined terms.** Not true BM25 (no document
-   length normalisation), and `ts_rank_cd` rewards more matching terms, which is the behaviour we
-   want for an OR query. This keeps the stock `pgvector/pgvector` image. If the retrieval golden
-   set shows the lexical channel underperforming, ParadeDB's `pg_search` (real BM25) is a drop-in
-   at the cost of a different image.
+3. **Lexical is Postgres `tsvector` + `ts_rank`; AND for short queries, OR for long.** Not true
+   BM25 (no document-length normalisation). This keeps the stock `pgvector/pgvector` image. If the
+   retrieval golden set shows the lexical channel underperforming, ParadeDB's `pg_search` (real
+   BM25) is a drop-in at the cost of a different image.
+
+   *Amended 2026-09-12 by the retrieval eval* (`evals/retrieval/HISTORY.md`): the original choice
+   was `ts_rank_cd` with OR-joined terms for every query. On 34-term paraphrase queries it matched
+   ~81k chunks and took 2 s to rank them, and ranked them badly enough (nDCG@10 0.105) that fusing
+   the channel *hurt* hybrid. `ts_rank` is 8× faster and nearly 3× better on the same queries. On
+   ≤ 4-term identifier queries, OR let the common word swamp the discriminating one; AND took
+   lexical P@10 from 0.13 to 0.75. Neither threshold was chosen by taste.
 
 4. **Dev-default models are the fast pair:** `BAAI/bge-base-en-v1.5` (110M, 768-d) and
    `BAAI/bge-reranker-base` (278M). Both run on Apple Silicon via MPS at ~115 docs/s and

@@ -51,6 +51,8 @@ class Retriever:
         mode: Mode = "hybrid",
         rerank: bool = True,
         candidates: int | None = None,
+        exclude_like: str | None = None,
+        icao_strict: bool = False,
     ) -> list[Hit]:
         """Fused candidates from Postgres, optionally reranked; top ``k``."""
         n = candidates or settings().retrieval_candidates
@@ -61,7 +63,7 @@ class Retriever:
             limit=n, candidates=n, rrf_k=settings().rrf_k,
             w_dense=0.0 if mode == "lexical" else 1.0,
             w_lex=0.0 if mode == "dense" else 1.0,
-            icao=icao, source=source,
+            icao=icao, source=source, exclude_like=exclude_like, icao_strict=icao_strict,
         )
         hits = [Hit(*c) for c in found]
         if rerank and self.reranker is not None and hits:

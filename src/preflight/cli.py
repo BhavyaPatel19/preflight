@@ -52,6 +52,8 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("status", help="last ingest run per source")
 
+    sub.add_parser("mcp", help="serve briefing, decoder and precedent search as MCP tools (stdio)")
+
     co = sub.add_parser("corpus", help="precedent corpus")
     cosub = co.add_subparsers(dest="op", required=True)
     ca = cosub.add_parser("add", help="chunk, embed and index one document")
@@ -302,6 +304,16 @@ def main(argv: list[str] | None = None) -> int:
             run_path, md_path = R.save_run(res)
             print(R.to_markdown(res))
             print(f"written: {run_path}  {md_path}")
+        finally:
+            close_pool()
+        return 0
+
+    if args.cmd == "mcp":
+        from preflight.db import close_pool
+        from preflight.mcp_server import main as mcp_main
+
+        try:
+            mcp_main()
         finally:
             close_pool()
         return 0

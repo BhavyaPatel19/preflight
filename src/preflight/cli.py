@@ -50,7 +50,7 @@ def main(argv: list[str] | None = None) -> int:
     ca.add_argument("--icao")
     cosub.add_parser("stats", help="document and chunk counts")
     ci = cosub.add_parser("ingest", help="download, chunk, embed and index a corpus")
-    ci.add_argument("corpus", choices=["asrs"])
+    ci.add_argument("corpus", choices=["asrs", "ntsb"])
     ci.add_argument("--limit", type=int, help="stop after N reports (for a first pass)")
     ci.add_argument("--split", action="append", choices=["train", "validation", "test"],
                     help="ASRS split(s); default all")
@@ -189,13 +189,16 @@ def main(argv: list[str] | None = None) -> int:
         from preflight.db import close_pool, get_pool
 
         if args.op == "ingest":
-            from preflight.ingest.corpus import ingest_asrs
+            from preflight.ingest.corpus import ingest_asrs, ingest_ntsb
             from preflight.retrieval.embed import STEmbedder
 
             try:
-                print(ingest_asrs(STEmbedder(), limit=args.limit,
-                                  splits=tuple(args.split) if args.split else
-                                  ("train", "validation", "test")))
+                if args.corpus == "ntsb":
+                    print(ingest_ntsb(STEmbedder(), limit=args.limit))
+                else:
+                    print(ingest_asrs(STEmbedder(), limit=args.limit,
+                                      splits=tuple(args.split) if args.split else
+                                      ("train", "validation", "test")))
             finally:
                 close_pool()
             return 0

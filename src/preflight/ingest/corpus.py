@@ -1,4 +1,4 @@
-"""Precedent-corpus ingestion: ASRS today, NTSB next."""
+"""Precedent-corpus ingestion: ASRS and NTSB."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ import structlog
 from preflight.db import get_pool
 from preflight.retrieval.embed import Embedder
 from preflight.retrieval.search import DocInput, index_documents
-from preflight.sources import asrs
+from preflight.sources import asrs, ntsb
 
 log = structlog.get_logger(__name__)
 
@@ -87,5 +87,55 @@ def ingest_asrs(
 
     elapsed = perf_counter() - t0
     log.info("asrs.done", docs=total_docs, chunks=total_chunks, seconds=round(elapsed, 1))
+    return {"docs": total_docs, "chunks": total_chunks, "skipped": len(skip),
+            "seconds": round(elapsed, 1)}
+
+
+def _ntsb_docs(events: Iterator[ntsb.NtsbEvent], skip: set[str]) -> Iterator[DocInput]:
+    for e in events:
+        if e.ev_id in skip:
+            continue
+        yield DocInput(
+            source="ntsb", external_id=e.ev_id, text=e.text, title=e.title,
+            published=e.date, icao=e.icao, metadata=e.metadata,
+            phases=tuple(p.value for p in e.phases),
+        )
+
+
+def ingest_ntsb(
+    embedder: Embedder, *, limit: int | None = None, commit_every: int = 256
+) -> dict[str, Any]:
+    """Export the NTSB tables (first run), assemble events, chunk, embed, store. Resumable."""
+    t0 = perf_counter()
+    total_docs = total_chunks = 0
+    with get_pool().connection() as conn:
+        skip = _already_indexed(conn, "ntsb", embedder.name)
+        log.info("ntsb.start", already_indexed=len(skip), limit=limit)
+
+        def events() -> Iterator[ntsb.NtsbEvent]:
+            for n, e in enumerate(ntsb.iter_events()):
+                if limit is not None and n >= limit:
+                    return
+                yield e
+
+        pending: list[DocInput] = []
+        for doc in _ntsb_docs(events(), skip):
+            pending.append(doc)
+            if len(pending) >= commit_every:
+                d, c = index_documents(conn, embedder, pending)
+                conn.commit()
+                total_docs += d
+                total_chunks += c
+                pending.clear()
+                log.info("ntsb.progress", docs=total_docs, chunks=total_chunks,
+                         rate_docs_per_s=round(total_docs / (perf_counter() - t0), 1))
+        if pending:
+            d, c = index_documents(conn, embedder, pending)
+            conn.commit()
+            total_docs += d
+            total_chunks += c
+
+    elapsed = perf_counter() - t0
+    log.info("ntsb.done", docs=total_docs, chunks=total_chunks, seconds=round(elapsed, 1))
     return {"docs": total_docs, "chunks": total_chunks, "skipped": len(skip),
             "seconds": round(elapsed, 1)}

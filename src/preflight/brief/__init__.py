@@ -7,6 +7,7 @@ traceable to a record, and everything here is the floor it cannot fall below.
 """
 
 from preflight.brief.core import build_briefing
+from preflight.brief.precedent import load_retriever, with_precedent
 from preflight.brief.render import render_text
 
-__all__ = ["build_briefing", "render_text"]
+__all__ = ["build_briefing", "load_retriever", "render_text", "with_precedent"]

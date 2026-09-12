@@ -21,7 +21,11 @@ A, B = "KZZY", "KZZX"
 
 @pytest.fixture
 def records():
-    swapped = [r.replace("KSFO", A).replace("KJFK", B).replace("SFO", A[1:]) for r in DEMO_NOTAMS]
+    swapped = [
+        r.replace("KSFO", A).replace("KJFK", B).replace("SFO", A[1:])
+         .replace("A1477/26", "Z1477/26").replace("A0912/26", "Z0912/26")
+        for r in DEMO_NOTAMS
+    ]
     return [parse_notam(r) for r in swapped]
 
 
@@ -44,7 +48,7 @@ def test_upsert_replaces_entities_not_duplicates(db, records):
 def test_active_at_filters_by_airport_and_window(db, records):
     ndb.upsert_many(db, records)
     here = ndb.active_at(db, A, T0)
-    assert {r.id for r in here} == {"A1477/26", "!ZZY 09/142"}     # B excluded
+    assert {r.id for r in here} == {"Z1477/26", "!ZZY 09/142"}     # B excluded
     assert ndb.active_at(db, A, datetime(2026, 9, 12, 2, 0, tzinfo=UTC)) == []
     assert ndb.active_at(db, A, datetime(2026, 9, 10, 22, 0, tzinfo=UTC)) == []
 

@@ -56,6 +56,12 @@ class Settings(BaseSettings):
     retrieval_candidates: int = 40   # per channel, before fusion
     rrf_k: int = 60
 
+    # Precedent in briefings: top-k prior reports per finding, kept only above this
+    # reranker score (the retrieval eval put relevant hits at 0.6–0.98, noise at 0.0–0.1;
+    # 0.5 is deliberately conservative for a safety-adjacent output).
+    precedent_k: int = 3
+    precedent_min_score: float = 0.5
+
     # Decoder routing: below this the rule parse is escalated to the model.
     decode_escalation_threshold: float = 0.6
 

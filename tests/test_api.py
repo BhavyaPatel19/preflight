@@ -53,7 +53,7 @@ def test_stream_get_validates_icao(client):
 
 
 @pytest.mark.db
-def test_stream_get_emits_start_findings_done(client):
+def test_stream_get_emits_start_findings_done(client, db):    # db: skip without Postgres
     with client.stream("GET", "/brief/stream", params={
         "departure": "KSFO", "destination": "KJFK", "alternates": "KBOS",
         "off_block": "2026-09-12T14:00:00Z", "precedent": "false",

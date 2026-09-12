@@ -2,10 +2,11 @@
 
 **An agentic route-risk briefing system for flight operations — every claim cited, every capability measured, and explicit about what it doesn't know.**
 
-Give it a flight. It reads every NOTAM, weather product and relevant historical incident for that route, and returns a ranked hazard briefing where each sentence traces back to a source record.
+Give it a flight. It reads every NOTAM, weather product and relevant historical incident for that
+route, and returns a ranked hazard briefing where each sentence traces back to a source record.
 
 ```
-$ preflight brief KSFO KJFK --off-block 2026-09-11T02:30Z --type A320
+$ preflight brief KSFO KJFK --alt KBOS --off-block 2026-09-11T02:30Z --type A320
 ```
 
 > [!WARNING]
@@ -45,47 +46,56 @@ objectively correct answer:
 
 > Did the briefing surface the hazard that the investigation later found contributed?
 
-Pair 200 of those positive cases with 200 **matched negative controls** — uneventful flights matched
-on airport, hour and season — and you can measure recall and false-alarm rate on the same footing.
-Alert fatigue is the real failure mode of every safety system ever fielded, so precision is not a
-secondary metric here.
+Pair those positive cases with **matched negative controls** — uneventful flights matched on airport,
+hour and season — and you can measure recall and false-alarm rate on the same footing. Alert fatigue
+is the real failure mode of every safety system ever fielded, so precision is not a secondary metric.
+
+One constraint shapes how that set gets built: nobody hands out historical NOTAMs (see
+[ADR 0002](docs/adr/0002-notam-access-and-the-provider-abstraction.md)). So every fetch is archived
+raw from day one, negatives come from that archive going forward, and positives older than the
+archive come from NTSB docket exhibits, which include the NOTAMs in effect at the time.
 
 This eval design is the centre of the project. Everything else is in service of it.
 
 ---
 
-## Example output
+## What it does today
+
+Real output from the deterministic core, against the bundled sample NOTAMs and live weather. No model
+in the loop yet; every claim carries a citation with a verbatim quote, and the schema makes an uncited
+claim impossible.
 
 ```
-KSFO → KJFK  ·  A320  ·  off-block 0230Z            3 findings · 1 abstention
+KSFO → KJFK (alt KBOS)  ·  A320  ·  off-block 11 Sep 0230Z
+6 findings · 2 abstentions
+──────────────────────────────────────────────────────────
+[HIGH] RUNWAY        KSFO: Runway 28R closed (work in progress) until 11 Sep 0700Z
+       takeoff, taxi
+       KSFO — Runway 28R closed (work in progress) until 11 Sep 0700Z.
+       [notam:A1477/26]
 
-┌ HIGH ── RUNWAY ──────────────────────────── taxi, takeoff ──┐
-│ 28R closed for work in progress until 0700Z — your entire   │
-│ departure window. Expect 28L, where the PAPI is also out of │
-│ service. Night departures at SFO with one parallel closed    │
-│ appear in 3 ASRS reports describing runway/taxiway           │
-│ misidentification at this airport.                           │
-│   [notam:A1477/26] [asrs:1465123] [asrs:1502877]             │
-└──────────────────────────────────────────────────────────────┘
+[HIGH] APPROACH AIDS KJFK: ILS 22L unserviceable (maintenance) until 11 Sep 1600Z (est)
+       approach
+       [notam:A0912/26]
 
-┌ MED ─── WEATHER ─────────────────────────────── approach ───┐
-│ KJFK TAF carries TEMPO 1/2SM +TSRA 0900Z–1200Z, inside your  │
-│ arrival window. Forecast arrival delay for that hour is      │
-│ 38 min (80% interval 12–94) against a 14 min baseline.       │
-│   [taf:KJFK@0220Z] [forecast:jfk-0900Z]                      │
-└──────────────────────────────────────────────────────────────┘
+[MED ] TAXIWAY       KSFO: Taxiway A closed between B and C until 11 Sep 0700Z (est)
+       taxi
+       [notam:!SFO 09/142]
 
-⊘ NOT DETERMINED — alternate minima at KBOS
-  Approach-minimums source last updated 19 days ago and may be stale.
-  No claim is made about alternate suitability.  [staleness:19d]
+[INFO] WEATHER       KSFO: VFR — wind 300/7 kt, vis 10 SM
+       taxi, takeoff, climb
+       [metar:KSFO@120600Z]
+…
+[ ⊘  ] NOT DETERMINED  KJFK forecast
+       No TAF for KJFK covers 11 Sep 0300Z–11 Sep 1030Z.  [no_coverage]
+
+sources considered: 9 · 19 ms
 ```
 
-The abstention is deliberate. In a safety-adjacent system "I don't know" is a first-class output and
-an evaluated behaviour, not a fallback.
-
-Today the **deterministic core** produces the NOTAM and weather findings and the abstentions above,
-with every claim cited, and no model in the loop. The precedent (ASRS) and delay-forecast rows are
-Sprints 3 and 6; the agent layer in Sprint 4 enriches this core rather than replacing it.
+Those two abstentions are correct, not a bug: the flight was yesterday and the only TAFs on record
+were issued today. In a safety-adjacent system "I don't know" is a first-class output and an
+evaluated behaviour. The precedent (ASRS) and delay-forecast findings arrive in Sprints 3 and 6; the
+Sprint 4 agent layer *enriches* this core rather than replacing it.
 
 ---
 
@@ -95,20 +105,26 @@ Built in the open, six sprints over twelve weeks.
 
 | Sprint | Focus | State |
 |---|---|---|
-| 1 | Foundation — schemas, rule decoder, ingestion, infra, deterministic briefing | 🟢 done (parser tuning waits on real NOTAM data) |
-| 2 | Fine-tuned NOTAM entity extractor → HF Hub | ⬜ not started |
-| 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟡 retrieval core done; corpus + golden set next |
+| 1 | Foundation — schemas, rule decoder, ingestion, archive, deterministic briefing, scheduler | 🟢 done |
+| 2 | Fine-tuned NOTAM entity extractor → HF Hub | ⬜ waits on a real NOTAM corpus |
+| 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟡 retrieval core done; corpus and golden set next |
 | 4 | LangGraph agent graph, grounding, abstention | ⬜ not started |
 | 5 | Time-travel eval harness + CI regression gate | ⬜ not started |
 | 6 | Delay forecasting, cost/latency, UI, MCP server | ⬜ not started |
 
-**Working today:** ICAO Q-code taxonomy (145 subjects × 79 conditions), FAA/ICAO contraction
-expansion, rule-based NOTAM parser producing typed records, strict briefing schemas, Postgres +
-pgvector persistence with an "in force at this instant" query, METAR/TAF ingestion from
-aviationweather.gov, a low-confidence escalation queue for the Sprint 2 extractor, a raw-payload
-archive of every fetch, and a deterministic briefing (`preflight brief`, `POST /brief`) that turns
-what's in the database into ranked, cited findings and explicit abstentions, and hybrid retrieval
-(pgvector + tsvector fused with RRF, cross-encoder reranked) over the precedent corpus.
+**Working today**
+
+- **Decode** — ICAO Q-code taxonomy (145 subjects × 79 conditions), FAA/ICAO contraction dictionary
+  (263 terms), rule-based parser for ICAO and US-domestic NOTAMs producing typed records with
+  clause-scoped entities and an honest `decode_confidence` for escalation routing.
+- **Store** — Postgres 16 + pgvector; an "in force at this instant" query; a low-confidence
+  escalation queue; every fetch archived raw before decode.
+- **Ingest** — METAR/TAF from aviationweather.gov; NOTAMs through a provider interface (text dumps
+  today, NASA DIP when access lands); hourly scheduler with a run log.
+- **Brief** — `preflight brief` / `POST /brief` / `POST /brief/stream`: ranked, cited findings and
+  explicit abstentions.
+- **Retrieve** — hybrid search (pgvector + tsvector fused with RRF, cross-encoder reranked) over the
+  precedent corpus, with ablation switches for the eval.
 
 ---
 
@@ -123,8 +139,8 @@ this table gets a `measured` column the moment there is something honest to put 
 | Retrieval | Recall@20 / nDCG@10 | ≥ 0.90 / 0.65 | — |
 | Rerank | nDCG@10 lift over dense-only | +0.12 | — |
 | Forecast | MASE vs seasonal-naive | < 0.85 | — |
-| End-to-end | implicated-hazard recall (200 positives) | ≥ 0.85 | — |
-| End-to-end | false-alarm rate (200 matched negatives) | < 0.15 | — |
+| End-to-end | implicated-hazard recall (positives) | ≥ 0.85 | — |
+| End-to-end | false-alarm rate (matched negatives) | < 0.15 | — |
 | Grounding | claim-level citation accuracy | ≥ 0.97 | — |
 | Abstention | correct abstention on data-gap cases | ≥ 0.90 | — |
 | Safety | prompt-injection resistance (60 adversarial NOTAMs) | 100% | — |
@@ -138,29 +154,37 @@ The κ row matters as much as the rest: an LLM judge nobody validated is a numbe
 ## Architecture
 
 ```
- SOURCES              DECODE                STORE              REASON            VERIFY        SERVE
- ─────────            ──────                ─────              ──────            ──────        ─────
- FAA NOTAM      ┐                                        ┌ NotamAgent  ┐
- aviationweather├──▶ rules ──▶ ModernBERT ──▶ Postgres 16 ┼ WxAgent     ┤
- NASA ASRS      │    (Q-code    token clf     + pgvector  ┼ PrecedentAg ┼─▶ NLI      ──▶ FastAPI
- NTSB CAROL     │   + contract-  ↓ low conf   + tsvector  ┼ DelayAgent  ┤   entailment    SSE
- BTS on-time    │    ions)      LLM fallback   + Redis    ┼ ListenAgent ┤   + abstain     MCP
- OpenSky        ┘                                         └ supervisor  ┘   + injection   Next.js
-                                                            (LangGraph)      filter
+ SOURCES               DECODE                 STORE                 REASON               VERIFY        SERVE
+ ───────               ──────                 ─────                 ──────               ──────        ─────
+ NASA DIP / dumps ┐                                             ┌ deterministic core ┐
+ aviationweather  ├─▶ archive ─▶ rules ─▶ ModernBERT ─▶ Postgres ┤   (today)          ├─▶ NLI      ─▶ FastAPI
+ NASA ASRS        │    raw       Q-code    token clf    pgvector  ┤ NotamAgent          │   entailment    SSE
+ NTSB CAROL       │             + contr-   ↓ low conf   tsvector  ┤ WxAgent   Precedent┤   + abstain     MCP
+ BTS on-time      ┘             actions    LLM fallback + Redis   ┤ DelayAgent Listen  │   + injection   Next.js
+                                                                  └ supervisor (S4)   ┘   filter
 ```
 
-Six specialists run concurrently under a LangGraph supervisor with a Postgres checkpointer, so a
-briefing survives a crash and latency is the slowest agent rather than the sum.
+The deterministic core (Sprint 1) is the floor: cited findings from records, abstentions on gaps.
+Sprint 4's LangGraph supervisor fans out to specialists that add precedent, forecasts and prose on
+top of it — every claim they make still has to trace to a record, and the verifier drops the ones
+that don't.
 
 ### Decisions worth arguing about
 
-- **pgvector, not a dedicated vector DB.** One datastore gives transactional metadata filters
-  alongside vectors. See [ADR 0001](docs/adr/0001-pgvector-over-dedicated-vector-db.md).
-- **Hybrid retrieval, not dense-only.** Aviation queries are full of exact identifiers — `28R`,
-  `KSFO`, `ILS 22L` — where embeddings alone fail. BM25 + dense, fused with RRF.
+- **pgvector, not a dedicated vector DB.** Every retrieval query is a *filtered* similarity search
+  — this airport, this window — and the filter is the question, not an optimisation.
+  [ADR 0001](docs/adr/0001-pgvector-over-dedicated-vector-db.md)
+- **A provider interface for NOTAMs, and archive everything.** The FAA's API is closed to the public;
+  the data is public domain. Ingestion is written against a protocol, and every fetch is written to
+  disk before decode so the project builds its own history.
+  [ADR 0002](docs/adr/0002-notam-access-and-the-provider-abstraction.md)
+- **Hybrid retrieval, reranked, with dev-speed models by default.** Aviation queries are full of
+  exact identifiers (`28R`, `ILS 22L`) that embeddings blur; narrative queries are the reverse. Both
+  channels, fused in SQL. `bge-m3` is the *measured* upgrade path, not the default.
+  [ADR 0003](docs/adr/0003-hybrid-retrieval.md)
 - **Rules before models before LLMs.** Q-codes and time windows are a solved problem in regex;
   spending a frontier model on them is a cost bug. The learned extractor handles the free-text `E)`
-  field, and the LLM only sees what the first two layers flag as low-confidence.
+  field; the LLM only sees what the first two layers flag as low-confidence.
 - **Claims cannot exist without citations.** Enforced in the type system (`Claim.citations` has
   `min_length=1`), not by prompt instruction.
 
@@ -169,63 +193,63 @@ briefing survives a crash and latency is the slowest agent rather than the sum.
 ## Quickstart
 
 ```bash
-git clone git@github.com:BhavyaPatel19/preflight.git
-cd preflight
+git clone git@github.com:BhavyaPatel19/preflight.git && cd preflight
+uv sync                             # .venv from the lockfile
+pytest                              # 128 tests, no keys, no network; db-marked tests skip without Postgres
 
-uv sync                     # creates .venv from the lockfile
-
-pytest                      # decoder tests — no API keys, no network
-cp .env.example .env        # fill in only what you need
+python -m preflight.decode.notam --demo     # decode three NOTAMs with zero setup
 ```
 
-Decode a NOTAM without any setup at all:
-
-```bash
-python -m preflight.decode.notam --demo
-```
-
-Infrastructure (Postgres + pgvector, Redis, MinIO, Langfuse) comes up with:
+**The stack** — Postgres + pgvector, Redis, MinIO, Langfuse, and the ingest scheduler:
 
 ```bash
 # Docker Desktop, or on macOS without it:  brew install colima docker docker-compose && colima start
-make up                       # docker compose up -d — schema auto-applies on first boot
-make db                       # apply db/*.sql migrations to an existing database
+cp .env.example .env                # fill in only what you need
+make up                             # docker compose up -d; schema auto-applies on first boot
+make db                             # apply db/*.sql to an existing database
 
-preflight dbcheck             # round-trips the database, confirms pgvector
+preflight dbcheck                   # round-trips the database, confirms pgvector
 preflight ingest weather KSFO KJFK
 preflight ingest notams --file data/samples/notams-demo.txt
-preflight brief KSFO KJFK --alt KBOS --off-block 2026-09-12T08:00Z --type A320
-pytest                        # the db-marked tests now run instead of skipping
+preflight brief KSFO KJFK --alt KBOS --off-block 2026-09-12T14:00Z --type A320
+preflight status                    # last ingest run per source
 ```
 
-### Retrieval
+**Retrieval** — needs the ML extras (~1.5 GB of model weights land in the Hugging Face cache on
+first use):
 
 ```bash
-uv sync --extra ml          # torch + sentence-transformers; ~1.5 GB of model weights on first use
+uv sync --extra ml
 preflight corpus add --source ops_note --id note-1 --file note.txt --icao KSFO
 preflight search "lined up with a taxiway at night, parallel runway closed" --icao KSFO
-preflight search "28R closed" --mode lexical --no-rerank     # ablation switches
-pytest -m ml                # opt-in: runs the real models
+preflight search "28R closed" --mode lexical --no-rerank      # ablation switches
+preflight corpus stats
 ```
 
-Dense and lexical candidates are fused inside Postgres and reranked by a cross-encoder —
-[ADR 0003](docs/adr/0003-hybrid-retrieval.md) has the reasoning and the model choices.
+**API** — `preflight serve`, then `POST /decode`, `POST /brief`, `POST /brief/stream` (SSE), `GET /health`.
 
-### Keeping the archive current
+---
 
-The time-travel evaluation replays what the system knew at a given instant, so the project keeps
-its own history. `docker compose up -d scheduler` builds the app image and runs an hourly ingest
-for the watchlist (default: the 30 busiest US airports; override with `PREFLIGHT_WATCHLIST`),
-archiving every fetch under `data/raw/` and logging each run:
+## Development
 
-```
-$ preflight status
-notams   nasa-dip         2026-09-12 06:31Z  skipped  NASA DIP is not configured (...) — see docs/adr/0002.
-weather  aviationweather  2026-09-12 06:31Z  ok       tafs=4 metars=7
-```
+| Command | What |
+|---|---|
+| `make check` | lint (`ruff`), types (`mypy --strict`), tests — what CI runs |
+| `pytest` | default: excludes `live` and `ml` |
+| `pytest -m live` | hits real external APIs (aviationweather.gov) |
+| `pytest -m ml` | loads the real embedding and reranker models |
+| `make up` / `make down` | the compose stack |
+| `make demo` | decode the bundled NOTAMs |
 
-The NOTAM job reports `skipped` until a source is configured, then starts filling the archive with
-no code change. `preflight schedule` runs the same loop outside Docker.
+CI runs on every push and PR against a `pgvector/pgvector:pg16` service container, applying
+`db/*.sql` first, so the `db`-marked tests run for real there. On a laptop without Postgres they
+skip. No model is ever downloaded in CI — retrieval tests use hash-based fakes behind the same
+protocols.
+
+Migrations are plain SQL in `db/`, applied in filename order; the Postgres container applies them
+on first boot, `make db` applies them to an existing database.
+
+After a reboot (Colima stops on sleep): `colima start && docker compose up -d`.
 
 ---
 
@@ -233,22 +257,26 @@ no code change. `preflight schedule` runs the same loop outside Docker.
 
 ```
 src/preflight/
-  schemas.py            typed contracts — NotamRecord, Claim, Finding, Briefing
+  schemas.py            typed contracts — NotamRecord, Claim, Finding, Abstention, Briefing
   decode/
     qcode.py            ICAO Q-code taxonomy (145 subjects × 79 conditions)
-    contractions.py     FAA/ICAO contraction dictionary
+    contractions.py     FAA/ICAO contraction dictionary (263 terms)
     notam.py            rule-based parser: raw NOTAM → NotamRecord
-  sources/              aviationweather client; NotamSource protocol + providers
+  sources/
+    aviationweather.py  METAR/TAF client
+    notams.py           NotamSource protocol; FileSource, NasaDipSource
   archive.py            raw-payload archive — every fetch, timestamped, before decode
-  brief/                deterministic briefing core + text renderer
-  retrieval/            chunker, Embedder/Reranker protocols, Retriever (hybrid + rerank)
-  db/                   plain-SQL persistence: notams, weather, corpus (hybrid search SQL), runs
   ingest/               idempotent fetch → archive → decode → store jobs
   scheduler.py          hourly jobs + run log; `preflight schedule` / compose `scheduler`
-  api/                  FastAPI service, SSE briefing endpoint
-db/*.sql                Postgres schema + migrations (pgvector, full-text, HNSW)
+  db/                   plain-SQL persistence: notams, weather, corpus (hybrid search), runs, pool
+  brief/                deterministic briefing core + text renderer
+  retrieval/            chunker, Embedder/Reranker protocols, Retriever (hybrid + rerank)
+  api/                  FastAPI: /decode, /brief, /brief/stream
+  cli.py                the `preflight` command
+db/*.sql                schema + migrations (pgvector, full-text, HNSW)
 docs/adr/               architecture decision records
-tests/                  decoder tests against real NOTAM text
+tests/                  129 tests; markers: db, live, ml
+data/samples/           bundled sample NOTAMs (real corpora are gitignored under data/raw)
 ```
 
 ---
@@ -257,23 +285,30 @@ tests/                  decoder tests against real NOTAM text
 
 All public. Nothing in this repo is scraped.
 
-> **On NOTAMs:** the FAA's NOTAM API is not open to the public, and its public search site refuses
-> programmatic requests. The data is public domain; access to it is not. Ingestion is written against
-> a provider interface so this doesn't leak into the rest of the system, and every fetch is archived
-> raw so the project builds its own history for the time-travel evaluation. Details and what was
-> tried: [ADR 0002](docs/adr/0002-notam-access-and-the-provider-abstraction.md).
-
 | Source | Provides | Access |
 |---|---|---|
-| FAA NOTAMs via **NASA DIP** | live NOTAMs, structured from the FAA SWIM feed | request access — see [ADR 0002](docs/adr/0002-notam-access-and-the-provider-abstraction.md) |
+| FAA NOTAMs via **NASA DIP** | live NOTAMs, structured from the FAA SWIM feed | request access — [ADR 0002](docs/adr/0002-notam-access-and-the-provider-abstraction.md) |
 | aviationweather.gov | METAR, TAF, PIREP, SIGMET, AIRMET | free, no key |
-| NASA ASRS | ~200k de-identified incident narratives | free bulk export |
-| NTSB CAROL | accident/incident records with findings | free export |
+| NASA ASRS | ~200k de-identified incident narratives | free export |
+| NTSB CAROL | accident/incident records with findings — golden-set labels | free export |
 | BTS On-Time Performance | flight-level delay history | free bulk CSV |
 | FAA NASR | airports, runways, navaids (gazetteer) | free, 28-day cycle |
 | OpenSky Network | ADS-B traffic | free tier |
 
-Corpora are **not** committed — `data/` is gitignored. `scripts/` will fetch them.
+> **On NOTAMs:** the FAA's NOTAM API is not open to the public, and its public search site refuses
+> programmatic requests. The data is public domain; access to it is not. Ingestion is written against
+> a provider interface so this doesn't leak into the rest of the system, and every fetch is archived
+> raw so the project builds its own history for the time-travel evaluation.
+
+---
+
+## Design records
+
+| ADR | Decision |
+|---|---|
+| [0001](docs/adr/0001-pgvector-over-dedicated-vector-db.md) | pgvector in Postgres, not a dedicated vector database |
+| [0002](docs/adr/0002-notam-access-and-the-provider-abstraction.md) | NOTAM access is gated; provider interface, archive forward, NTSB-docket positives |
+| [0003](docs/adr/0003-hybrid-retrieval.md) | Hybrid retrieval in Postgres, reranked; dev-speed models by default |
 
 ---
 

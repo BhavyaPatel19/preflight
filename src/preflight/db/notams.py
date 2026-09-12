@@ -66,6 +66,17 @@ ORDER BY
   effective_from DESC NULLS LAST
 """
 
+# NOTAMs whose validity overlaps [start, end] — what a flight in that window sees.
+_DURING = f"""
+SELECT {_COLUMNS} FROM notams
+WHERE icao = %(icao)s
+  AND (effective_from IS NULL OR effective_from <= %(end)s)
+  AND (permanent OR effective_to IS NULL OR effective_to >= %(start)s)
+ORDER BY
+  CASE severity WHEN 'HIGH' THEN 0 WHEN 'MEDIUM' THEN 1 WHEN 'LOW' THEN 2 ELSE 3 END,
+  effective_from DESC NULLS LAST
+"""
+
 _ENTITIES_FOR = """
 SELECT notam_id, type, ref, state, cause, detail, span_start, span_end
 FROM notam_entities WHERE notam_id = ANY(%s) ORDER BY id
@@ -110,6 +121,13 @@ def upsert_many(conn: Connection[Any], records: list[NotamRecord]) -> int:
 
 def active_at(conn: Connection[Any], icao: str, at: datetime) -> list[NotamRecord]:
     rows = conn.execute(_ACTIVE, {"icao": icao, "at": at}).fetchall()
+    return _hydrate(conn, rows)
+
+
+def active_during(
+    conn: Connection[Any], icao: str, start: datetime, end: datetime
+) -> list[NotamRecord]:
+    rows = conn.execute(_DURING, {"icao": icao, "start": start, "end": end}).fetchall()
     return _hydrate(conn, rows)
 
 

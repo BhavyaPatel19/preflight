@@ -1,8 +1,8 @@
 """HTTP surface.
 
-``/decode`` is real today. ``/brief`` streams a stub so the SSE contract and the
-client can be built against it now; the agent graph replaces the body in
-Sprint 4 without changing the wire format.
+``/decode`` and ``/brief`` are real. ``/brief/stream`` emits the same briefing
+section by section over SSE so a client can render progressively; the agent
+layer (Sprint 4) slots in behind the same events without changing the wire.
 """
 
 from __future__ import annotations
@@ -10,20 +10,30 @@ from __future__ import annotations
 import asyncio
 import json
 from collections.abc import AsyncIterator
-from datetime import UTC, datetime
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from sse_starlette.sse import EventSourceResponse
 
 from preflight import __version__
+from preflight.brief import build_briefing
+from preflight.db import close_pool, get_pool
 from preflight.decode.notam import NotamParseError, parse_notam
-from preflight.schemas import FlightRequest, NotamRecord
+from preflight.schemas import Briefing, FlightRequest, NotamRecord
+
+
+@asynccontextmanager
+async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
+    yield
+    close_pool()
+
 
 app = FastAPI(
     title="Preflight",
     version=__version__,
     description="Agentic route-risk briefing. Research system — not for operational use.",
+    lifespan=_lifespan,
 )
 
 
@@ -44,25 +54,33 @@ async def decode(req: DecodeRequest) -> NotamRecord:
         raise HTTPException(status_code=422, detail=str(e)) from e
 
 
+def _build(req: FlightRequest) -> Briefing:
+    with get_pool().connection() as conn:
+        return build_briefing(conn, req)
+
+
+@app.post("/brief", response_model=Briefing)
+async def brief(req: FlightRequest) -> Briefing:
+    return await asyncio.to_thread(_build, req)
+
+
 async def _brief_events(req: FlightRequest) -> AsyncIterator[dict[str, str]]:
-    """Section-by-section stream. Each event is a JSON payload with a ``section`` key."""
-    started = datetime.now(UTC)
     yield {"event": "start", "data": json.dumps({
         "departure": req.departure, "destination": req.destination,
-        "generated_at": started.isoformat(),
+        "alternates": list(req.alternates),
     })}
-    for section in ("notams", "weather", "precedent", "forecast"):
-        await asyncio.sleep(0.05)
-        yield {"event": "section", "data": json.dumps({
-            "section": section, "status": "not_implemented",
-            "note": "agent graph lands in Sprint 4",
-        })}
+    b = await asyncio.to_thread(_build, req)
+    for f in b.ranked():
+        yield {"event": "finding", "data": f.model_dump_json()}
+    for a in b.abstentions:
+        yield {"event": "abstention", "data": a.model_dump_json()}
     yield {"event": "done", "data": json.dumps({
-        "findings": 0, "abstentions": 0,
-        "latency_ms": int((datetime.now(UTC) - started).total_seconds() * 1000),
+        "findings": len(b.findings), "abstentions": len(b.abstentions),
+        "sources_considered": b.sources_considered, "latency_ms": b.latency_ms,
+        "generated_at": b.generated_at.isoformat(),
     })}
 
 
-@app.post("/brief")
-async def brief(req: FlightRequest) -> EventSourceResponse:
+@app.post("/brief/stream")
+async def brief_stream(req: FlightRequest) -> EventSourceResponse:
     return EventSourceResponse(_brief_events(req))

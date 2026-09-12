@@ -35,6 +35,19 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("dbcheck", help="round-trip the database")
 
+    sc = sub.add_parser("schedule", help="run the ingest scheduler (hourly weather + NOTAMs)")
+    sc.add_argument("--no-run-now", action="store_true", help="wait for the first tick")
+
+    sub.add_parser("status", help="last ingest run per source")
+
+    b = sub.add_parser("brief", help="build a briefing from what is in the database")
+    b.add_argument("departure")
+    b.add_argument("destination")
+    b.add_argument("--alt", action="append", default=[], help="alternate; repeatable")
+    b.add_argument("--off-block", required=True, help="ISO-8601 UTC, e.g. 2026-09-11T02:30Z")
+    b.add_argument("--type", dest="aircraft_type", help="e.g. A320")
+    b.add_argument("--json", action="store_true", help="emit JSON instead of text")
+
     args = ap.parse_args(argv)
 
     if args.cmd == "decode":
@@ -95,6 +108,59 @@ def main(argv: list[str] | None = None) -> int:
                     return 3
         finally:
             close_pool()
+        return 0
+
+    if args.cmd == "brief":
+        from datetime import datetime
+
+        from preflight.brief import build_briefing, render_text
+        from preflight.db import close_pool, get_pool
+        from preflight.schemas import FlightRequest
+
+        req = FlightRequest(
+            departure=args.departure.upper(), destination=args.destination.upper(),
+            alternates=tuple(a.upper() for a in args.alt),
+            off_block=datetime.fromisoformat(args.off_block.replace("Z", "+00:00")),
+            aircraft_type=args.aircraft_type,
+        )
+        try:
+            with get_pool().connection() as conn:
+                briefing = build_briefing(conn, req)
+        finally:
+            close_pool()
+        print(briefing.model_dump_json(indent=2) if args.json else render_text(briefing))
+        return 0
+
+    if args.cmd == "schedule":
+        import asyncio
+
+        from preflight.db import close_pool
+        from preflight.scheduler import run_forever
+
+        try:
+            asyncio.run(run_forever(run_now=not args.no_run_now))
+        except KeyboardInterrupt:
+            pass
+        finally:
+            close_pool()
+        return 0
+
+    if args.cmd == "status":
+        from preflight.db import close_pool, get_pool
+        from preflight.db.runs import last_runs
+
+        try:
+            with get_pool().connection() as conn:
+                rows = last_runs(conn)
+        finally:
+            close_pool()
+        if not rows:
+            print("no ingest runs recorded yet")
+        for r in rows:
+            counts = " ".join(f"{k}={v}" for k, v in r.counts.items())
+            tail = f"  {r.error}" if r.error else f"  {counts}"
+            when = f"{r.finished_at:%Y-%m-%d %H:%M}Z"
+            print(f"{r.kind:<8} {r.source:<16} {when}  {r.status:<7}{tail}")
         return 0
 
     if args.cmd == "dbcheck":

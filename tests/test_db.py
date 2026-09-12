@@ -86,10 +86,10 @@ def test_metar_upsert_and_latest(db):
     newer = Metar(icao=A, observed_at=datetime(2026, 9, 11, 3, 0, tzinfo=UTC),
                   raw="METAR NEW", flight_category="VFR", ceiling_ft=2500)
     assert wdb.upsert_metars(db, [older, newer]) == 2
-    raw, parsed, issued = wdb.latest(db, A, "METAR")
-    assert raw == "METAR NEW"
-    assert parsed["flight_category"] == "VFR" and parsed["ceiling_ft"] == 2500
-    assert issued == newer.observed_at
+    row = wdb.latest(db, A, "METAR")
+    assert row is not None and row.raw == "METAR NEW"
+    assert row.parsed["flight_category"] == "VFR" and row.parsed["ceiling_ft"] == 2500
+    assert row.issued_at == newer.observed_at and row.valid_from is None
 
 
 def test_metar_same_timestamp_updates_in_place(db):
@@ -98,7 +98,7 @@ def test_metar_same_timestamp_updates_in_place(db):
     wdb.upsert_metars(db, [m1])
     wdb.upsert_metars(db, [m2])
     n = db.execute("SELECT count(*) FROM weather_reports WHERE icao = %s", (B,)).fetchone()[0]
-    assert n == 1 and wdb.latest(db, B, "METAR")[0] == "v2"
+    assert n == 1 and wdb.latest(db, B, "METAR").raw == "v2"
 
 
 def test_taf_validity_window_stored(db):

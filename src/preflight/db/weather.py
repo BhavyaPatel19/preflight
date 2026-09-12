@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Any
+from datetime import datetime
+from typing import Any, NamedTuple
 
 from psycopg import Connection
 from psycopg.types.json import Jsonb
@@ -18,9 +19,17 @@ ON CONFLICT (icao, kind, issued_at) DO UPDATE SET
 """
 
 _LATEST = """
-SELECT raw, parsed, issued_at FROM weather_reports
+SELECT raw, parsed, issued_at, valid_from, valid_to FROM weather_reports
 WHERE icao = %s AND kind = %s ORDER BY issued_at DESC LIMIT 1
 """
+
+
+class WeatherRow(NamedTuple):
+    raw: str
+    parsed: dict[str, Any]
+    issued_at: datetime
+    valid_from: datetime | None
+    valid_to: datetime | None
 
 
 def upsert_metars(conn: Connection[Any], metars: list[Metar]) -> int:
@@ -38,6 +47,6 @@ def upsert_tafs(conn: Connection[Any], tafs: list[Taf]) -> int:
     return len(tafs)
 
 
-def latest(conn: Connection[Any], icao: str, kind: str) -> tuple[str, dict[str, Any], Any] | None:
+def latest(conn: Connection[Any], icao: str, kind: str) -> WeatherRow | None:
     row = conn.execute(_LATEST, (icao, kind)).fetchone()
-    return (row[0], row[1], row[2]) if row else None
+    return WeatherRow(*row) if row else None

@@ -23,6 +23,10 @@ def render_text(b: Briefing) -> str:
         lines.append(f"       {phases}")
         for c in f.claims:
             refs = " ".join(f"[{cit.kind}:{cit.ref}]" for cit in c.citations)
+            if c.verified is True:
+                refs += f"  ✓ grounded {c.entailment_score:.2f}"
+            elif c.verified is False:
+                refs += f"  ✗ UNVERIFIED {c.entailment_score:.2f}"
             lines.append(f"       {c.text}")
             lines.append(f"       {refs}")
         lines.append("")

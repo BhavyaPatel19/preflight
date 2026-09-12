@@ -131,7 +131,7 @@ Built in the open, six sprints over twelve weeks.
 | 1 | Foundation — schemas, rule decoder, ingestion, archive, deterministic briefing, scheduler | 🟢 done |
 | 2 | Fine-tuned NOTAM entity extractor → HF Hub | ⬜ waits on a real NOTAM corpus |
 | 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟢 done — corpus, golden set, measured |
-| 4 | LangGraph agent graph, grounding, abstention | ⬜ not started |
+| 4 | LangGraph agent graph, grounding, abstention | 🟡 grounding verifier + abstention done; the agent graph waits on an LLM key |
 | 5 | Time-travel eval harness + CI regression gate | 🟡 600-case set built from NTSB (300 + 300 matched); scorer reports coverage honestly; judge + gate wait on an LLM key |
 | 6 | Delay forecasting, cost/latency, UI, MCP server | 🟡 forecasting, UI and MCP server done; cost/latency waits on the LLM layer |
 
@@ -155,6 +155,11 @@ Built in the open, six sprints over twelve weeks.
   foundation-model forecaster (Chronos-Bolt) is *evaluated* against it and seasonal-naive on a real
   holdout — `evals/forecast/RESULTS.md` — but not cited: BTS lands with a ~3-month lag, and a
   flight next week is beyond any honest horizon.
+- **Verify** — an NLI cross-encoder checks every factual claim against the passage it cites
+  (`✓ grounded 0.94` in the output). Annotates, never drops: in the deterministic core a failed
+  check is a bug or a verifier miss, and hiding a hazard would be the worse failure. Building it
+  forced the citations to carry the evidence — NOTAM validity windows, decoded METAR fields —
+  which they now do.
 - **MCP** — `preflight mcp` exposes `brief`, `decode_notam`, `search_precedent` and `status` as
   Model Context Protocol tools over stdio, so Claude Desktop or Claude Code can call the system
   directly.
@@ -178,7 +183,7 @@ CI gate will enforce.
 | Forecast | MASE, 24 h arrival delay, rolling-origin backtest | < 0.85 | **0.715** Chronos-Bolt · 0.751 climatology · 1.067 seasonal-naive — [details](evals/forecast/RESULTS.md) |
 | End-to-end | implicated-hazard recall (300 NTSB positives) | ≥ 0.85 | — (0 / 300 covered: archive began 2026-09-11 — [details](evals/briefing/RESULTS.md)) |
 | End-to-end | false-alarm rate (300 matched negatives) | < 0.15 | — (0 / 300 covered) |
-| Grounding | claim-level citation accuracy | ≥ 0.97 | — |
+| Grounding | NLI verifier: true-claim acceptance · corruption rejection (74 claims + 74 corrupted) | ≥ 0.97 | **1.000 · 1.000** at threshold 0.5 — [details](evals/grounding/RESULTS.md) |
 | Abstention | correct abstention on data-gap cases | ≥ 0.90 | — |
 | Safety | prompt-injection resistance (60 adversarial NOTAMs) | 100% | — |
 | Judge | LLM-judge vs human agreement (Cohen's κ) | ≥ 0.70 | — |
@@ -186,7 +191,8 @@ CI gate will enforce.
 
 The κ row matters as much as the rest: an LLM judge nobody validated is a number nobody should trust.
 
-The forecast row is the first target met. The retrieval numbers are below target and that is the point of having them: the first run of the
+The forecast and grounding rows are the first targets met — the grounding one on the deterministic
+core's own claims; the same harness gates the LLM layer when it arrives. The retrieval numbers are below target and that is the point of having them: the first run of the
 harness found the lexical ranking function was both slow and bad, and fixing it moved hybrid from
 *worse* than dense to better (`evals/retrieval/HISTORY.md`). Candidate-pool size is the next knob.
 
@@ -309,6 +315,7 @@ searched.
 | `preflight eval retrieval` | Recall/nDCG/P@10 per config on the 350-query golden set (~30 min) |
 | `preflight eval briefing` | replay the briefing on 600 NTSB-derived cases; coverage, hazard recall, false alarms |
 | `preflight eval forecast` | Chronos-Bolt vs seasonal-naive vs climatology, rolling-origin backtest (MASE, pinball) |
+| `preflight eval grounding` | NLI verifier on the briefing's own claims and one corrupted copy of each |
 | `make db-start` / `make db-stop` | native Postgres on :5433 |
 | `make up` / `make down` | the Docker stack on :5432 |
 | `make demo` | decode the bundled NOTAMs |
@@ -350,6 +357,8 @@ src/preflight/
   evals/retrieval.py    golden-set builder, metrics, runner → evals/retrieval/RESULTS.md
   evals/briefing.py     NTSB-derived cases (positives + matched negatives), time-travel scorer
   evals/forecast.py     rolling-origin delay backtest
+  evals/grounding.py    true-claim acceptance vs corruption rejection, threshold sweep
+  verify/               NLI verifier (nli.py) and claim-level grounding policy (ground.py)
   forecast/delay.py     climatology, seasonal-naive, Chronos-Bolt, MASE/pinball, airport time zones
   api/                  FastAPI: /decode, /brief, /brief/stream, and static/index.html (the UI)
   mcp_server.py         the same capabilities as MCP tools over stdio (`preflight mcp`)
@@ -359,6 +368,7 @@ docs/adr/               architecture decision records
 evals/retrieval/        golden.jsonl (350 queries), RESULTS.md (latest run), HISTORY.md (what each run changed)
 evals/briefing/         golden.jsonl (600 cases), RESULTS.md — coverage, recall, false alarms
 evals/forecast/         RESULTS.md — MASE / pinball per forecaster and per airport
+evals/grounding/        RESULTS.md — verifier acceptance / rejection per claim kind and threshold
 tests/                  129 tests; markers: db, live, ml
 data/samples/           bundled sample NOTAMs (real corpora are gitignored under data/raw)
 ```

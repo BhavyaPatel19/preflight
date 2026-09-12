@@ -66,6 +66,8 @@ button:disabled{opacity:.55;cursor:wait}
 .cites{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 2px}
 .cite{font:11px var(--mono);color:var(--blue);background:var(--blue-soft);border:0;padding:2px 7px;border-radius:3px;cursor:pointer}
 .cite[aria-expanded="true"]{outline:1.5px solid var(--blue)}
+.ok{font:11px var(--mono);color:var(--green);background:var(--green-soft);padding:2px 7px;border-radius:3px}
+.bad{font:11px var(--mono);color:var(--red);background:var(--red-soft);padding:2px 7px;border-radius:3px}
 .quote{display:none;margin:6px 0 4px;padding:8px 10px;border-left:3px solid var(--blue);background:var(--surface-2);font:12.5px/1.5 var(--mono);color:var(--ink-2);white-space:pre-wrap;word-break:break-word}
 .quote.open{display:block}
 .quote .src{color:var(--ink-3);display:block;margin-bottom:4px;font-size:11px}
@@ -126,7 +128,9 @@ button:disabled{opacity:.55;cursor:wait}
       `<button class="cite" type="button" data-q="${i}-${j}" aria-expanded="false">${esc(c.kind)}:${esc(c.ref)}</button>`).join("");
     const quotes = claim.citations.map((c, j) =>
       `<div class="quote" id="q-${i}-${j}"><span class="src">${esc(c.kind)} · ${esc(c.ref)}${c.issued_at ? " · " + esc(c.issued_at) : ""}</span>${esc(c.quote || "(no passage recorded)")}</div>`).join("");
-    return `<p class="claim">${esc(claim.text)}</p><div class="cites">${refs}</div>${quotes}`;
+    const mark = claim.verified === true ? `<span class="ok" title="entailment ${claim.entailment_score}">✓ grounded</span>`
+               : claim.verified === false ? `<span class="bad" title="entailment ${claim.entailment_score}">✗ unverified</span>` : "";
+    return `<p class="claim">${esc(claim.text)}</p><div class="cites">${refs}${mark}</div>${quotes}`;
   }
 
   function renderFinding(f, n) {

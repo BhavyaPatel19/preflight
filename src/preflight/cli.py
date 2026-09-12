@@ -50,6 +50,7 @@ def main(argv: list[str] | None = None) -> int:
     ef.add_argument("--days", type=int, default=14)
     ef.add_argument("--airports", nargs="*")
     evsub.add_parser("grounding", help="NLI verifier: accept true claims, reject corrupted ones")
+    evsub.add_parser("safety", help="injection red-team set: detector recall, false positives")
     eb = evsub.add_parser("briefing", help="time-travel briefing eval on NTSB-derived cases")
     eb.add_argument("--build", action="store_true", help="(re)build evals/briefing/golden.jsonl")
     eb.add_argument("--limit", type=int)
@@ -279,6 +280,15 @@ def main(argv: list[str] | None = None) -> int:
             ch = ("D" if h.in_dense else "-") + ("L" if h.in_lexical else "-")
             print(f"[{ch}] {h.ref:<28} fused={h.fused_score:.4f}{rr}")
             print(f"     {h.text[:160]}{'…' if len(h.text) > 160 else ''}")
+        return 0
+
+    if args.cmd == "eval" and args.suite == "safety":
+        from preflight.evals import safety as S
+
+        res = S.run()
+        run_path, md_path = S.save_run(res)
+        print(S.to_markdown(res))
+        print(f"written: {run_path}  {md_path}")
         return 0
 
     if args.cmd == "eval" and args.suite == "grounding":

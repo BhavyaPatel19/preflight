@@ -37,7 +37,7 @@ _CATEGORY = {
     "lighting": "lighting", "approach_aids": "approach aids", "navaid": "navaid",
     "airspace_restriction": "airspace", "airspace": "airspace", "obstacle": "obstacle",
     "surface": "surface", "services": "services", "comms_surveillance": "comms",
-    "activity_warning": "activity",
+    "activity_warning": "activity", "wildlife": "wildlife",
 }
 
 _WX_SEVERITY = {
@@ -171,6 +171,17 @@ def notam_findings(icao: str, role: Role, records: list[NotamRecord]) -> list[Fi
 # Weather findings
 # --------------------------------------------------------------------------
 
+def _wind_severity(parsed: dict[str, Any]) -> Severity:
+    """Gusts and strong surface wind are the most common briefable hazard in the NTSB set."""
+    wind = float(parsed.get("wind_kt") or 0)
+    gust = float(parsed.get("gust_kt") or 0)
+    if gust >= 35 or wind >= 30:
+        return Severity.MEDIUM
+    if gust >= 25 or wind >= 20:
+        return Severity.LOW
+    return Severity.INFO
+
+
 def _metar_summary(parsed: dict[str, Any]) -> str:
     bits: list[str] = []
     if parsed.get("wind_kt") is not None:
@@ -221,6 +232,7 @@ def weather_findings(
     else:
         cat = str(metar.parsed.get("flight_category") or "").upper()
         sev = _WX_SEVERITY.get(cat, Severity.INFO)
+        sev = max(sev, _wind_severity(metar.parsed), key=lambda s: s.rank)
         summary = _metar_summary(metar.parsed)
         label = cat or "conditions"
         findings.append(Finding(

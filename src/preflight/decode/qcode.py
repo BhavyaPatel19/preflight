@@ -342,6 +342,8 @@ class QCode:
 
     @property
     def hazard_class(self) -> str:
+        if self.condition in {"HX", "HK"}:
+            return "wildlife"
         if self.subject == "MR":
             return "runway_closure" if self.condition == "LC" else "runway"
         if self.subject == "MX":

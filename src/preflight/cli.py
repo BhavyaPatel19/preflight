@@ -43,6 +43,9 @@ def main(argv: list[str] | None = None) -> int:
     er.add_argument("--no-rerank", action="store_true", help="skip the reranker config")
     er.add_argument("--candidates", type=int, default=40)
     er.add_argument("--kind", choices=["synopsis", "identifier"], help="run only one query set")
+    eb = evsub.add_parser("briefing", help="time-travel briefing eval on NTSB-derived cases")
+    eb.add_argument("--build", action="store_true", help="(re)build evals/briefing/golden.jsonl")
+    eb.add_argument("--limit", type=int)
 
     sc = sub.add_parser("schedule", help="run the ingest scheduler (hourly weather + NOTAMs)")
     sc.add_argument("--no-run-now", action="store_true", help="wait for the first tick")
@@ -255,6 +258,27 @@ def main(argv: list[str] | None = None) -> int:
             ch = ("D" if h.in_dense else "-") + ("L" if h.in_lexical else "-")
             print(f"[{ch}] {h.ref:<28} fused={h.fused_score:.4f}{rr}")
             print(f"     {h.text[:160]}{'…' if len(h.text) > 160 else ''}")
+        return 0
+
+    if args.cmd == "eval" and args.suite == "briefing":
+        from preflight.db import close_pool, get_pool
+        from preflight.evals import briefing as B
+
+        try:
+            with get_pool().connection() as conn:
+                if args.build or not B.GOLDEN.exists():
+                    cases = B.build_cases(conn)
+                    B.save_cases(cases)
+                    print(f"golden set: {len(cases)} cases → {B.GOLDEN}")
+                cases = B.load_cases()
+                if args.limit:
+                    cases = cases[: args.limit]
+                res = B.run(conn, cases)
+            run_path, md_path = B.save_run(res)
+            print(B.to_markdown(res))
+            print(f"written: {run_path}  {md_path}")
+        finally:
+            close_pool()
         return 0
 
     if args.cmd == "eval":

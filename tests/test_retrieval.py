@@ -164,3 +164,32 @@ def test_real_models_rank_the_taxiway_narrative_first(indexed):
     ))
     assert hits[0].external_id == "test-syn-001"
     assert hits[0].rerank_score is not None and hits[0].rerank_score > hits[1].rerank_score
+
+
+# ---------------------------------------------------------------- batched indexer
+
+@pytest.mark.db
+def test_index_documents_batches_across_docs(db):
+    from preflight.retrieval.search import DocInput, index_documents
+
+    class CountingEmbedder(HashEmbedder):
+        calls = 0
+
+        def encode(self, texts, *, query=False):
+            type(self).calls += 1
+            return super().encode(texts, query=query)
+
+    def body(i):
+        return f"Report {i}. " + " ".join(f"Sentence {j} about runway {i}." for j in range(30))
+
+    docs = [DocInput(source="ops_note", external_id=f"test-batch-{i}", text=body(i),
+                     icao="KZZY", phases=("taxi",)) for i in range(10)]
+    emb = CountingEmbedder()
+    n_docs, n_chunks = index_documents(db, emb, docs, batch_docs=4)
+    assert n_docs == 10 and n_chunks >= 10
+    assert emb.calls == 3                          # ceil(10 / 4) batches, not 10 calls
+    row = db.execute(
+        "SELECT count(*), count(embedding), bool_and(phases = '{taxi}') FROM chunks c "
+        "JOIN documents d ON d.id = c.document_id WHERE d.external_id LIKE 'test-batch-%'"
+    ).fetchone()
+    assert row[0] == n_chunks and row[1] == n_chunks and row[2] is True

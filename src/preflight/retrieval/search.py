@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass, replace
 from datetime import date
-from typing import Any, Literal
+from typing import Any, Literal, NamedTuple
 
 from psycopg import Connection
 
@@ -93,3 +94,55 @@ def index_document(
         conn, doc_id, [(c.ordinal, c.text) for c in chunks], vecs,
         embedding_model=embedder.name, icao=icao,
     )
+
+
+class DocInput(NamedTuple):
+    source: str
+    external_id: str
+    text: str
+    title: str | None = None
+    published: date | None = None
+    icao: str | None = None
+    metadata: dict[str, Any] | None = None
+    phases: tuple[str, ...] = ()
+
+
+def index_documents(
+    conn: Connection[Any], embedder: Embedder, docs: Iterable[DocInput], *, batch_docs: int = 64
+) -> tuple[int, int]:
+    """Index many documents, embedding all their chunks per batch in one call.
+
+    Per-document encoding is the slow path (a model call per two chunks); this
+    encodes a few hundred chunks at once. Returns (documents, chunks).
+    """
+    n_docs = n_chunks = 0
+    batch: list[DocInput] = []
+
+    def flush() -> None:
+        nonlocal n_docs, n_chunks
+        if not batch:
+            return
+        per_doc = [chunk_text(d.text) for d in batch]
+        flat = [c.text for cs in per_doc for c in cs]
+        vecs = embedder.encode(flat) if flat else []
+        i = 0
+        for d, cs in zip(batch, per_doc, strict=True):
+            doc_id = corpus.upsert_document(
+                conn, source=d.source, external_id=d.external_id, title=d.title,
+                published=d.published, icao=d.icao, metadata=d.metadata,
+            )
+            corpus.replace_chunks(
+                conn, doc_id, [(c.ordinal, c.text) for c in cs], vecs[i:i + len(cs)],
+                embedding_model=embedder.name, icao=d.icao, phases=d.phases,
+            )
+            i += len(cs)
+            n_docs += 1
+            n_chunks += len(cs)
+        batch.clear()
+
+    for d in docs:
+        batch.append(d)
+        if len(batch) >= batch_docs:
+            flush()
+    flush()
+    return n_docs, n_chunks

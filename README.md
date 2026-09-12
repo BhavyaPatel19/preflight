@@ -107,7 +107,7 @@ Built in the open, six sprints over twelve weeks.
 |---|---|---|
 | 1 | Foundation — schemas, rule decoder, ingestion, archive, deterministic briefing, scheduler | 🟢 done |
 | 2 | Fine-tuned NOTAM entity extractor → HF Hub | ⬜ waits on a real NOTAM corpus |
-| 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟡 retrieval core done; corpus and golden set next |
+| 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟡 retrieval core + ASRS corpus (47.7k reports) done; NTSB and golden set next |
 | 4 | LangGraph agent graph, grounding, abstention | ⬜ not started |
 | 5 | Time-travel eval harness + CI regression gate | ⬜ not started |
 | 6 | Delay forecasting, cost/latency, UI, MCP server | ⬜ not started |
@@ -123,8 +123,8 @@ Built in the open, six sprints over twelve weeks.
   today, NASA DIP when access lands); hourly scheduler with a run log.
 - **Brief** — `preflight brief` / `POST /brief` / `POST /brief/stream`: ranked, cited findings and
   explicit abstentions.
-- **Retrieve** — hybrid search (pgvector + tsvector fused with RRF, cross-encoder reranked) over the
-  precedent corpus, with ablation switches for the eval.
+- **Retrieve** — hybrid search (pgvector + tsvector fused with RRF, cross-encoder reranked) over
+  47,723 real ASRS incident reports, with ablation switches for the eval.
 
 ---
 
@@ -220,8 +220,9 @@ first use):
 
 ```bash
 uv sync --extra ml
+preflight corpus ingest asrs --limit 2000      # ~20 reports/s on Apple Silicon; drop --limit for all 47.7k
 preflight corpus add --source ops_note --id note-1 --file note.txt --icao KSFO
-preflight search "lined up with a taxiway at night, parallel runway closed" --icao KSFO
+preflight search "lined up with a taxiway instead of the runway at night"
 preflight search "28R closed" --mode lexical --no-rerank      # ablation switches
 preflight corpus stats
 ```
@@ -265,8 +266,9 @@ src/preflight/
   sources/
     aviationweather.py  METAR/TAF client
     notams.py           NotamSource protocol; FileSource, NasaDipSource
+    asrs.py             ASRS export download + row parsing (locale→ICAO, phase taxonomy)
   archive.py            raw-payload archive — every fetch, timestamped, before decode
-  ingest/               idempotent fetch → archive → decode → store jobs
+  ingest/               idempotent fetch → archive → decode → store jobs; resumable corpus ingest
   scheduler.py          hourly jobs + run log; `preflight schedule` / compose `scheduler`
   db/                   plain-SQL persistence: notams, weather, corpus (hybrid search), runs, pool
   brief/                deterministic briefing core + text renderer
@@ -289,7 +291,7 @@ All public. Nothing in this repo is scraped.
 |---|---|---|
 | FAA NOTAMs via **NASA DIP** | live NOTAMs, structured from the FAA SWIM feed | request access — [ADR 0002](docs/adr/0002-notam-access-and-the-provider-abstraction.md) |
 | aviationweather.gov | METAR, TAF, PIREP, SIGMET, AIRMET | free, no key |
-| NASA ASRS | ~200k de-identified incident narratives | free export |
+| NASA ASRS | 47,723 de-identified incident reports with the full ASRS taxonomy, via [`elihoole/asrs-aviation-reports`](https://huggingface.co/datasets/elihoole/asrs-aviation-reports) | HF Hub, Apache-2.0 packaging over public-domain data |
 | NTSB CAROL | accident/incident records with findings — golden-set labels | free export |
 | BTS On-Time Performance | flight-level delay history | free bulk CSV |
 | FAA NASR | airports, runways, navaids (gazetteer) | free, 28-day cycle |

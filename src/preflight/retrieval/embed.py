@@ -60,7 +60,9 @@ class STEmbedder:
             from sentence_transformers import SentenceTransformer
 
             self._model = SentenceTransformer(self.name, device=_device())
-            self.dim = int(self._model.get_sentence_embedding_dimension())
+            getdim = getattr(self._model, "get_embedding_dimension", None) or \
+                self._model.get_sentence_embedding_dimension
+            self.dim = int(getdim())
         return self._model
 
     def encode(self, texts: Sequence[str], *, query: bool = False) -> list[list[float]]:

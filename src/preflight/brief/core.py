@@ -118,11 +118,22 @@ def headline(rec: NotamRecord) -> str:
     return text
 
 
+def _notam_quote(rec: NotamRecord) -> str:
+    """The evidence a NOTAM claim rests on: the body plus its validity window."""
+    if rec.permanent:
+        valid = f"valid from {_fmt(rec.effective_from)}, permanent"
+    else:
+        valid = f"valid {_fmt(rec.effective_from)} to {_fmt(rec.effective_to)}"
+        if rec.estimated_end:
+            valid += " (estimated)"
+    return f"{rec.body[:220]} — {valid}."
+
+
 def _claim(rec: NotamRecord, text: str) -> Claim:
     return Claim(
         text=text,
         citations=(Citation(
-            kind="notam", ref=rec.id, issued_at=rec.effective_from, quote=rec.body[:240]
+            kind="notam", ref=rec.id, issued_at=rec.effective_from, quote=_notam_quote(rec)
         ),),
     )
 
@@ -160,7 +171,8 @@ def notam_findings(icao: str, role: Role, records: list[NotamRecord]) -> list[Fi
                      + "; ".join(headline(r) for r in minor[:6])
                      + (" …" if len(minor) > 6 else "") + ".",
                 citations=tuple(
-                    Citation(kind="notam", ref=r.id, issued_at=r.effective_from, quote=r.body[:240])
+                    Citation(kind="notam", ref=r.id, issued_at=r.effective_from,
+                             quote=_notam_quote(r))
                     for r in minor
                 ),
             ),),
@@ -247,7 +259,10 @@ def weather_findings(
                      + (f": {summary}." if summary else "."),
                 citations=(Citation(
                     kind="metar", ref=f"{icao}@{_utc(metar.issued_at):%d%H%M}Z",
-                    issued_at=metar.issued_at, quote=metar.raw,
+                    issued_at=metar.issued_at,
+                    quote=f"{metar.raw} — decoded: {icao} reporting {label} at "
+                          f"{_fmt(_utc(metar.issued_at))}" + (f", {summary}" if summary else "")
+                          + ".",
                 ),),
             ),),
         ))
@@ -324,8 +339,10 @@ def delay_finding(
                  f"(~{c.flights_per_hour:.0f} arrivals/h). Climatology, not a forecast.",
             citations=(Citation(
                 kind="forecast", ref=f"climatology:{icao}:{day}{local:%H}",
-                quote=f"BTS On-Time Performance, {c.samples} weekday-hour samples, "
-                      f"{c.history_from:%Y-%m-%d}→{c.history_to:%Y-%m-%d}",
+                quote=f"BTS On-Time Performance for {icao}, {c.samples} {day} {local:%H}:00 "
+                      f"hours from {c.history_from:%b %Y} to {c.history_to:%b %Y}: median arrival "
+                      f"delay {c.p50:.0f} min, 10th percentile {c.p10:.0f} min, 90th percentile "
+                      f"{c.p90:.0f} min, about {c.flights_per_hour:.0f} arrivals per hour.",
             ),),
         ),),
     )

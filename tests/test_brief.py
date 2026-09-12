@@ -72,7 +72,8 @@ def test_high_and_medium_become_individual_cited_findings():
     assert fs[0].category == "runway" and fs[0].headline.startswith("KSFO: Runway 28R closed")
     assert fs[0].claims[0].citations[0].kind == "notam"
     assert fs[0].claims[0].citations[0].ref == "A1477/26"
-    assert fs[0].claims[0].citations[0].quote.startswith("RWY 28R CLSD")
+    q = fs[0].claims[0].citations[0].quote
+    assert q.startswith("RWY 28R CLSD") and "valid 10 Sep 2300Z to 11 Sep 0700Z" in q
 
 
 def test_phases_filtered_to_the_airport_role():
@@ -111,7 +112,8 @@ def test_lifr_is_high_and_cites_the_metar():
     assert wx.severity is Severity.HIGH
     assert "ceiling 200 ft" in wx.headline and "vis 0.5 SM" in wx.headline
     assert wx.claims[0].citations[0].kind == "metar"
-    assert wx.claims[0].citations[0].quote == "METAR LIFR"
+    q = wx.claims[0].citations[0].quote
+    assert q.startswith("METAR LIFR") and "decoded: KJFK reporting LIFR" in q   # raw + decoding
     assert gaps == []
 
 

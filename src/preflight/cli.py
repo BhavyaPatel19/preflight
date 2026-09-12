@@ -49,6 +49,7 @@ def main(argv: list[str] | None = None) -> int:
     ef = evsub.add_parser("forecast", help="Chronos-Bolt vs seasonal-naive vs climatology backtest")
     ef.add_argument("--days", type=int, default=14)
     ef.add_argument("--airports", nargs="*")
+    evsub.add_parser("grounding", help="NLI verifier: accept true claims, reject corrupted ones")
     eb = evsub.add_parser("briefing", help="time-travel briefing eval on NTSB-derived cases")
     eb.add_argument("--build", action="store_true", help="(re)build evals/briefing/golden.jsonl")
     eb.add_argument("--limit", type=int)
@@ -92,6 +93,8 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--json", action="store_true", help="emit JSON instead of text")
     b.add_argument("--no-precedent", action="store_true",
                    help="skip the prior-report search (faster; no model load)")
+    b.add_argument("--verify", action="store_true",
+                   help="run the NLI grounding verifier over every factual claim")
 
     args = ap.parse_args(argv)
 
@@ -178,6 +181,10 @@ def main(argv: list[str] | None = None) -> int:
                 briefing = build_briefing(conn, req)
                 if not args.no_precedent:
                     briefing = with_precedent(conn, briefing, load_retriever())
+            if args.verify:
+                from preflight.verify.ground import load_verifier, with_verification
+
+                briefing = with_verification(briefing, load_verifier())
         finally:
             close_pool()
         print(briefing.model_dump_json(indent=2) if args.json else render_text(briefing))
@@ -272,6 +279,23 @@ def main(argv: list[str] | None = None) -> int:
             ch = ("D" if h.in_dense else "-") + ("L" if h.in_lexical else "-")
             print(f"[{ch}] {h.ref:<28} fused={h.fused_score:.4f}{rr}")
             print(f"     {h.text[:160]}{'…' if len(h.text) > 160 else ''}")
+        return 0
+
+    if args.cmd == "eval" and args.suite == "grounding":
+
+        from preflight.db import close_pool, get_pool
+        from preflight.evals import grounding as G
+        from preflight.evals.grounding_notams import GROUNDING_NOTAMS
+        from preflight.verify.nli import HFVerifier
+
+        try:
+            with get_pool().connection() as conn:
+                res = G.run(conn, HFVerifier(), GROUNDING_NOTAMS)
+            run_path, md_path = G.save_run(res)
+            print(G.to_markdown(res))
+            print(f"written: {run_path}  {md_path}")
+        finally:
+            close_pool()
         return 0
 
     if args.cmd == "eval" and args.suite == "forecast":

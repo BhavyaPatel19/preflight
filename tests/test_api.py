@@ -16,13 +16,14 @@ def client():
     # Keep the suite fast: don't load the retrieval models for API tests.
     import preflight.api.main as m
 
-    original = m.load_retriever
+    originals = (m.load_retriever, m.load_verifier)
     m.load_retriever = lambda: None
+    m.load_verifier = lambda: None
     try:
         with TestClient(app) as c:
             yield c
     finally:
-        m.load_retriever = original
+        m.load_retriever, m.load_verifier = originals
 
 
 def test_health(client):

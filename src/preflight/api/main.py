@@ -26,14 +26,17 @@ from preflight.brief import build_briefing, load_retriever, with_precedent
 from preflight.db import close_pool, get_pool
 from preflight.decode.notam import NotamParseError, parse_notam
 from preflight.schemas import Briefing, FlightRequest, NotamRecord
+from preflight.verify.ground import load_verifier, with_verification
 
 _retriever: Any = None
+_verifier: Any = None
 
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
-    global _retriever
+    global _retriever, _verifier
     _retriever = load_retriever()
+    _verifier = load_verifier()
     yield
     close_pool()
 
@@ -71,15 +74,17 @@ async def decode(req: DecodeRequest) -> NotamRecord:
         raise HTTPException(status_code=422, detail=str(e)) from e
 
 
-def _build(req: FlightRequest, precedent: bool = True) -> Briefing:
+def _build(req: FlightRequest, precedent: bool = True, verify: bool = True) -> Briefing:
     with get_pool().connection() as conn:
         b = build_briefing(conn, req)
-        return with_precedent(conn, b, _retriever) if precedent else b
+        if precedent:
+            b = with_precedent(conn, b, _retriever)
+    return with_verification(b, _verifier) if verify else b
 
 
 @app.post("/brief", response_model=Briefing)
-async def brief(req: FlightRequest, precedent: bool = True) -> Briefing:
-    return await asyncio.to_thread(_build, req, precedent)
+async def brief(req: FlightRequest, precedent: bool = True, verify: bool = True) -> Briefing:
+    return await asyncio.to_thread(_build, req, precedent, verify)
 
 
 async def _brief_events(

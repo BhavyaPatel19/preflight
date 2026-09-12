@@ -4,9 +4,16 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+from typing import Annotated
 
-from pydantic import Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field, field_validator
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
+
+DEFAULT_WATCHLIST = [
+    "KATL", "KLAX", "KORD", "KDFW", "KDEN", "KJFK", "KSFO", "KSEA", "KLAS", "KMCO",
+    "KEWR", "KCLT", "KPHX", "KIAH", "KMIA", "KBOS", "KMSP", "KFLL", "KDTW", "KPHL",
+    "KLGA", "KBWI", "KSLC", "KSAN", "KIAD", "KDCA", "KMDW", "KTPA", "KPDX", "KHNL",
+]
 
 
 class Settings(BaseSettings):
@@ -26,6 +33,11 @@ class Settings(BaseSettings):
     # Raw-payload archive root (see preflight.archive).
     archive_dir: Path = Path("data/raw")
 
+    # Airports the scheduler keeps current. Comma-separated in the environment.
+    watchlist: Annotated[list[str], NoDecode] = Field(
+        default=DEFAULT_WATCHLIST, alias="PREFLIGHT_WATCHLIST"
+    )
+
     # Infra
     database_url: str = "postgresql://preflight:preflight@localhost:5432/preflight"
     redis_url: str = "redis://localhost:6379/0"
@@ -43,6 +55,13 @@ class Settings(BaseSettings):
     # Without a flight time, destination/alternate hazards are checked across a
     # conservative window after off-block. Sprint 6 replaces this with a real ETE.
     default_ete_window_hours: int = 8
+
+    @field_validator("watchlist", mode="before")
+    @classmethod
+    def _split_csv(cls, v: object) -> object:
+        if isinstance(v, str):
+            return [x.strip().upper() for x in v.split(",") if x.strip()] or DEFAULT_WATCHLIST
+        return v or DEFAULT_WATCHLIST
 
 
 @lru_cache

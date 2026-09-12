@@ -92,7 +92,7 @@ class NasaDipSource:
         client: httpx.AsyncClient | None = None,
     ):
         self.base_url = base_url.rstrip("/") if base_url else None
-        self.token = token
+        self.token = token or None
         self._client = client or httpx.AsyncClient(timeout=20.0)
 
     async def fetch(self, icaos: Sequence[str]) -> list[RawNotam]:

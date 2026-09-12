@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     )
 
     # Infra
-    database_url: str = "postgresql://preflight:preflight@localhost:5432/preflight"
+    database_url: str = "postgresql://preflight:preflight@localhost:5433/preflight"
     redis_url: str = "redis://localhost:6379/0"
 
     # Observability

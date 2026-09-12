@@ -35,6 +35,15 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("dbcheck", help="round-trip the database")
 
+    ev = sub.add_parser("eval", help="evaluation harnesses")
+    evsub = ev.add_subparsers(dest="suite", required=True)
+    er = evsub.add_parser("retrieval", help="Recall/nDCG per retrieval config on the golden set")
+    er.add_argument("--build", action="store_true", help="(re)build evals/retrieval/golden.jsonl")
+    er.add_argument("--limit", type=int, help="only the first N queries (quick check)")
+    er.add_argument("--no-rerank", action="store_true", help="skip the reranker config")
+    er.add_argument("--candidates", type=int, default=40)
+    er.add_argument("--kind", choices=["synopsis", "identifier"], help="run only one query set")
+
     sc = sub.add_parser("schedule", help="run the ingest scheduler (hourly weather + NOTAMs)")
     sc.add_argument("--no-run-now", action="store_true", help="wait for the first tick")
 
@@ -242,6 +251,31 @@ def main(argv: list[str] | None = None) -> int:
             ch = ("D" if h.in_dense else "-") + ("L" if h.in_lexical else "-")
             print(f"[{ch}] {h.ref:<28} fused={h.fused_score:.4f}{rr}")
             print(f"     {h.text[:160]}{'…' if len(h.text) > 160 else ''}")
+        return 0
+
+    if args.cmd == "eval":
+        from preflight.db import close_pool, get_pool
+        from preflight.evals import retrieval as R
+        from preflight.retrieval.embed import STEmbedder, STReranker
+
+        try:
+            with get_pool().connection() as conn:
+                if args.build or not R.GOLDEN.exists():
+                    qs = R.build_golden(conn)
+                    R.save_golden(qs)
+                    print(f"golden set: {len(qs)} queries → {R.GOLDEN}")
+                queries = R.load_golden()
+                if args.kind:
+                    queries = [q for q in queries if q.kind == args.kind]
+                if args.limit:
+                    queries = queries[: args.limit]
+                res = R.run(conn, STEmbedder(), None if args.no_rerank else STReranker(),
+                            queries, candidates=args.candidates)
+            run_path, md_path = R.save_run(res)
+            print(R.to_markdown(res))
+            print(f"written: {run_path}  {md_path}")
+        finally:
+            close_pool()
         return 0
 
     if args.cmd == "dbcheck":

@@ -107,7 +107,7 @@ Built in the open, six sprints over twelve weeks.
 |---|---|---|
 | 1 | Foundation — schemas, rule decoder, ingestion, archive, deterministic briefing, scheduler | 🟢 done |
 | 2 | Fine-tuned NOTAM entity extractor → HF Hub | ⬜ waits on a real NOTAM corpus |
-| 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟡 retrieval core + both corpora (47.7k ASRS, 28k NTSB) done; golden set next |
+| 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟢 done — corpus, golden set, measured |
 | 4 | LangGraph agent graph, grounding, abstention | ⬜ not started |
 | 5 | Time-travel eval harness + CI regression gate | ⬜ not started |
 | 6 | Delay forecasting, cost/latency, UI, MCP server | ⬜ not started |
@@ -131,14 +131,15 @@ Built in the open, six sprints over twelve weeks.
 
 ## Evaluation targets
 
-No results yet — the harness lands in Sprint 5. These are the targets the CI gate will enforce, and
-this table gets a `measured` column the moment there is something honest to put in it.
+The retrieval rows are measured; the rest wait on their harnesses (Sprint 5). Targets are what the
+CI gate will enforce.
 
 | Layer | Metric | Target | Measured |
 |---|---|---:|---:|
 | Extraction | macro entity F1 (RWY/TWY/NAVAID/OBST/AIRSPACE/TIME) | ≥ 0.92 | — |
-| Retrieval | Recall@20 / nDCG@10 | ≥ 0.90 / 0.65 | — |
-| Rerank | nDCG@10 lift over dense-only | +0.12 | — |
+| Retrieval | Recall@20 / nDCG@10 — synopsis→narrative, 300 queries | ≥ 0.90 / 0.65 | 0.61 / 0.41 — [details](evals/retrieval/RESULTS.md) |
+| Retrieval | P@10 on exact-identifier queries (`runway 28R` at an airport) | ≥ 0.80 | 0.77 |
+| Rerank | nDCG@10 lift over dense-only | +0.12 | +0.09 |
 | Forecast | MASE vs seasonal-naive | < 0.85 | — |
 | End-to-end | implicated-hazard recall (positives) | ≥ 0.85 | — |
 | End-to-end | false-alarm rate (matched negatives) | < 0.15 | — |
@@ -149,6 +150,10 @@ this table gets a `measured` column the moment there is something honest to put 
 | Cost | p50 $/briefing · p95 latency | < $0.08 · 25 s | — |
 
 The κ row matters as much as the rest: an LLM judge nobody validated is a number nobody should trust.
+
+The retrieval numbers are below target and that is the point of having them: the first run of the
+harness found the lexical ranking function was both slow and bad, and fixing it moved hybrid from
+*worse* than dense to better (`evals/retrieval/HISTORY.md`). Candidate-pool size is the next knob.
 
 ---
 
@@ -201,14 +206,26 @@ pytest                              # 128 tests, no keys, no network; db-marked 
 python -m preflight.decode.notam --demo     # decode three NOTAMs with zero setup
 ```
 
-**The stack** — Postgres + pgvector, Redis, MinIO, Langfuse, and the ingest scheduler:
+**The database** — two options. On a laptop, native is the right one: it idles at ~25 MB and
+starts in a second, versus a 6 GB Linux VM for Docker.
 
 ```bash
-# Docker Desktop, or on macOS without it:  brew install colima docker docker-compose && colima start
-cp .env.example .env                # fill in only what you need
-make up                             # docker compose up -d; schema auto-applies on first boot
-make db                             # apply db/*.sql to an existing database
+# Option A — native Postgres (macOS)
+brew install postgresql@17 pgvector
+make db-start                       # pg_ctl on :5433; not a login service, nothing runs unless you start it
+createdb -p 5433 preflight && psql -p 5433 preflight -c "CREATE ROLE preflight LOGIN PASSWORD 'preflight' SUPERUSER"
+cp .env.example .env                # DATABASE_URL already points at :5433
+make db                             # apply db/*.sql
+make db-stop                        # when you're done
 
+# Option B — the full Docker stack (what deploys): Postgres :5432, Redis, MinIO, Langfuse, scheduler
+# Docker Desktop, or on macOS without it:  brew install colima docker docker-compose && colima start
+make up                             # schema auto-applies on first boot; set DATABASE_URL to :5432
+```
+
+Then:
+
+```bash
 preflight dbcheck                   # round-trips the database, confirms pgvector
 preflight ingest weather KSFO KJFK
 preflight ingest notams --file data/samples/notams-demo.txt
@@ -241,10 +258,12 @@ preflight corpus stats
 | `pytest` | default: excludes `live` and `ml` |
 | `pytest -m live` | hits real external APIs (aviationweather.gov) |
 | `pytest -m ml` | loads the real embedding and reranker models |
-| `make up` / `make down` | the compose stack |
+| `preflight eval retrieval` | Recall/nDCG/P@10 per config on the 350-query golden set (~30 min) |
+| `make db-start` / `make db-stop` | native Postgres on :5433 |
+| `make up` / `make down` | the Docker stack on :5432 |
 | `make demo` | decode the bundled NOTAMs |
 
-CI runs on every push and PR against a `pgvector/pgvector:pg16` service container, applying
+CI runs on every push and PR against a `pgvector/pgvector:pg17` service container, applying
 `db/*.sql` first, so the `db`-marked tests run for real there. On a laptop without Postgres they
 skip. No model is ever downloaded in CI — retrieval tests use hash-based fakes behind the same
 protocols.
@@ -252,7 +271,8 @@ protocols.
 Migrations are plain SQL in `db/`, applied in filename order; the Postgres container applies them
 on first boot, `make db` applies them to an existing database.
 
-After a reboot (Colima stops on sleep): `colima start && docker compose up -d`.
+Nothing starts on login. Native Postgres: `make db-start` when you sit down, `make db-stop` when
+you're done. The Docker stack: `colima start && make up` (Colima stops on sleep and reboot).
 
 ---
 
@@ -276,10 +296,12 @@ src/preflight/
   db/                   plain-SQL persistence: notams, weather, corpus (hybrid search), runs, pool
   brief/                deterministic briefing core + text renderer
   retrieval/            chunker, Embedder/Reranker protocols, Retriever (hybrid + rerank)
+  evals/retrieval.py    golden-set builder, metrics, runner → evals/retrieval/RESULTS.md
   api/                  FastAPI: /decode, /brief, /brief/stream
   cli.py                the `preflight` command
 db/*.sql                schema + migrations (pgvector, full-text, HNSW)
 docs/adr/               architecture decision records
+evals/retrieval/        golden.jsonl (350 queries), RESULTS.md (latest run), HISTORY.md (what each run changed)
 tests/                  129 tests; markers: db, live, ml
 data/samples/           bundled sample NOTAMs (real corpora are gitignored under data/raw)
 ```

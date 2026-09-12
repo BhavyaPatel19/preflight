@@ -1,8 +1,11 @@
 """Precedent corpus: documents, chunks, and the hybrid search statement.
 
 One SQL statement does the retrieval: a dense candidate set (HNSW, cosine) and
-a lexical candidate set (tsvector, ts_rank_cd), each filtered by the same
-metadata, fused with reciprocal rank fusion. Weights of 0 switch a channel off,
+a lexical candidate set (tsvector, ts_rank), each filtered by the same
+metadata, fused with reciprocal rank fusion. ``ts_rank`` rather than
+``ts_rank_cd``: on a 34-term paraphrase query both match ~81k chunks, and the
+cover-density variant took 2 s to rank them against 236 ms — measured in the
+retrieval eval; see evals/retrieval/RESULTS.md. Weights of 0 switch a channel off,
 which is how the eval ablates dense-only vs lexical-only vs hybrid.
 """
 
@@ -84,10 +87,21 @@ def replace_chunks(
     return len(chunks)
 
 
+SHORT_QUERY_TERMS = 4
+
+
 def lexical_query(text: str) -> str:
-    """OR-join the terms so partial matches still rank; ts_rank_cd rewards more hits."""
-    terms = {t.lower() for t in _TOKEN.findall(text) if len(t) > 1}
-    return " | ".join(sorted(terms))
+    """tsquery for the lexical channel.
+
+    Short queries (≤ 4 terms) are identifier-shaped — ``runway 28R`` — and every
+    term must match, or the common word swamps the discriminating one. Long
+    queries are paraphrases; OR-join them so partial matches still rank and
+    ``ts_rank`` rewards the chunks that hit more of them. Both thresholds were
+    set by the retrieval eval, not by taste.
+    """
+    terms = sorted({t.lower() for t in _TOKEN.findall(text) if len(t) > 1})
+    joiner = " & " if len(terms) <= SHORT_QUERY_TERMS else " | "
+    return joiner.join(terms)
 
 
 _HYBRID = """
@@ -98,8 +112,10 @@ WITH params AS (
 pool AS (
     SELECT c.id, c.embedding, c.search_tsv
     FROM chunks c JOIN documents d ON d.id = c.document_id
-    WHERE (%(icao)s::text IS NULL OR c.icao = %(icao)s OR c.icao IS NULL)
+    WHERE (%(icao)s::text IS NULL OR c.icao = %(icao)s
+           OR (c.icao IS NULL AND NOT %(icao_strict)s))
       AND (%(source)s::text IS NULL OR d.source = %(source)s)
+      AND (%(exclude)s::text IS NULL OR c.text NOT LIKE %(exclude)s)
 ),
 dense AS (
     SELECT p.id, row_number() OVER (ORDER BY p.embedding <=> params.qvec) AS rnk
@@ -109,10 +125,10 @@ dense AS (
     LIMIT %(n)s
 ),
 lexical AS (
-    SELECT p.id, row_number() OVER (ORDER BY ts_rank_cd(p.search_tsv, params.q) DESC) AS rnk
+    SELECT p.id, row_number() OVER (ORDER BY ts_rank(p.search_tsv, params.q) DESC) AS rnk
     FROM pool p, params
     WHERE %(w_lex)s > 0 AND %(qor)s <> '' AND p.search_tsv @@ params.q
-    ORDER BY ts_rank_cd(p.search_tsv, params.q) DESC
+    ORDER BY ts_rank(p.search_tsv, params.q) DESC
     LIMIT %(n)s
 ),
 fused AS (
@@ -149,13 +165,19 @@ def hybrid_search(
     w_lex: float = 1.0,
     icao: str | None = None,
     source: str | None = None,
+    exclude_like: str | None = None,
+    icao_strict: bool = False,
 ) -> list[Candidate]:
+    """``exclude_like`` drops chunks matching a SQL LIKE pattern — the eval uses it to hide
+    synopsis-bearing chunks so a synopsis query has to find the narrative. ``icao_strict``
+    makes the airport filter exclude chunks with no airport (by default they are admitted,
+    since an unknown airport is not a different airport)."""
     if query_vec is None:
         w_dense = 0.0
     rows = conn.execute(_HYBRID, {
         "qvec": list(query_vec) if query_vec is not None else [0.0] * 768,
         "qor": lexical_query(query_text),
-        "icao": icao, "source": source,
+        "icao": icao, "source": source, "exclude": exclude_like, "icao_strict": icao_strict,
         "n": candidates, "k": rrf_k, "limit": limit,
         "w_dense": w_dense, "w_lex": w_lex,
     }).fetchall()

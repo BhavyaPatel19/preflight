@@ -51,8 +51,10 @@ def test_fakes_satisfy_protocols():
     assert isinstance(HashEmbedder(), Embedder) and isinstance(SubstringReranker("x"), Reranker)
 
 
-def test_lexical_query_is_or_joined_and_sanitised():
-    assert corpus.lexical_query("Runway 28R closed! (WIP)") == "28r | closed | runway | wip"
+def test_lexical_query_short_is_and_long_is_or():
+    assert corpus.lexical_query("Runway 28R closed! (WIP)") == "28r & closed & runway & wip"
+    long = corpus.lexical_query("night arrival with the parallel runway closed led to a taxiway")
+    assert " | " in long and " & " not in long
     assert corpus.lexical_query("a b") == ""                 # single chars dropped
 
 

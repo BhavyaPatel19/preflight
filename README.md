@@ -132,7 +132,7 @@ Built in the open, six sprints over twelve weeks.
 | 2 | Fine-tuned NOTAM entity extractor → HF Hub | ⬜ waits on a real NOTAM corpus |
 | 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟢 done — corpus, golden set, measured |
 | 4 | LangGraph agent graph, grounding, abstention | ⬜ not started |
-| 5 | Time-travel eval harness + CI regression gate | ⬜ not started |
+| 5 | Time-travel eval harness + CI regression gate | 🟡 600-case set built from NTSB (300 + 300 matched); scorer reports coverage honestly; judge + gate wait on an LLM key |
 | 6 | Delay forecasting, cost/latency, UI, MCP server | 🟡 UI done (pulled forward) |
 
 **Working today**
@@ -168,8 +168,8 @@ CI gate will enforce.
 | Retrieval | P@10 on exact-identifier queries (`runway 28R` at an airport) | ≥ 0.80 | 0.77 |
 | Rerank | nDCG@10 lift over dense-only | +0.12 | +0.09 |
 | Forecast | MASE vs seasonal-naive | < 0.85 | — |
-| End-to-end | implicated-hazard recall (positives) | ≥ 0.85 | — |
-| End-to-end | false-alarm rate (matched negatives) | < 0.15 | — |
+| End-to-end | implicated-hazard recall (300 NTSB positives) | ≥ 0.85 | — (0 / 300 covered: archive began 2026-09-11 — [details](evals/briefing/RESULTS.md)) |
+| End-to-end | false-alarm rate (300 matched negatives) | < 0.15 | — (0 / 300 covered) |
 | Grounding | claim-level citation accuracy | ≥ 0.97 | — |
 | Abstention | correct abstention on data-gap cases | ≥ 0.90 | — |
 | Safety | prompt-injection resistance (60 adversarial NOTAMs) | 100% | — |
@@ -289,6 +289,7 @@ searched.
 | `pytest -m live` | hits real external APIs (aviationweather.gov) |
 | `pytest -m ml` | loads the real embedding and reranker models |
 | `preflight eval retrieval` | Recall/nDCG/P@10 per config on the 350-query golden set (~30 min) |
+| `preflight eval briefing` | replay the briefing on 600 NTSB-derived cases; coverage, hazard recall, false alarms |
 | `make db-start` / `make db-stop` | native Postgres on :5433 |
 | `make up` / `make down` | the Docker stack on :5432 |
 | `make demo` | decode the bundled NOTAMs |
@@ -327,11 +328,13 @@ src/preflight/
   brief/                deterministic briefing core, precedent attachment, text renderer
   retrieval/            chunker, Embedder/Reranker protocols, Retriever (hybrid + rerank)
   evals/retrieval.py    golden-set builder, metrics, runner → evals/retrieval/RESULTS.md
+  evals/briefing.py     NTSB-derived cases (positives + matched negatives), time-travel scorer
   api/                  FastAPI: /decode, /brief, /brief/stream, and static/index.html (the UI)
   cli.py                the `preflight` command
 db/*.sql                schema + migrations (pgvector, full-text, HNSW)
 docs/adr/               architecture decision records
 evals/retrieval/        golden.jsonl (350 queries), RESULTS.md (latest run), HISTORY.md (what each run changed)
+evals/briefing/         golden.jsonl (600 cases), RESULTS.md — coverage, recall, false alarms
 tests/                  129 tests; markers: db, live, ml
 data/samples/           bundled sample NOTAMs (real corpora are gitignored under data/raw)
 ```

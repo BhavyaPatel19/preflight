@@ -82,48 +82,65 @@ class AviationWeatherClient:
         self._base = (base or settings().aviationweather_base).rstrip("/")
         self._client = client or httpx.AsyncClient(timeout=15.0)
 
-    async def metars(self, *icaos: str, hours: int = 3) -> list[Metar]:
+    async def metar_rows(self, *icaos: str, hours: int = 3) -> list[dict[str, Any]]:
+        """Raw API rows — what the archive keeps."""
         params = {"ids": ",".join(icaos), "format": "json", "hours": str(hours)}
         r = await self._client.get(f"{self._base}/metar", params=params)
         r.raise_for_status()
-        out: list[Metar] = []
-        for row in r.json():
-            observed = _ts(row.get("reportTime") or row.get("obsTime"))
-            if observed is None:
-                continue
-            out.append(Metar(
-                icao=row["icaoId"],
-                observed_at=observed,
-                raw=row.get("rawOb", ""),
-                flight_category=row.get("fltCat"),
-                wind_dir=row.get("wdir") if isinstance(row.get("wdir"), int) else None,
-                wind_kt=row.get("wspd"),
-                gust_kt=row.get("wgst"),
-                visibility_sm=_visibility(row.get("visib")),
-                temp_c=row.get("temp"),
-                dewpoint_c=row.get("dewp"),
-                altimeter_hpa=row.get("altim"),
-                wx=row.get("wxString"),
-                ceiling_ft=_ceiling(row.get("clouds")),
-            ))
-        return out
+        rows: list[dict[str, Any]] = r.json()
+        return rows
 
-    async def tafs(self, *icaos: str) -> list[Taf]:
+    async def taf_rows(self, *icaos: str) -> list[dict[str, Any]]:
         params = {"ids": ",".join(icaos), "format": "json"}
         r = await self._client.get(f"{self._base}/taf", params=params)
         r.raise_for_status()
-        out: list[Taf] = []
-        for row in r.json():
-            issued = _ts(row.get("issueTime"))
-            vfrom = _ts(row.get("validTimeFrom"))
-            vto = _ts(row.get("validTimeTo"))
-            if not (issued and vfrom and vto):
-                continue
-            out.append(Taf(
-                icao=row["icaoId"], issued_at=issued, valid_from=vfrom, valid_to=vto,
-                raw=row.get("rawTAF", ""),
-            ))
-        return out
+        rows: list[dict[str, Any]] = r.json()
+        return rows
+
+    async def metars(self, *icaos: str, hours: int = 3) -> list[Metar]:
+        return parse_metar_rows(await self.metar_rows(*icaos, hours=hours))
+
+    async def tafs(self, *icaos: str) -> list[Taf]:
+        return parse_taf_rows(await self.taf_rows(*icaos))
 
     async def aclose(self) -> None:
         await self._client.aclose()
+
+
+def parse_metar_rows(rows: list[dict[str, Any]]) -> list[Metar]:
+    out: list[Metar] = []
+    for row in rows:
+        observed = _ts(row.get("reportTime") or row.get("obsTime"))
+        if observed is None:
+            continue
+        out.append(Metar(
+            icao=row["icaoId"],
+            observed_at=observed,
+            raw=row.get("rawOb", ""),
+            flight_category=row.get("fltCat"),
+            wind_dir=row.get("wdir") if isinstance(row.get("wdir"), int) else None,
+            wind_kt=row.get("wspd"),
+            gust_kt=row.get("wgst"),
+            visibility_sm=_visibility(row.get("visib")),
+            temp_c=row.get("temp"),
+            dewpoint_c=row.get("dewp"),
+            altimeter_hpa=row.get("altim"),
+            wx=row.get("wxString"),
+            ceiling_ft=_ceiling(row.get("clouds")),
+        ))
+    return out
+
+
+def parse_taf_rows(rows: list[dict[str, Any]]) -> list[Taf]:
+    out: list[Taf] = []
+    for row in rows:
+        issued = _ts(row.get("issueTime"))
+        vfrom = _ts(row.get("validTimeFrom"))
+        vto = _ts(row.get("validTimeTo"))
+        if not (issued and vfrom and vto):
+            continue
+        out.append(Taf(
+            icao=row["icaoId"], issued_at=issued, valid_from=vfrom, valid_to=vto,
+            raw=row.get("rawTAF", ""),
+        ))
+    return out

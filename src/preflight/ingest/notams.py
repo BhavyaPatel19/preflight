@@ -1,26 +1,21 @@
 from __future__ import annotations
 
-import re
-from pathlib import Path
+from collections.abc import Sequence
+from datetime import UTC, datetime
 
 import structlog
 
+from preflight.archive import archive_raw
 from preflight.db import get_pool
 from preflight.db import notams as ndb
 from preflight.decode.notam import NotamParseError, parse_notam
 from preflight.schemas import NotamRecord
+from preflight.sources.notams import NotamSource
 
 log = structlog.get_logger(__name__)
 
-# NOTAMs in a text dump are separated by blank lines; ICAO ones may span lines.
-_SPLIT = re.compile(r"\n\s*\n")
 
-
-def split_dump(text: str) -> list[str]:
-    return [chunk.strip() for chunk in _SPLIT.split(text) if chunk.strip()]
-
-
-def decode_many(raws: list[str]) -> tuple[list[NotamRecord], list[str]]:
+def decode_many(raws: Sequence[str]) -> tuple[list[NotamRecord], list[str]]:
     """Decode what parses; return the rest so nothing is silently dropped."""
     records: list[NotamRecord] = []
     failed: list[str] = []
@@ -32,20 +27,29 @@ def decode_many(raws: list[str]) -> tuple[list[NotamRecord], list[str]]:
     return records, failed
 
 
-def ingest_notams(raws: list[str]) -> dict[str, int]:
-    """Decode and store a batch of raw NOTAMs.
+async def ingest_notams(source: NotamSource, icaos: Sequence[str] = ()) -> dict[str, int | str]:
+    """Fetch from ``source``, archive the raw batch, decode, store.
 
-    The source is a list of strings so the same job serves a text dump today
-    and the FAA API client once its key is in place.
+    Archive happens before decode on purpose: a parser bug must never cost us
+    the snapshot. The archive is what the time-travel evaluation replays.
     """
-    records, failed = decode_many(raws)
+    raws = await source.fetch(icaos)
+    fetched_at = raws[0].fetched_at if raws else datetime.now(UTC)
+    archived = archive_raw(
+        "notams", source.name, "\n\n".join(r.text for r in raws), fetched_at=fetched_at
+    )
+
+    records, failed = decode_many([r.text for r in raws])
     with get_pool().connection() as conn:
         stored = ndb.upsert_many(conn, records)
         conn.commit()
+
     low = sum(1 for r in records if r.decode_confidence < 0.6)
-    log.info("notams.ingested", stored=stored, unparseable=len(failed), low_confidence=low)
-    return {"stored": stored, "unparseable": len(failed), "low_confidence": low}
-
-
-def ingest_file(path: Path) -> dict[str, int]:
-    return ingest_notams(split_dump(path.read_text()))
+    log.info(
+        "notams.ingested", source=source.name, fetched=len(raws), stored=stored,
+        unparseable=len(failed), low_confidence=low, archive=str(archived),
+    )
+    return {
+        "fetched": len(raws), "stored": stored, "unparseable": len(failed),
+        "low_confidence": low, "archive": str(archived),
+    }

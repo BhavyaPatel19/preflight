@@ -402,6 +402,13 @@ All public. Nothing in this repo is scraped.
 
 ---
 
+## Demo
+
+[docs/WALKTHROUGH.md](docs/WALKTHROUGH.md) — a three-minute demo script, what each measured number
+means and what it does not claim, and the questions you will be asked.
+
+---
+
 ## Design records
 
 | ADR | Decision |

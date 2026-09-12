@@ -61,9 +61,16 @@ This eval design is the centre of the project. Everything else is in service of 
 
 ## What it does today
 
-Real output from the deterministic core, against the bundled sample NOTAMs and live weather. No model
-in the loop yet; every claim carries a citation with a verbatim quote, and the schema makes an uncited
-claim impossible.
+![The briefing UI: a KSFO→KJFK flight with a runway closure, an ILS outage and a taxiway closure, each with cited NOTAMs and prior-report precedent](docs/briefing-ui.png)
+
+`preflight serve` then open http://localhost:8000 — findings stream in as they resolve, every citation
+clicks open to its source passage. For the runway closure at KSFO, the precedent search returned the
+NTSB investigation of **Air Canada 759** — the incident this project is motivated by — with nothing tuned
+for it.
+
+The same briefing in the terminal, against the bundled sample NOTAMs and live weather. No model in the
+loop; every claim carries a citation with a verbatim quote, and the schema makes an uncited claim
+impossible.
 
 ```
 KSFO → KJFK (alt KBOS)  ·  A320  ·  off-block 11 Sep 0230Z
@@ -126,7 +133,7 @@ Built in the open, six sprints over twelve weeks.
 | 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟢 done — corpus, golden set, measured |
 | 4 | LangGraph agent graph, grounding, abstention | ⬜ not started |
 | 5 | Time-travel eval harness + CI regression gate | ⬜ not started |
-| 6 | Delay forecasting, cost/latency, UI, MCP server | ⬜ not started |
+| 6 | Delay forecasting, cost/latency, UI, MCP server | 🟡 UI done (pulled forward) |
 
 **Working today**
 
@@ -137,9 +144,12 @@ Built in the open, six sprints over twelve weeks.
   escalation queue; every fetch archived raw before decode.
 - **Ingest** — METAR/TAF from aviationweather.gov; NOTAMs through a provider interface (text dumps
   today, NASA DIP when access lands); hourly scheduler with a run log.
-- **Brief** — `preflight brief` / `POST /brief` / `POST /brief/stream`: ranked, cited findings and
+- **Brief** — `preflight brief` / `POST /brief` / `GET /brief/stream`: ranked, cited findings and
   explicit abstentions, with **precedent**: for each actionable finding, prior ASRS/NTSB reports
   describing what went wrong for crews in those conditions, each citing the verbatim passage.
+- **UI** — `preflight serve` → http://localhost:8000: findings stream in over SSE, citations click
+  open to the source passage, abstentions shown as their own block. URL parameters make a briefing
+  shareable. One HTML file, no build step.
 - **Retrieve** — hybrid search (pgvector + tsvector fused with RRF, cross-encoder reranked) over
   47,723 ASRS incident reports and 27,986 NTSB accident/incident investigations, with ablation
   switches for the eval.
@@ -263,7 +273,10 @@ preflight search "28R closed" --mode lexical --no-rerank      # ablation switche
 preflight corpus stats
 ```
 
-**API** — `preflight serve`, then `POST /decode`, `POST /brief`, `POST /brief/stream` (SSE), `GET /health`.
+**API and UI** — `preflight serve`, then open http://localhost:8000. Endpoints: `POST /decode`,
+`POST /brief`, `GET|POST /brief/stream` (SSE), `GET /health`. The retrieval models load once at
+startup when the ML extras are installed; without them the briefing states that precedent was not
+searched.
 
 ---
 
@@ -314,7 +327,7 @@ src/preflight/
   brief/                deterministic briefing core, precedent attachment, text renderer
   retrieval/            chunker, Embedder/Reranker protocols, Retriever (hybrid + rerank)
   evals/retrieval.py    golden-set builder, metrics, runner → evals/retrieval/RESULTS.md
-  api/                  FastAPI: /decode, /brief, /brief/stream
+  api/                  FastAPI: /decode, /brief, /brief/stream, and static/index.html (the UI)
   cli.py                the `preflight` command
 db/*.sql                schema + migrations (pgvector, full-text, HNSW)
 docs/adr/               architecture decision records

@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preflight</title>
+<style>
+:root{
+  --paper:#EDF0F4; --surface:#FFFFFF; --surface-2:#F5F7FA; --surface-3:#E7ECF2;
+  --ink:#121924; --ink-2:#44516A; --ink-3:#6B7992; --rule:#D3DBE5; --rule-soft:#E4E9F0;
+  --accent:#B3276C; --accent-soft:#FBEAF2; --blue:#2B5CA8; --blue-soft:#E8EFFA;
+  --amber:#94600A; --amber-soft:#FAF0DA; --red:#B03227; --red-soft:#FBEAE7;
+  --green:#1B7250; --green-soft:#E4F3EC;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#0A0F16; --surface:#121A24; --surface-2:#18212D; --surface-3:#1E2937;
+  --ink:#E4EBF3; --ink-2:#A2B0C4; --ink-3:#78869A; --rule:#27323F; --rule-soft:#1D2733;
+  --accent:#F175AD; --accent-soft:#2D1524; --blue:#7CA8E8; --blue-soft:#14223A;
+  --amber:#E0A244; --amber-soft:#2C2113; --red:#EE8074; --red-soft:#2E1815;
+  --green:#4FC08D; --green-soft:#10261D;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 var(--sans);padding:0 20px 56px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+
+/* masthead: a flight progress strip */
+.strip{margin-top:28px;border:1.5px solid var(--ink);background:var(--surface);display:flex;flex-wrap:wrap}
+.strip-id{flex:1 1 260px;padding:16px 20px;border-right:1.5px solid var(--ink)}
+.strip-id h1{margin:0;font:700 34px/1 var(--sans);letter-spacing:-.03em}
+.strip-id h1 span{color:var(--accent)}
+.strip-id p{margin:8px 0 0;color:var(--ink-2);font-size:13.5px;max-width:44ch}
+.strip-note{flex:0 1 280px;padding:14px 18px;background:var(--surface-2);font:12px/1.5 var(--mono);color:var(--ink-2)}
+.strip-note b{color:var(--red)}
+
+/* form */
+form{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:16px 18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px 14px;align-items:end}
+label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+input,select{font:14px var(--mono);padding:8px 10px;border:1px solid var(--rule);border-radius:3px;background:var(--surface-2);color:var(--ink)}
+input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.off{grid-column:span 2}
+.check{flex-direction:row;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-size:13px;font-weight:500;color:var(--ink-2)}
+.check input{width:15px;height:15px;accent-color:var(--accent)}
+button{font:600 14px var(--sans);padding:10px 18px;border:0;border-radius:3px;background:var(--accent);color:#fff;cursor:pointer}
+button:disabled{opacity:.55;cursor:wait}
+
+/* results */
+.status{font:12.5px var(--mono);color:var(--ink-3);display:flex;gap:16px;flex-wrap:wrap;min-height:18px}
+.status .live::before{content:"●";color:var(--green);margin-right:6px}
+.findings{display:flex;flex-direction:column;gap:10px}
+.finding{background:var(--surface);border:1px solid var(--rule);border-radius:4px;display:flex;gap:14px;padding:14px 16px;animation:in .25s ease}
+@keyframes in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.finding{animation:none}}
+.sev{width:4px;border-radius:2px;flex:none;align-self:stretch}
+.sev-HIGH{background:var(--red)} .sev-MEDIUM{background:var(--amber)} .sev-LOW{background:var(--blue)} .sev-INFO{background:var(--green)}
+.body{flex:1;min-width:0}
+.hd{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:4px}
+.hd b{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.tag{font:11px var(--mono);padding:2px 7px;border-radius:3px;white-space:nowrap}
+.tag-HIGH{background:var(--red-soft);color:var(--red)} .tag-MEDIUM{background:var(--amber-soft);color:var(--amber)}
+.tag-LOW{background:var(--blue-soft);color:var(--blue)} .tag-INFO{background:var(--green-soft);color:var(--green)}
+.phases{font:11px var(--mono);color:var(--ink-3)}
+.headline{font-weight:600;margin:2px 0 6px}
+.claim{font-size:14px;color:var(--ink-2);margin:6px 0 2px}
+.cites{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 2px}
+.cite{font:11px var(--mono);color:var(--blue);background:var(--blue-soft);border:0;padding:2px 7px;border-radius:3px;cursor:pointer}
+.cite[aria-expanded="true"]{outline:1.5px solid var(--blue)}
+.quote{display:none;margin:6px 0 4px;padding:8px 10px;border-left:3px solid var(--blue);background:var(--surface-2);font:12.5px/1.5 var(--mono);color:var(--ink-2);white-space:pre-wrap;word-break:break-word}
+.quote.open{display:block}
+.quote .src{color:var(--ink-3);display:block;margin-bottom:4px;font-size:11px}
+.abstain{border-left:3px solid var(--amber);background:var(--amber-soft);padding:10px 14px;border-radius:0 4px 4px 0}
+.abstain b{font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.abstain p{margin:2px 0 0;font-size:13.5px;color:var(--ink-2)}
+.abstain code{font:11px var(--mono);color:var(--ink-3)}
+.empty{color:var(--ink-3);font-size:13.5px}
+.err{border-left:3px solid var(--red);background:var(--red-soft);padding:10px 14px;font:13px var(--mono);color:var(--red)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="strip">
+    <div class="strip-id">
+      <h1>PRE<span>FLIGHT</span></h1>
+      <p>Route-risk briefing: NOTAMs, weather and prior incident reports for a flight, every claim cited, gaps stated.</p>
+    </div>
+    <div class="strip-note"><b>NOT FOR OPERATIONAL USE.</b><br>Research system. Not certified, not validated. Do not use for real flight planning.</div>
+  </header>
+
+  <form id="f">
+    <label>Departure <input id="dep" value="KSFO" pattern="[A-Za-z]{4}" required></label>
+    <label>Destination <input id="dest" value="KJFK" pattern="[A-Za-z]{4}" required></label>
+    <label>Alternates <input id="alt" value="KBOS" placeholder="KBOS, KPHL"></label>
+    <label class="off">Off-block (UTC) <input id="off" type="datetime-local" required></label>
+    <label>Aircraft <input id="type" value="A320"></label>
+    <label class="check"><input id="prec" type="checkbox" checked> prior-report precedent</label>
+    <button id="go" type="submit">Brief</button>
+  </form>
+
+  <div class="status" id="status"></div>
+  <section class="findings" id="findings"><p class="empty">Findings appear here as they resolve.</p></section>
+  <section id="abstentions" style="display:flex;flex-direction:column;gap:8px"></section>
+</div>
+
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const off = $("off");
+  // default: two hours from now, in UTC, as datetime-local wants it
+  const t = new Date(Date.now() + 2 * 3600e3);
+  off.value = t.toISOString().slice(0, 16);
+
+  const qs = new URLSearchParams(location.search);
+  if (qs.get("departure")) $("dep").value = qs.get("departure");
+  if (qs.get("destination")) $("dest").value = qs.get("destination");
+  if (qs.has("alternates")) $("alt").value = qs.get("alternates");
+  if (qs.get("off_block")) off.value = qs.get("off_block").slice(0, 16);
+  if (qs.has("aircraft_type")) $("type").value = qs.get("aircraft_type");
+  if (qs.has("precedent")) $("prec").checked = qs.get("precedent") !== "false";
+
+  let es = null;
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+  function citeBlock(claim, i) {
+    const refs = claim.citations.map((c, j) =>
+      `<button class="cite" type="button" data-q="${i}-${j}" aria-expanded="false">${esc(c.kind)}:${esc(c.ref)}</button>`).join("");
+    const quotes = claim.citations.map((c, j) =>
+      `<div class="quote" id="q-${i}-${j}"><span class="src">${esc(c.kind)} · ${esc(c.ref)}${c.issued_at ? " · " + esc(c.issued_at) : ""}</span>${esc(c.quote || "(no passage recorded)")}</div>`).join("");
+    return `<p class="claim">${esc(claim.text)}</p><div class="cites">${refs}</div>${quotes}`;
+  }
+
+  function renderFinding(f, n) {
+    const el = document.createElement("article");
+    el.className = "finding";
+    el.innerHTML =
+      `<div class="sev sev-${f.severity}"></div><div class="body">` +
+      `<div class="hd"><span class="tag tag-${f.severity}">${f.severity}</span><b>${esc(f.category)}</b>` +
+      `<span class="phases">${f.phases.join(", ")}</span></div>` +
+      `<div class="headline">${esc(f.headline)}</div>` +
+      f.claims.map((c, i) => citeBlock(c, `${n}-${i}`)).join("") + `</div>`;
+    el.addEventListener("click", e => {
+      const b = e.target.closest(".cite"); if (!b) return;
+      const q = document.getElementById("q-" + b.dataset.q);
+      const open = q.classList.toggle("open");
+      b.setAttribute("aria-expanded", open);
+    });
+    return el;
+  }
+
+  function renderAbstention(a) {
+    const el = document.createElement("div");
+    el.className = "abstain";
+    el.innerHTML = `<b>Not determined — ${esc(a.topic)}</b><p>${esc(a.detail)} <code>[${esc(a.reason)}]</code></p>`;
+    return el;
+  }
+
+  $("f").addEventListener("submit", ev => {
+    ev.preventDefault();
+    if (es) es.close();
+    const p = new URLSearchParams({
+      departure: $("dep").value.toUpperCase(), destination: $("dest").value.toUpperCase(),
+      alternates: $("alt").value.toUpperCase().replace(/\s+/g, ""),
+      off_block: off.value + ":00Z", aircraft_type: $("type").value, precedent: $("prec").checked,
+    });
+    const findings = $("findings"), abst = $("abstentions"), status = $("status");
+    findings.innerHTML = ""; abst.innerHTML = "";
+    status.innerHTML = `<span class="live">building</span>`;
+    $("go").disabled = true;
+    let n = 0, sevCount = {};
+    es = new EventSource("/brief/stream?" + p.toString());
+    es.addEventListener("finding", e => {
+      const f = JSON.parse(e.data); sevCount[f.severity] = (sevCount[f.severity] || 0) + 1;
+      findings.appendChild(renderFinding(f, n++));
+    });
+    es.addEventListener("abstention", e => abst.appendChild(renderAbstention(JSON.parse(e.data))));
+    es.addEventListener("done", e => {
+      const d = JSON.parse(e.data);
+      status.innerHTML = `<span>${d.findings} finding${d.findings === 1 ? "" : "s"}</span><span>${d.abstentions} abstention${d.abstentions === 1 ? "" : "s"}</span>` +
+        `<span>sources considered ${d.sources_considered}</span><span>${d.latency_ms} ms</span>`;
+      if (!n) findings.innerHTML = `<p class="empty">No findings for this flight in the current data.</p>`;
+      es.close(); $("go").disabled = false;
+    });
+    es.onerror = () => {
+      status.innerHTML = `<div class="err">stream error — is the API running and the database up?</div>`;
+      es.close(); $("go").disabled = false;
+    };
+    history.replaceState(null, "", "?" + p.toString());
+  });
+  if (qs.get("departure") && qs.get("destination")) $("f").requestSubmit();
+})();
+</script>
+</body>
+</html>

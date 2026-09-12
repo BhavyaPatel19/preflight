@@ -1,8 +1,9 @@
 """HTTP surface.
 
 ``/decode`` and ``/brief`` are real. ``/brief/stream`` emits the same briefing
-section by section over SSE so a client can render progressively; the agent
-layer (Sprint 4) slots in behind the same events without changing the wire.
+finding by finding over SSE so a client can render progressively; ``GET /``
+serves the single-page briefing UI that consumes it. The agent layer (Sprint 4)
+slots in behind the same events without changing the wire.
 """
 
 from __future__ import annotations
@@ -11,9 +12,12 @@ import asyncio
 import json
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from typing import Any
+from datetime import datetime
+from pathlib import Path
+from typing import Annotated, Any
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from sse_starlette.sse import EventSourceResponse
 
@@ -46,6 +50,14 @@ class DecodeRequest(BaseModel):
     text: str = Field(min_length=1, description="Raw NOTAM, ICAO or US domestic format")
 
 
+_STATIC = Path(__file__).parent / "static"
+
+
+@app.get("/", include_in_schema=False)
+async def index() -> FileResponse:
+    return FileResponse(_STATIC / "index.html")
+
+
 @app.get("/health")
 async def health() -> dict[str, str]:
     return {"status": "ok", "version": __version__}
@@ -70,12 +82,14 @@ async def brief(req: FlightRequest, precedent: bool = True) -> Briefing:
     return await asyncio.to_thread(_build, req, precedent)
 
 
-async def _brief_events(req: FlightRequest) -> AsyncIterator[dict[str, str]]:
+async def _brief_events(
+    req: FlightRequest, precedent: bool = True
+) -> AsyncIterator[dict[str, str]]:
     yield {"event": "start", "data": json.dumps({
         "departure": req.departure, "destination": req.destination,
         "alternates": list(req.alternates),
     })}
-    b = await asyncio.to_thread(_build, req)
+    b = await asyncio.to_thread(_build, req, precedent)
     for f in b.ranked():
         yield {"event": "finding", "data": f.model_dump_json()}
     for a in b.abstentions:
@@ -88,5 +102,23 @@ async def _brief_events(req: FlightRequest) -> AsyncIterator[dict[str, str]]:
 
 
 @app.post("/brief/stream")
-async def brief_stream(req: FlightRequest) -> EventSourceResponse:
-    return EventSourceResponse(_brief_events(req))
+async def brief_stream(req: FlightRequest, precedent: bool = True) -> EventSourceResponse:
+    return EventSourceResponse(_brief_events(req, precedent))
+
+
+@app.get("/brief/stream")
+async def brief_stream_get(
+    departure: Annotated[str, Query(pattern=r"^[A-Za-z]{4}$")],
+    destination: Annotated[str, Query(pattern=r"^[A-Za-z]{4}$")],
+    off_block: datetime,
+    alternates: Annotated[str, Query(description="comma-separated ICAO codes")] = "",
+    aircraft_type: str | None = None,
+    precedent: bool = True,
+) -> EventSourceResponse:
+    """Query-string form of the stream, for EventSource (which can only GET)."""
+    req = FlightRequest(
+        departure=departure.upper(), destination=destination.upper(),
+        alternates=tuple(a.strip().upper() for a in alternates.split(",") if a.strip()),
+        off_block=off_block, aircraft_type=aircraft_type or None,
+    )
+    return EventSourceResponse(_brief_events(req, precedent))

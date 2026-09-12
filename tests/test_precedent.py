@@ -125,3 +125,12 @@ def test_same_report_not_cited_twice_across_findings():
     r = _Retriever([_hit("dup", "t", icao="KSFO", title="Dup")])
     out = with_precedent(None, two, r)
     assert len(out.findings[0].claims) == 2 and len(out.findings[1].claims) == 1
+
+
+def test_one_report_cited_once_even_when_several_chunks_match():
+    r = _Retriever([_hit("same", "chunk 0", icao="KSFO", title="Same report", score=0.9),
+                    _hit("same", "chunk 3", icao="KSFO", title="Same report", score=0.8),
+                    _hit("other", "t", icao="KSFO", title="Other", score=0.7)])
+    out = with_precedent(None, _briefing(), r)
+    refs = [c.ref for c in out.findings[0].claims[1].citations]
+    assert refs == ["same", "other"]

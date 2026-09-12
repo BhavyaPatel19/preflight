@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from typing import Any
 
+from pgvector.psycopg import register_vector
+from psycopg import Connection
 from psycopg_pool import ConnectionPool
 
 from preflight.config import settings
@@ -16,7 +19,12 @@ def get_pool() -> ConnectionPool:
         max_size=8,
         open=True,
         kwargs={"autocommit": False},
+        configure=_configure,
     )
+
+
+def _configure(conn: Connection[Any]) -> None:
+    register_vector(conn)
 
 
 def close_pool() -> None:

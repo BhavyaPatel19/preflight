@@ -47,6 +47,15 @@ class Settings(BaseSettings):
     langfuse_public_key: str | None = None
     langfuse_secret_key: str | None = None
 
+    # Retrieval models (ADR 0003). Dev defaults are the fast pair; bge-m3 and
+    # bge-reranker-v2-m3 are the measured upgrade path once the golden set exists.
+    embedding_model: str = "BAAI/bge-base-en-v1.5"
+    embedding_dim: int = 768
+    reranker_model: str = "BAAI/bge-reranker-base"
+    device: str = Field(default="auto", alias="PREFLIGHT_DEVICE")  # auto | cpu | mps | cuda
+    retrieval_candidates: int = 40   # per channel, before fusion
+    rrf_k: int = 60
+
     # Decoder routing: below this the rule parse is escalated to the model.
     decode_escalation_threshold: float = 0.6
 

@@ -47,11 +47,12 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
-addopts = "-q -m 'not live'"
+addopts = "-q -m 'not live and not ml'"
 asyncio_mode = "auto"
 markers = [
     "live: hits real external APIs; opt in with -m live",
     "db: needs Postgres at DATABASE_URL; auto-skips when unreachable",
+    "ml: loads the real embedding/reranker models; opt in with -m ml",
 ]
 
 [tool.mypy]
@@ -59,7 +60,7 @@ python_version = "3.12"
 strict = true
 files = ["src/preflight"]
 
-# APScheduler 3.x ships no type information.
+# APScheduler 3.x ships no type information; the ML extras are optional and absent in CI.
 [[tool.mypy.overrides]]
-module = "apscheduler.*"
+module = ["apscheduler.*", "torch", "torch.*", "sentence_transformers", "sentence_transformers.*"]
 ignore_missing_imports = true

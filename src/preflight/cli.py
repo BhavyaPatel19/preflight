@@ -40,6 +40,23 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("status", help="last ingest run per source")
 
+    co = sub.add_parser("corpus", help="precedent corpus")
+    cosub = co.add_subparsers(dest="op", required=True)
+    ca = cosub.add_parser("add", help="chunk, embed and index one document")
+    ca.add_argument("--source", required=True, choices=["asrs", "ntsb", "far_aim", "ops_note"])
+    ca.add_argument("--id", required=True, help="external id, e.g. ASRS ACN")
+    ca.add_argument("--file", type=Path, required=True)
+    ca.add_argument("--title")
+    ca.add_argument("--icao")
+    cosub.add_parser("stats", help="document and chunk counts")
+
+    se = sub.add_parser("search", help="hybrid search over the corpus")
+    se.add_argument("query")
+    se.add_argument("-k", type=int, default=5)
+    se.add_argument("--icao")
+    se.add_argument("--mode", choices=["hybrid", "dense", "lexical"], default="hybrid")
+    se.add_argument("--no-rerank", action="store_true")
+
     b = sub.add_parser("brief", help="build a briefing from what is in the database")
     b.add_argument("departure")
     b.add_argument("destination")
@@ -161,6 +178,51 @@ def main(argv: list[str] | None = None) -> int:
             tail = f"  {r.error}" if r.error else f"  {counts}"
             when = f"{r.finished_at:%Y-%m-%d %H:%M}Z"
             print(f"{r.kind:<8} {r.source:<16} {when}  {r.status:<7}{tail}")
+        return 0
+
+    if args.cmd == "corpus":
+        from preflight.db import close_pool, get_pool
+
+        try:
+            with get_pool().connection() as conn:
+                if args.op == "stats":
+                    from preflight.db.corpus import stats
+
+                    print(stats(conn))
+                else:
+                    from preflight.retrieval.embed import STEmbedder
+                    from preflight.retrieval.search import index_document
+
+                    n_chunks = index_document(
+                        conn, STEmbedder(), source=args.source, external_id=args.id,
+                        text=args.file.read_text(), title=args.title,
+                        icao=args.icao.upper() if args.icao else None,
+                    )
+                    conn.commit()
+                    print(f"indexed {args.source}:{args.id} — {n_chunks} chunks")
+        finally:
+            close_pool()
+        return 0
+
+    if args.cmd == "search":
+        from preflight.db import close_pool, get_pool
+        from preflight.retrieval.embed import STEmbedder, STReranker
+        from preflight.retrieval.search import Retriever
+
+        retriever = Retriever(STEmbedder(), None if args.no_rerank else STReranker())
+        try:
+            with get_pool().connection() as conn:
+                hits = retriever.search(
+                    conn, args.query, k=args.k, mode=args.mode,
+                    icao=args.icao.upper() if args.icao else None, rerank=not args.no_rerank,
+                )
+        finally:
+            close_pool()
+        for h in hits:
+            rr = f" rerank={h.rerank_score:.3f}" if h.rerank_score is not None else ""
+            ch = ("D" if h.in_dense else "-") + ("L" if h.in_lexical else "-")
+            print(f"[{ch}] {h.ref:<28} fused={h.fused_score:.4f}{rr}")
+            print(f"     {h.text[:160]}{'…' if len(h.text) > 160 else ''}")
         return 0
 
     if args.cmd == "dbcheck":

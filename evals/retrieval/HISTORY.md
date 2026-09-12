@@ -9,6 +9,7 @@ for every run is under `runs/` (gitignored — the numbers that matter are here)
 | 2 | 2026-09-12 18:42 | step 11 | pg17 native | `ts_rank` instead of `ts_rank_cd`; identifier queries use the airport as a metadata filter; `dense+rerank` added | 0.315 | **0.294** | **0.379** | **0.405** | 0.134 / 0.100 | 421 ms |
 | 3 | 2026-09-12 18:48 | step 11 | pg17 native | AND-semantics for ≤ 4-term queries; strict airport filter for identifier queries | — | — | — | — | **0.746 / 0.774** | — |
 | 4 | 2026-09-12 19:11 | step 11 | pg17 native | **final full run** at the step-11 retrieval code (recorded sha is the step-12 checkout; retrieval code identical) — `RESULTS.md` | 0.315 | 0.294 | 0.379 | **0.405** | 0.746 / 0.772 | 424 ms |
+| 5 | 2026-09-12 20:08 | main | pg17 native | experiment: **100 candidates** per channel instead of 40 (`--candidates 100`) — not adopted | 0.315 | 0.294 | 0.388 | 0.391 | 0.748 / 0.776 | 429 ms |
 
 ## What each run taught
 
@@ -26,6 +27,12 @@ P@10 went 0.13 → 0.75. Dense-only stays at 0.54: it finds *runway-related* chu
 but not the specific runway about half the time. That is the exact-identifier weakness hybrid
 retrieval exists to cover, now with a number on it.
 
-**Still open.** Recall@20 tops out around 0.6 with 40 candidates per channel; the reranker cannot
-recover what the pool never held. Candidate-pool size is the next knob (`--candidates 100`).
-`bge-m3` remains the untested upgrade path.
+**Run 5: a bigger candidate pool is not the answer.** With 100 candidates per channel, hybrid
+without rerank gains a little (nDCG@10 0.379 → 0.388, Recall@20 0.553 → 0.580) but hybrid+rerank
+gets slightly *worse* (0.405 → 0.391): the reranker is handed more noise to promote, and latency
+doubles (p50 1.4 s → 2.7 s). Recall@20 does not move. So the ceiling is not the pool — for roughly
+40% of synopsis queries the target narrative is not in the top 100 chunks of either channel. That
+points at the embedder. Kept at 40.
+
+**Still open.** The measured upgrade path is now the embedder: `bge-large-en-v1.5` or `bge-m3`,
+re-embed the corpus (~1–2 h), re-run. Recall@20 is the number to watch.

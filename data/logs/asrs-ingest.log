@@ -1,6 +1,0 @@
-2026-09-12 00:17:15 [info     ] asrs.start                     already_indexed=1500 limit=None splits=('train', 'validation', 'test')
-Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
-Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 18836.13it/s]
-2026-09-12 00:18:07 [info     ] asrs.progress                  chunks=1383 docs=512 rate_docs_per_s=9.9
-2026-09-12 00:18:28 [info     ] asrs.progress                  chunks=2788 docs=1024 rate_docs_per_s=14.0
-2026-09-12 00:18:49 [info     ] asrs.progress                  chunks=4193 docs=1536 rate_docs_per_s=16.3

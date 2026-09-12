@@ -48,7 +48,7 @@ async def test_search_precedent_without_models_is_an_error_payload(monkeypatch):
 
 
 @pytest.mark.db
-async def test_brief_tool_end_to_end(monkeypatch):
+async def test_brief_tool_end_to_end(db, monkeypatch):    # db: skip without Postgres
     monkeypatch.setattr(M, "_retriever", None)
     monkeypatch.setattr(M, "_retriever_loaded", True)
     out = _payload(await M.server.call_tool("brief", {
@@ -62,6 +62,6 @@ async def test_brief_tool_end_to_end(monkeypatch):
 
 
 @pytest.mark.db
-async def test_status_tool():
+async def test_status_tool(db):
     out = _payload(await M.server.call_tool("status", {}))
     assert "corpus" in out and "version" in out

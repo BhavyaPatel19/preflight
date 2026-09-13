@@ -30,6 +30,7 @@ ml = [
     "datasets>=3.0",
     "chronos-forecasting>=1.4",
 ]
+llm = ["anthropic>=1.0"]
 
 [dependency-groups]
 dev = ["pytest>=8.3", "pytest-asyncio>=0.24", "ruff>=0.7", "mypy>=1.11", "respx>=0.21"]
@@ -72,6 +73,6 @@ files = ["src/preflight"]
 [[tool.mypy.overrides]]
 module = [
     "apscheduler.*", "torch", "torch.*", "sentence_transformers", "sentence_transformers.*",
-    "chronos", "chronos.*", "transformers", "transformers.*",
+    "chronos", "chronos.*", "transformers", "transformers.*", "anthropic", "anthropic.*",
 ]
 ignore_missing_imports = true

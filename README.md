@@ -131,7 +131,7 @@ Built in the open, six sprints over twelve weeks.
 | 1 | Foundation — schemas, rule decoder, ingestion, archive, deterministic briefing, scheduler | 🟢 done |
 | 2 | Fine-tuned NOTAM entity extractor → HF Hub | ⬜ waits on a real NOTAM corpus |
 | 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟢 done — corpus, golden set, measured |
-| 4 | LangGraph agent graph, grounding, abstention | 🟡 grounding verifier + abstention done; the agent graph waits on an LLM key |
+| 4 | LLM layer, grounding, abstention | 🟡 local LLM layer (query rewriting + verified narrative), grounding, abstention done; orchestration graph next |
 | 5 | Time-travel eval harness + CI regression gate | 🟡 600-case set built from NTSB (300 + 300 matched); scorer reports coverage honestly; judge + gate wait on an LLM key |
 | 6 | Delay forecasting, cost/latency, UI, MCP server | 🟡 forecasting, UI and MCP server done; cost/latency waits on the LLM layer |
 
@@ -155,8 +155,19 @@ Built in the open, six sprints over twelve weeks.
   foundation-model forecaster (Chronos-Bolt) is *evaluated* against it and seasonal-naive on a real
   holdout — `evals/forecast/RESULTS.md` — but not cited: BTS lands with a ~3-month lag, and a
   flight next week is beyond any honest horizon.
-- **Verify** — an NLI cross-encoder checks every factual claim against the passage it cites
-  (`✓ grounded 0.94` in the output). Annotates, never drops: in the deterministic core a failed
+- **Narrate** — a local open-weight model (`qwen3:14b` via Ollama, zero cost) rewrites each hazard
+  into the operational scenario the precedent search should look for, and writes 1–3 plain-language
+  sentences per finding. Untrusted text reaches it only inside `<data>` blocks with the injection
+  verdict attached; every sentence it writes is verified against the finding's citations and
+  **dropped if unsupported** — the one place in the system where dropping is the policy. Its
+  unsupported-claim rate is the model's score — 0.50 → 0.22 → 0.01 across three runs that fixed
+  the prompt, the evidence and the verifier in turn (`evals/narrative/HISTORY.md`). An Anthropic
+  backend (Claude Opus 5) is implemented and tested but dormant until a key exists; it's for
+  the comparison row, not the default.
+- **Verify** — a hybrid check on every factual claim: an NLI cross-encoder for meaning, plus every
+  figure in the claim must appear in its evidence (`✓ grounded 0.94` in the output). The second gate
+  exists because the eval caught the NLI model accepting a fabricated "44 min" at 0.98 once the
+  surrounding prose matched. Annotates, never drops: in the deterministic core a failed
   check is a bug or a verifier miss, and hiding a hazard would be the worse failure. Building it
   forced the citations to carry the evidence — NOTAM validity windows, decoded METAR fields —
   which they now do.
@@ -186,7 +197,8 @@ CI gate will enforce.
 | Forecast | MASE, 24 h arrival delay, rolling-origin backtest | < 0.85 | **0.715** Chronos-Bolt · 0.751 climatology · 1.067 seasonal-naive — [details](evals/forecast/RESULTS.md) |
 | End-to-end | implicated-hazard recall (300 NTSB positives) | ≥ 0.85 | — (0 / 300 covered: archive began 2026-09-11 — [details](evals/briefing/RESULTS.md)) |
 | End-to-end | false-alarm rate (300 matched negatives) | < 0.15 | — (0 / 300 covered) |
-| Grounding | NLI verifier: true-claim acceptance · corruption rejection (74 claims + 74 corrupted) | ≥ 0.97 | **1.000 · 1.000** at threshold 0.5 — [details](evals/grounding/RESULTS.md) |
+| Grounding | hybrid verifier (NLI + exact-figure gate): true-claim acceptance · corruption rejection | ≥ 0.97 | **1.000 · 0.972** at 0.5 — [details](evals/grounding/RESULTS.md) |
+| Narrative | unsupported-claim rate of model-written sentences, `qwen3:14b` local | ≤ 0.05 | **0.010** (98 / 99 kept; 1 genuine catch) — [history](evals/narrative/HISTORY.md) |
 | Abstention | correct abstention on data-gap cases | ≥ 0.90 | — |
 | Safety | injection detector on 60 adversarial NOTAMs: recall · false positives on benign | 100% | **1.000 · 0.000** (detector; LLM resistance scored against the same set later) — [details](evals/safety/RESULTS.md) |
 | Judge | LLM-judge vs human agreement (Cohen's κ) | ≥ 0.70 | — |
@@ -194,8 +206,8 @@ CI gate will enforce.
 
 The κ row matters as much as the rest: an LLM judge nobody validated is a number nobody should trust.
 
-The forecast and grounding rows are the first targets met — the grounding one on the deterministic
-core's own claims; the same harness gates the LLM layer when it arrives. The retrieval numbers are below target and that is the point of having them: the first run of the
+The forecast, grounding and narrative rows are met. The narrative row is measured on a local model at
+zero cost; the same command with `PREFLIGHT_LLM=anthropic` produces the frontier comparison row. The retrieval numbers are below target and that is the point of having them: the first run of the
 harness found the lexical ranking function was both slow and bad, and fixing it moved hybrid from
 *worse* than dense to better (`evals/retrieval/HISTORY.md`). Candidate-pool size is the next knob.
 
@@ -277,6 +289,18 @@ preflight brief KSFO KJFK --alt KBOS --off-block 2026-09-12T14:00Z --type A320
 preflight status                    # last ingest run per source
 ```
 
+**LLM layer** — local and free. Ollama runs only while you start it:
+
+```bash
+brew install ollama && ollama serve &          # not a login service; stop it with `pkill ollama`
+ollama pull qwen3:14b                          # 9.3 GB; qwen3:8b if memory is tight
+preflight brief KSFO KJFK --alt KBOS --off-block 2026-09-12T14:00Z --llm
+preflight eval narrative                       # the model's unsupported-claim rate
+```
+
+To compare against Claude later: `uv sync --extra llm`, set `ANTHROPIC_API_KEY` and
+`PREFLIGHT_LLM=anthropic`, re-run `preflight eval narrative`. Same code, same harness.
+
 **Retrieval** — needs the ML extras (~1.5 GB of model weights land in the Hugging Face cache on
 first use):
 
@@ -320,6 +344,7 @@ searched.
 | `preflight eval forecast` | Chronos-Bolt vs seasonal-naive vs climatology, rolling-origin backtest (MASE, pinball) |
 | `preflight eval grounding` | NLI verifier on the briefing's own claims and one corrupted copy of each |
 | `preflight eval safety` | injection detector: recall on the red-team set, false positives on benign NOTAMs |
+| `preflight eval narrative` | unsupported-claim rate of the configured model's prose, with the dropped sentences listed |
 | `make db-start` / `make db-stop` | native Postgres on :5433 |
 | `make up` / `make down` | the Docker stack on :5432 |
 | `make demo` | decode the bundled NOTAMs |
@@ -362,8 +387,11 @@ src/preflight/
   evals/briefing.py     NTSB-derived cases (positives + matched negatives), time-travel scorer
   evals/forecast.py     rolling-origin delay backtest
   evals/grounding.py    true-claim acceptance vs corruption rejection, threshold sweep
+  evals/narrative.py    generated / kept / dropped per model and finding kind
   verify/               NLI verifier (nli.py) and claim-level grounding policy (ground.py)
   safety/               injection detector — weighted, named signals; leetspeak/zero-width aware
+  llm/                  LLM protocol; Ollama (default, local) and Anthropic (dormant) backends
+  brief/narrate.py      precedent-query rewriting and verified narrative — the LLM's two jobs
   forecast/delay.py     climatology, seasonal-naive, Chronos-Bolt, MASE/pinball, airport time zones
   api/                  FastAPI: /decode, /brief, /brief/stream, and static/index.html (the UI)
   mcp_server.py         the same capabilities as MCP tools over stdio (`preflight mcp`)
@@ -375,6 +403,7 @@ evals/briefing/         golden.jsonl (600 cases), RESULTS.md — coverage, recal
 evals/forecast/         RESULTS.md — MASE / pinball per forecaster and per airport
 evals/grounding/        RESULTS.md — verifier acceptance / rejection per claim kind and threshold
 evals/safety/           injections.jsonl (60 adversarial NOTAMs, 6 families), RESULTS.md
+evals/narrative/        RESULTS.md (latest run), HISTORY.md — three runs, what each changed and taught
 tests/                  129 tests; markers: db, live, ml
 data/samples/           bundled sample NOTAMs (real corpora are gitignored under data/raw)
 ```

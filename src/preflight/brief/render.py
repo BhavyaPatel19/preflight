@@ -27,7 +27,8 @@ def render_text(b: Briefing) -> str:
                 refs += f"  ✓ grounded {c.entailment_score:.2f}"
             elif c.verified is False:
                 refs += f"  ✗ UNVERIFIED {c.entailment_score:.2f}"
-            lines.append(f"       {c.text}")
+            prefix = "   ✎   " if c.author == "llm" else "       "
+            lines.append(f"{prefix}{c.text}")
             lines.append(f"       {refs}")
         lines.append("")
 

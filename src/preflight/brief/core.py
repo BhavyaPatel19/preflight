@@ -341,8 +341,9 @@ def delay_finding(
                 kind="forecast", ref=f"climatology:{icao}:{day}{local:%H}",
                 quote=f"BTS On-Time Performance for {icao}, {c.samples} {day} {local:%H}:00 "
                       f"hours from {c.history_from:%b %Y} to {c.history_to:%b %Y}: median arrival "
-                      f"delay {c.p50:.0f} min, 10th percentile {c.p10:.0f} min, 90th percentile "
-                      f"{c.p90:.0f} min, about {c.flights_per_hour:.0f} arrivals per hour.",
+                      f"delay {c.p50:.0f} min; 80% of hours fell within {c.p10:.0f} to {c.p90:.0f} "
+                      f"min (10th to 90th percentile); about {c.flights_per_hour:.0f} arrivals per "
+                      "hour. This is climatology — historical typical values — not a forecast.",
             ),),
         ),),
     )

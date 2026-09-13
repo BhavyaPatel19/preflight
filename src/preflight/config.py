@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
@@ -21,8 +21,6 @@ class Settings(BaseSettings):
 
     # LLM
     anthropic_api_key: str | None = None
-    model_synth: str = Field(default="claude-opus-5", alias="PREFLIGHT_MODEL_SYNTH")
-    model_fast: str = Field(default="claude-haiku-4-5-20251001", alias="PREFLIGHT_MODEL_FAST")
 
     # Sources
     aviationweather_base: str = "https://aviationweather.gov/api/data"
@@ -55,6 +53,15 @@ class Settings(BaseSettings):
     device: str = Field(default="auto", alias="PREFLIGHT_DEVICE")  # auto | cpu | mps | cuda
     retrieval_candidates: int = 40   # per channel, before fusion
     rrf_k: int = 60
+
+    # LLM layer (src/preflight/llm). 'ollama' is the zero-cost default; 'anthropic' activates
+    # only with a key and is used for the comparison rows; 'none' skips the layer.
+    llm_provider: Literal["none", "ollama", "anthropic"] = Field(
+        default="ollama", alias="PREFLIGHT_LLM"
+    )
+    ollama_url: str = Field(default="http://localhost:11434", alias="PREFLIGHT_OLLAMA_URL")
+    ollama_model: str = Field(default="qwen3:14b", alias="PREFLIGHT_OLLAMA_MODEL")
+    anthropic_model: str = Field(default="claude-opus-5", alias="PREFLIGHT_ANTHROPIC_MODEL")
 
     # Grounding verifier (NLI). A claim passes when P(entailment) against any of its
     # citations clears the threshold. See src/preflight/verify.

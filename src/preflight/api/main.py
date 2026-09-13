@@ -22,21 +22,24 @@ from pydantic import BaseModel, Field
 from sse_starlette.sse import EventSourceResponse
 
 from preflight import __version__
-from preflight.brief import build_briefing, load_retriever, with_precedent
+from preflight.brief import build_briefing, load_retriever, with_narrative, with_precedent
 from preflight.db import close_pool, get_pool
 from preflight.decode.notam import NotamParseError, parse_notam
+from preflight.llm import load_llm
 from preflight.schemas import Briefing, FlightRequest, NotamRecord
 from preflight.verify.ground import load_verifier, with_verification
 
 _retriever: Any = None
 _verifier: Any = None
+_llm: Any = None
 
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
-    global _retriever, _verifier
+    global _retriever, _verifier, _llm
     _retriever = load_retriever()
     _verifier = load_verifier()
+    _llm = load_llm()
     yield
     close_pool()
 
@@ -74,27 +77,34 @@ async def decode(req: DecodeRequest) -> NotamRecord:
         raise HTTPException(status_code=422, detail=str(e)) from e
 
 
-def _build(req: FlightRequest, precedent: bool = True, verify: bool = True) -> Briefing:
+def _build(req: FlightRequest, precedent: bool = True, verify: bool = True,
+           narrative: bool = True) -> Briefing:
+    llm = _llm if narrative else None
     with get_pool().connection() as conn:
         b = build_briefing(conn, req)
         if precedent:
-            b = with_precedent(conn, b, _retriever)
-    return with_verification(b, _verifier) if verify else b
+            b = with_precedent(conn, b, _retriever, llm=llm)
+    if verify or llm is not None:
+        b = with_verification(b, _verifier)
+        if llm is not None:
+            b, _ = with_narrative(b, llm, _verifier)
+    return b
 
 
 @app.post("/brief", response_model=Briefing)
-async def brief(req: FlightRequest, precedent: bool = True, verify: bool = True) -> Briefing:
-    return await asyncio.to_thread(_build, req, precedent, verify)
+async def brief(req: FlightRequest, precedent: bool = True, verify: bool = True,
+                narrative: bool = True) -> Briefing:
+    return await asyncio.to_thread(_build, req, precedent, verify, narrative)
 
 
 async def _brief_events(
-    req: FlightRequest, precedent: bool = True
+    req: FlightRequest, precedent: bool = True, narrative: bool = True
 ) -> AsyncIterator[dict[str, str]]:
     yield {"event": "start", "data": json.dumps({
         "departure": req.departure, "destination": req.destination,
         "alternates": list(req.alternates),
     })}
-    b = await asyncio.to_thread(_build, req, precedent)
+    b = await asyncio.to_thread(_build, req, precedent, True, narrative)
     for f in b.ranked():
         yield {"event": "finding", "data": f.model_dump_json()}
     for a in b.abstentions:
@@ -119,6 +129,7 @@ async def brief_stream_get(
     alternates: Annotated[str, Query(description="comma-separated ICAO codes")] = "",
     aircraft_type: str | None = None,
     precedent: bool = True,
+    narrative: bool = True,
 ) -> EventSourceResponse:
     """Query-string form of the stream, for EventSource (which can only GET)."""
     req = FlightRequest(
@@ -126,4 +137,4 @@ async def brief_stream_get(
         alternates=tuple(a.strip().upper() for a in alternates.split(",") if a.strip()),
         off_block=off_block, aircraft_type=aircraft_type or None,
     )
-    return EventSourceResponse(_brief_events(req, precedent))
+    return EventSourceResponse(_brief_events(req, precedent, narrative))

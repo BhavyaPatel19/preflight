@@ -20,6 +20,7 @@ from typing import Any
 from psycopg import Connection
 
 from preflight.config import settings
+from preflight.llm import LLM
 from preflight.retrieval.search import Hit, Retriever
 from preflight.schemas import Abstention, Briefing, Citation, Claim, Finding, Severity
 
@@ -108,8 +109,13 @@ def with_precedent(
     *,
     k: int | None = None,
     min_score: float | None = None,
+    llm: LLM | None = None,
 ) -> Briefing:
-    """Return a briefing with precedent claims attached where warranted."""
+    """Return a briefing with precedent claims attached where warranted.
+
+    With an ``llm``, the search query is the model's rewrite of the hazard into its
+    operational consequence; the per-category template is the fallback.
+    """
     t0 = perf_counter()
     k = k or settings().precedent_k
     min_score = settings().precedent_min_score if min_score is None else min_score
@@ -130,6 +136,10 @@ def with_precedent(
         if q is None:
             findings.append(f)
             continue
+        if llm is not None:
+            from preflight.brief.narrate import rewrite_query
+
+            q = rewrite_query(llm, f) or q
         # Ask for more than k: several chunks of one report can rank together, and a
         # report is cited once per briefing.
         hits = retriever.search(conn, q, k=k * 3, icao=f.airport, rerank=True)

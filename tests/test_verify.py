@@ -34,14 +34,15 @@ class FakeVerifier:
 def test_premise_expands_notam_contractions_and_prefixes_airport():
     cit = Citation(kind="notam", ref="x", quote="RWY 28R CLSD DUE WIP. PAPI RWY 28L U/S.")
     p = premise_for(cit, "KSFO")
-    assert p.startswith("KSFO: runway 28R closed due to work in progress.")
+    assert p.startswith("NOTAM x at KSFO states: runway 28R closed due to work in progress.")
     assert "precision approach path indicator runway 28L unserviceable" in p
     assert "CLSD" not in p and "U/S" not in p
+    assert "unserviceable means not working" in p          # glossary for the NLI model
 
 
 def test_premise_leaves_metar_raw_but_prefixed():
     cit = Citation(kind="metar", ref="x", quote="METAR KSFO 120656Z 30007KT 10SM")
-    assert premise_for(cit, "KSFO") == "KSFO: METAR KSFO 120656Z 30007KT 10SM"
+    assert premise_for(cit, "KSFO") == "METAR report for KSFO: METAR KSFO 120656Z 30007KT 10SM"
     assert premise_for(cit, None) == "METAR KSFO 120656Z 30007KT 10SM"
 
 
@@ -95,3 +96,34 @@ def test_corruptions_are_material_and_one_per_claim():
     assert corrupt("median arrival delay at KJFK was -1 min")[1] == "median -1→44 min"
     assert corrupt("valid at 11 Sep 0700Z")[1] == "time 07→13Z"
     assert corrupt("nothing material here") is None
+
+
+# ---------------------------------------------------------------- numeric gate
+
+def test_numbers_extraction_normalises_times_and_signs():
+    from preflight.verify.ground import numbers
+
+    assert numbers("until 11 Sep 0700Z, median -1 min, 80% of hours") == {11.0, 700.0, -1.0, 80.0}
+    assert numbers("07:00Z") == numbers("0700Z")
+    assert numbers("Runway 28R") == {28.0}
+    assert numbers("no figures here") == set()
+
+
+def test_figures_must_appear_in_the_evidence():
+    from preflight.verify.ground import figures_supported
+
+    ev = "median arrival delay -1 min; 80% of hours within -15 to 33 min; about 17 arrivals"
+    assert figures_supported("median delay -1 min, 80% within -15…33", ev)
+    assert not figures_supported("median delay 44 min", ev)          # fabricated figure
+    assert figures_supported("nothing numeric", ev)
+
+
+def test_numeric_gate_overrides_a_confident_model():
+    """NLI said 0.98 for 'median 44 min' against evidence saying −1 — the gate must not."""
+    v = FakeVerifier(lambda p, h: 0.98)
+    b = _briefing()
+    f = b.findings[0]
+    forged = f.claims[0].model_copy(update={"text": "KSFO — Runway 99R closed until 11 Sep 0700Z."})
+    b = b.model_copy(update={"findings": (f.model_copy(update={"claims": (forged,)}),)})
+    out = with_verification(b, v)
+    assert out.findings[0].claims[0].verified is False         # 99 is not in the evidence

@@ -51,6 +51,7 @@ def main(argv: list[str] | None = None) -> int:
     ef.add_argument("--airports", nargs="*")
     evsub.add_parser("grounding", help="NLI verifier: accept true claims, reject corrupted ones")
     evsub.add_parser("safety", help="injection red-team set: detector recall, false positives")
+    evsub.add_parser("narrative", help="unsupported-claim rate of the configured LLM's prose")
     eb = evsub.add_parser("briefing", help="time-travel briefing eval on NTSB-derived cases")
     eb.add_argument("--build", action="store_true", help="(re)build evals/briefing/golden.jsonl")
     eb.add_argument("--limit", type=int)
@@ -96,6 +97,9 @@ def main(argv: list[str] | None = None) -> int:
                    help="skip the prior-report search (faster; no model load)")
     b.add_argument("--verify", action="store_true",
                    help="run the NLI grounding verifier over every factual claim")
+    b.add_argument("--llm", action="store_true",
+                   help="use the configured model for precedent queries and narrative "
+                        "(implies --verify; unsupported sentences are dropped)")
 
     args = ap.parse_args(argv)
 
@@ -178,14 +182,30 @@ def main(argv: list[str] | None = None) -> int:
             aircraft_type=args.aircraft_type, ete_minutes=args.ete,
         )
         try:
+            llm = None
+            if args.llm:
+                from preflight.llm import load_llm
+
+                llm = load_llm()
+                if llm is None:
+                    print("warning: no LLM available (is `ollama serve` running?); "
+                          "continuing without narrative", file=sys.stderr)
             with get_pool().connection() as conn:
                 briefing = build_briefing(conn, req)
                 if not args.no_precedent:
-                    briefing = with_precedent(conn, briefing, load_retriever())
-            if args.verify:
+                    briefing = with_precedent(conn, briefing, load_retriever(), llm=llm)
+            if args.verify or llm is not None:
                 from preflight.verify.ground import load_verifier, with_verification
 
-                briefing = with_verification(briefing, load_verifier())
+                verifier = load_verifier()
+                briefing = with_verification(briefing, verifier)
+                if llm is not None:
+                    from preflight.brief import with_narrative
+
+                    briefing, ns = with_narrative(briefing, llm, verifier)
+                    if ns:
+                        print(f"narrative: {ns.model} wrote {ns.generated} sentences, "
+                              f"kept {ns.kept}, dropped {ns.dropped}", file=sys.stderr)
         finally:
             close_pool()
         print(briefing.model_dump_json(indent=2) if args.json else render_text(briefing))
@@ -280,6 +300,26 @@ def main(argv: list[str] | None = None) -> int:
             ch = ("D" if h.in_dense else "-") + ("L" if h.in_lexical else "-")
             print(f"[{ch}] {h.ref:<28} fused={h.fused_score:.4f}{rr}")
             print(f"     {h.text[:160]}{'…' if len(h.text) > 160 else ''}")
+        return 0
+
+    if args.cmd == "eval" and args.suite == "narrative":
+        from preflight.db import close_pool, get_pool
+        from preflight.evals import narrative as N
+        from preflight.llm import load_llm
+        from preflight.verify.nli import HFVerifier
+
+        llm = load_llm()
+        if llm is None:
+            print("error: no LLM available (PREFLIGHT_LLM / ollama serve)", file=sys.stderr)
+            return 3
+        try:
+            with get_pool().connection() as conn:
+                res = N.run(conn, llm, HFVerifier())
+            run_path, md_path = N.save_run(res)
+            print(N.to_markdown(res))
+            print(f"written: {run_path}  {md_path}")
+        finally:
+            close_pool()
         return 0
 
     if args.cmd == "eval" and args.suite == "safety":

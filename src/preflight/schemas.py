@@ -172,6 +172,9 @@ class Claim(BaseModel):
         default=None, description="Set by the NLI verifier; None means not yet checked"
     )
     entailment_score: float | None = Field(default=None, ge=0.0, le=1.0)
+    author: Literal["core", "llm"] = Field(
+        default="core", description="core: templated from records; llm: written by a model"
+    )
 
 
 class Finding(BaseModel):
@@ -223,6 +226,7 @@ class Briefing(BaseModel):
     abstentions: tuple[Abstention, ...] = ()
 
     sources_considered: int = 0
+    llm: str | None = Field(default=None, description="Model that wrote narrative, if any")
     trace_id: str | None = None
     cost_usd: float | None = None
     latency_ms: int | None = None

@@ -29,7 +29,7 @@ from preflight.config import settings
 from preflight.db import weather as wdb
 from preflight.decode.notam import parse_notam
 from preflight.schemas import Claim, Finding
-from preflight.verify.ground import _pairs_for
+from preflight.verify.ground import _pairs_for, figures_supported
 from preflight.verify.nli import Verifier
 
 RESULTS = Path("evals/grounding/RESULTS.md")
@@ -145,7 +145,9 @@ def run(conn: Connection[Any], verifier: Verifier, notam_texts: list[str],
     best: dict[tuple[int, bool], float] = {}
     k = 0
     for i, is_true, n in index:
-        best[(i, is_true)] = max(scores[k:k + n]) if n else 0.0
+        gated = [sc if figures_supported(h, p) else 0.0
+                 for (p, h), sc in zip(pairs[k:k + n], scores[k:k + n], strict=True)]
+        best[(i, is_true)] = max(gated) if n else 0.0
         k += n
 
     by_kind: dict[str, dict[str, Any]] = {}

@@ -63,6 +63,7 @@ button:disabled{opacity:.55;cursor:wait}
 .phases{font:11px var(--mono);color:var(--ink-3)}
 .headline{font-weight:600;margin:2px 0 6px}
 .claim{font-size:14px;color:var(--ink-2);margin:6px 0 2px}
+.claim.llm{border-left:2px solid var(--accent);padding-left:8px;font-style:italic}
 .cites{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 2px}
 .cite{font:11px var(--mono);color:var(--blue);background:var(--blue-soft);border:0;padding:2px 7px;border-radius:3px;cursor:pointer}
 .cite[aria-expanded="true"]{outline:1.5px solid var(--blue)}
@@ -130,7 +131,8 @@ button:disabled{opacity:.55;cursor:wait}
       `<div class="quote" id="q-${i}-${j}"><span class="src">${esc(c.kind)} · ${esc(c.ref)}${c.issued_at ? " · " + esc(c.issued_at) : ""}</span>${esc(c.quote || "(no passage recorded)")}</div>`).join("");
     const mark = claim.verified === true ? `<span class="ok" title="entailment ${claim.entailment_score}">✓ grounded</span>`
                : claim.verified === false ? `<span class="bad" title="entailment ${claim.entailment_score}">✗ unverified</span>` : "";
-    return `<p class="claim">${esc(claim.text)}</p><div class="cites">${refs}${mark}</div>${quotes}`;
+    const cls = claim.author === "llm" ? "claim llm" : "claim";
+    return `<p class="${cls}" title="${claim.author === "llm" ? "written by the model, verified against the citations" : ""}">${esc(claim.text)}</p><div class="cites">${refs}${mark}</div>${quotes}`;
   }
 
   function renderFinding(f, n) {

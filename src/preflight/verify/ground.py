@@ -1,9 +1,13 @@
 """Claim-level grounding: every claim is checked against the passage it cites.
 
 The premise is the citation's verbatim quote, made readable — NOTAM
-contractions expanded, the airport prefixed — because the NLI model reads
-English, not ICAO shorthand. A claim passes if its entailment score against
-*any* of its citations clears the threshold.
+contractions expanded, the source named — because the NLI model reads
+English, not ICAO shorthand. A claim passes if, against *any* of its
+citations, (1) the entailment score clears the threshold **and** (2) every
+number in the claim appears in the evidence. The second gate exists because
+NLI models are unreliable on figures: with enough surrounding text in common,
+"median delay 44 min" scored 0.98 against evidence saying −1 min. Numbers are
+checked exactly; semantics are checked by the model.
 
 Scope: factual claims (NOTAM, weather, forecast/climatology). Precedent
 claims are descriptive by construction — the quote *is* the passage — and are
@@ -17,6 +21,7 @@ be the worse failure. The LLM layer is where unsupported claims get dropped.
 
 from __future__ import annotations
 
+import re
 from collections.abc import Sequence
 from time import perf_counter
 
@@ -27,6 +32,28 @@ from preflight.verify.nli import Verifier
 
 VERIFIABLE_KINDS = {"notam", "metar", "taf", "forecast"}
 
+_NUMBER = re.compile(r"-?\d+(?::\d{2})?(?:\.\d+)?")
+
+
+def numbers(text: str) -> set[float]:
+    """Every figure in the text as a value. '07:00' and '0700' are the same number."""
+    out: set[float] = set()
+    for tok in _NUMBER.findall(text):
+        try:
+            out.add(float(tok.replace(":", "")))
+        except ValueError:
+            continue
+    return out
+
+
+def figures_supported(claim_text: str, premise: str) -> bool:
+    return numbers(claim_text) <= numbers(premise)
+
+# Plain-language equivalents the NLI model does not know. Appended to NOTAM premises so a
+# restatement like "the PAPI is not working" is not rejected on vocabulary.
+_NOTAM_GLOSSARY = (" (Here: unserviceable means not working / out of service; closed means"
+                   " not available for use; available means usable.)")
+
 
 def premise_for(cit: Citation, airport: str | None) -> str:
     """A readable premise from a citation's quote."""
@@ -34,6 +61,14 @@ def premise_for(cit: Citation, airport: str | None) -> str:
     if cit.kind == "notam":
         q = expand(q).replace(" DUE ", " due to ").replace(" AND ", " and ")
         q = q.replace(" BTN ", " between ").replace(" ALTN ", " alternate ")
+        q += _NOTAM_GLOSSARY
+    if cit.kind == "notam":
+        where = f" at {airport}" if airport else ""
+        return f"NOTAM {cit.ref}{where} states: {q}"
+    if cit.kind == "metar":
+        return f"METAR report for {airport}: {q}" if airport else q
+    if cit.kind == "forecast":
+        return f"Delay statistics for {airport}: {q}" if airport else q
     if airport and not q.startswith(airport):
         q = f"{airport}: {q}"
     return q
@@ -67,7 +102,10 @@ def with_verification(
     best: dict[tuple[int, int], float] = {}
     k = 0
     for fi, ci, pairs in jobs:
-        best[(fi, ci)] = max(scores[k:k + len(pairs)])
+        # A citation with a missing figure cannot support the claim, whatever the model says.
+        gated = [s if figures_supported(h, p) else 0.0
+                 for (p, h), s in zip(pairs, scores[k:k + len(pairs)], strict=True)]
+        best[(fi, ci)] = max(gated)
         k += len(pairs)
 
     findings: list[Finding] = []
@@ -111,4 +149,5 @@ def summary(briefing: Briefing) -> dict[str, int]:
 
 __all__: Sequence[str] = (
     "premise_for", "with_verification", "load_verifier", "unverified", "summary",
+    "numbers", "figures_supported",
 )

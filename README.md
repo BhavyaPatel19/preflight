@@ -74,7 +74,7 @@ impossible.
 
 ```
 KSFO → KJFK (alt KBOS)  ·  A320  ·  off-block 11 Sep 0230Z
-6 findings · 2 abstentions
+6 findings · 3 abstentions
 ──────────────────────────────────────────────────────────
 [HIGH] RUNWAY        KSFO: Runway 28R closed (work in progress) until 11 Sep 0700Z
        takeoff, taxi
@@ -96,12 +96,18 @@ KSFO → KJFK (alt KBOS)  ·  A320  ·  off-block 11 Sep 0230Z
 [ ⊘  ] NOT DETERMINED  KJFK forecast
        No TAF for KJFK covers 11 Sep 0300Z–11 Sep 1030Z.  [no_coverage]
 
+[ ⊘  ] NOT DETERMINED  KBOS NOTAMs
+       No NOTAMs on record for KBOS; the archive does not cover this airport, so NOTAM
+       hazards were not assessed.  [no_coverage]
+
 sources considered: 9 · 19 ms
 ```
 
-Those two abstentions are correct, not a bug: the flight was yesterday and the only TAFs on record
-were issued today. In a safety-adjacent system "I don't know" is a first-class output and an
-evaluated behaviour.
+Those abstentions are correct, not a bug: the flight was yesterday and the only TAFs on record
+were issued today, and the archive holds only the bundled sample NOTAMs, none of them for KBOS —
+which is a different fact from "nothing in force at KBOS", and the briefing says which. In a
+safety-adjacent system "I don't know" is a first-class output and an evaluated behaviour
+([`evals/abstention`](evals/abstention/README.md)).
 
 With the retrieval models installed, each actionable finding also carries **precedent** from the
 75,000-report corpus:
@@ -205,14 +211,14 @@ CI gate will enforce.
 | End-to-end | false-alarm rate (300 matched negatives) | < 0.15 | — (0 / 300 covered) |
 | Grounding | hybrid verifier (NLI + exact-figure gate): true-claim acceptance · corruption rejection | ≥ 0.97 | **1.000 · 0.972** at 0.5 — [details](evals/grounding/RESULTS.md) |
 | Narrative | unsupported-claim rate of model-written sentences, `qwen3:14b` local | ≤ 0.05 | **0.010** (98 / 99 kept; 1 genuine catch) — [history](evals/narrative/HISTORY.md) |
-| Abstention | correct abstention on data-gap cases | ≥ 0.90 | — |
+| Abstention | recall on constructed data-gap cases · false-abstention rate on clean cases | ≥ 0.90 | **1.000 · 0.000** (26 cases, 20 gaps; 0.55 before this eval named three silent gaps — [details](evals/abstention/README.md)) |
 | Safety | injection detector on 60 adversarial NOTAMs: recall · false positives on benign | 100% | **1.000 · 0.000** (detector; LLM resistance scored against the same set later) — [details](evals/safety/RESULTS.md) |
 | Judge | LLM-judge vs human agreement (Cohen's κ) on precedent relevance | ≥ 0.70 | — (judge run on 304 pairs; 100-row sheet awaits human labels — [how](evals/precedent/README.md)) |
 | Cost | p50 $/briefing · p95 latency, full briefing with precedent + narrative | < $0.08 · 25 s | **$0 · 26.2 s** local `qwen3:14b` on an M5 (was 53.2 s) · 4.0 s without the model — [details](evals/latency/RESULTS.md) |
 
 The κ row matters as much as the rest: an LLM judge nobody validated is a number nobody should trust.
 
-The forecast, grounding and narrative rows are met; latency is within a second of target. The narrative row is measured on a local model at
+The forecast, grounding, narrative and abstention rows are met; latency is within a second of target. The narrative row is measured on a local model at
 zero cost; the same command with `PREFLIGHT_LLM=anthropic` produces the frontier comparison row. The retrieval numbers are below target and that is the point of having them: the first run of the
 harness found the lexical ranking function was both slow and bad, and fixing it moved hybrid from
 *worse* than dense to better; the latency pass then found the SQL was sequentially scanning the
@@ -357,6 +363,7 @@ searched.
 | `preflight eval forecast` | Chronos-Bolt vs seasonal-naive vs climatology, rolling-origin backtest (MASE, pinball) |
 | `preflight eval grounding` | NLI verifier on the briefing's own claims and one corrupted copy of each |
 | `preflight eval safety` | injection detector: recall on the red-team set, false positives on benign NOTAMs |
+| `preflight eval abstention` | 26 constructed data-gap cases on a synthetic route, rolled back; recall and false-abstention rate |
 | `preflight eval narrative` | unsupported-claim rate of the configured model's prose, with the dropped sentences listed |
 | `preflight eval precedent` | LLM judge over (hazard, prior report) pairs; `--score` reports κ against the human sheet |
 | `preflight bench` | p50/p95 wall time per graph stage over repeated briefings, with or without the model |
@@ -406,6 +413,7 @@ src/preflight/
   evals/narrative.py    generated / kept / dropped per model and finding kind
   evals/precedent.py    judge, human sheet, Cohen's κ, attached-precedent precision
   evals/latency.py      per-stage p50/p95 bench over the graph's node timings
+  evals/abstention.py   constructed data-gap cases: expected abstention present, nothing spurious
   verify/               NLI verifier (nli.py) and claim-level grounding policy (ground.py)
   safety/               injection detector — weighted, named signals; leetspeak/zero-width aware
   llm/                  LLM protocol; Ollama (default, local) and Anthropic (dormant) backends
@@ -424,6 +432,7 @@ evals/grounding/        RESULTS.md — verifier acceptance / rejection per claim
 evals/safety/           injections.jsonl (60 adversarial NOTAMs, 6 families), RESULTS.md
 evals/narrative/        RESULTS.md (latest run), HISTORY.md — three runs, what each changed and taught
 evals/latency/          RESULTS.md — before/after per stage, what each change was worth, where the rest is
+evals/abstention/       RESULTS.md (latest run), README.md — case design, the three gaps it exposed
 evals/precedent/        pairs.jsonl, labels.csv (the human sheet), verdicts.json, RESULTS.md
 tests/                  129 tests; markers: db, live, ml
 data/samples/           bundled sample NOTAMs (real corpora are gitignored under data/raw)

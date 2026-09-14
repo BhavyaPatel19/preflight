@@ -203,7 +203,7 @@ CI gate will enforce.
 | Layer | Metric | Target | Measured |
 |---|---|---:|---:|
 | Extraction | macro entity F1 (RWY/TWY/NAVAID/OBST/AIRSPACE/TIME) | ≥ 0.92 | — |
-| Retrieval | Recall@20 / nDCG@10 — synopsis→narrative, 300 queries | ≥ 0.90 / 0.65 | 0.61 / 0.41 — [details](evals/retrieval/RESULTS.md) |
+| Retrieval | Recall@20 / nDCG@10 — synopsis→narrative, 300 queries | ≥ 0.90 / 0.65 | 0.61 / 0.41 — [details](evals/retrieval/RESULTS.md); embedder ablation says `bge-large` is worth **+0.13 R@20** ([details](evals/embedder/RESULTS.md)) |
 | Retrieval | P@10 on exact-identifier queries (`runway 28R` at an airport) | ≥ 0.80 | 0.77 |
 | Rerank | nDCG@10 lift over dense-only | +0.12 | +0.09 |
 | Forecast | MASE, 24 h arrival delay, rolling-origin backtest | < 0.85 | **0.715** Chronos-Bolt · 0.751 climatology · 1.067 seasonal-naive — [details](evals/forecast/RESULTS.md) |
@@ -223,7 +223,9 @@ zero cost; the same command with `PREFLIGHT_LLM=anthropic` produces the frontier
 harness found the lexical ranking function was both slow and bad, and fixing it moved hybrid from
 *worse* than dense to better; the latency pass then found the SQL was sequentially scanning the
 corpus, and fixing *that* was checked against the same harness before it was kept
-(`evals/retrieval/HISTORY.md`). The embedder is the next knob.
+(`evals/retrieval/HISTORY.md`). The embedder is the next knob, and a subset ablation has priced
+it: `bge-large-en-v1.5` gains +0.127 Recall@20 over the current model, `bge-m3` +0.03, at 3.6× the
+embedding cost — the full re-embed is the next retrieval step.
 
 ---
 
@@ -359,6 +361,7 @@ searched.
 | `pytest -m live` | hits real external APIs (aviationweather.gov) |
 | `pytest -m ml` | loads the real embedding and reranker models |
 | `preflight eval retrieval` | Recall/nDCG/P@10 per config on the 350-query golden set (~30 min) |
+| `preflight eval embedder` | embedder ablation: same queries, a 20k-chunk subset, exact search in memory, one row per model (~50 min for three) |
 | `preflight eval briefing` | replay the briefing on 600 NTSB-derived cases; coverage, hazard recall, false alarms |
 | `preflight eval forecast` | Chronos-Bolt vs seasonal-naive vs climatology, rolling-origin backtest (MASE, pinball) |
 | `preflight eval grounding` | NLI verifier on the briefing's own claims and one corrupted copy of each |
@@ -417,6 +420,7 @@ src/preflight/
   brief/                deterministic briefing core, precedent attachment, text renderer
   retrieval/            chunker, Embedder/Reranker protocols, Retriever (hybrid + rerank)
   evals/retrieval.py    golden-set builder, metrics, runner → evals/retrieval/RESULTS.md
+  evals/embedder.py     embedder ablation on a corpus subset, in memory — prices a re-embed
   evals/briefing.py     NTSB-derived cases (positives + matched negatives), time-travel scorer
   evals/forecast.py     rolling-origin delay backtest
   evals/grounding.py    true-claim acceptance vs corruption rejection, threshold sweep
@@ -440,6 +444,7 @@ docs/adr/               architecture decision records
 evals/gates.toml        regression floors per suite metric, with why each is (or is not) gated
 evals/*/summary.json    headline metrics of the latest run + commit + time; committed, diffed, gated
 evals/retrieval/        golden.jsonl (350 queries), RESULTS.md (latest run), HISTORY.md (what each run changed)
+evals/embedder/         RESULTS.md — bge-base vs bge-large vs bge-m3 on the same subset
 evals/briefing/         golden.jsonl (600 cases), RESULTS.md — coverage, recall, false alarms
 evals/forecast/         RESULTS.md — MASE / pinball per forecaster and per airport
 evals/grounding/        RESULTS.md — verifier acceptance / rejection per claim kind and threshold

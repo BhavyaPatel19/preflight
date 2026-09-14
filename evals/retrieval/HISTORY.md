@@ -45,5 +45,13 @@ nDCG@10 0.315 → 0.310, and after fusion and reranking nothing measurable (0.40
 unchanged at 0.607, identifier P@10 0.772 → 0.774). Dense p50 472 → 46 ms, hybrid 631 → 266 ms,
 hybrid+rerank 1405 → 1100 ms; the reranker is now most of the cost.
 
-**Still open.** The measured upgrade path is now the embedder: `bge-large-en-v1.5` or `bge-m3`,
-re-embed the corpus (~1–2 h), re-run. Recall@20 is the number to watch.
+**Embedder ablation (2026-09-14, `evals/embedder/RESULTS.md`).** Before spending hours re-embedding
+316k chunks per candidate, the cheap question: on a 20k-chunk subset holding every target
+narrative, exact cosine search, same 300 queries — `bge-large-en-v1.5` **+0.127 Recall@20** over
+`bge-base` (0.640 → 0.767, nDCG@10 0.447 → 0.545); `bge-m3` only +0.030. Large embeds at 18
+chunks/s on this machine (base: 65), so the full re-embed is ~5 h and needs a migration (the chunk
+column is `vector(768)`; large is 1024-d). That is the next retrieval step, and it is now a
+decision with a number behind it rather than a hope.
+
+**Still open.** Re-embed with `bge-large-en-v1.5`, rebuild the HNSW index, re-run this eval.
+Recall@20 is the number to watch; the ablation says to expect roughly +0.1.

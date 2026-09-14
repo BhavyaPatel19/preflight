@@ -106,6 +106,16 @@ def main(argv: list[str] | None = None) -> int:
                    help="use the configured model for precedent queries and narrative "
                         "(implies --verify; unsupported sentences are dropped)")
 
+    bn = sub.add_parser("bench", help="p50/p95 latency per briefing stage over repeated runs")
+    bn.add_argument("departure")
+    bn.add_argument("destination")
+    bn.add_argument("--off-block", required=True, help="ISO-8601 UTC")
+    bn.add_argument("--runs", type=int, default=3)
+    bn.add_argument("--no-warmup", action="store_true", help="count the first run too")
+    bn.add_argument("--no-precedent", action="store_true")
+    bn.add_argument("--llm", action="store_true", help="include rewrite + narrative")
+    bn.add_argument("--label", default="", help="heading for the markdown table")
+
     args = ap.parse_args(argv)
 
     if args.cmd == "decode":
@@ -226,6 +236,41 @@ def main(argv: list[str] | None = None) -> int:
             print(f"· {line}", file=sys.stderr)
         print(f"· briefing id {briefing.trace_id}", file=sys.stderr)
         print(briefing.model_dump_json(indent=2) if args.json else render_text(briefing))
+        return 0
+
+    if args.cmd == "bench":
+        from datetime import datetime
+
+        from preflight.brief import load_retriever
+        from preflight.db import close_pool, get_pool
+        from preflight.evals.latency import bench, render_markdown
+        from preflight.graph import Deps, Options, build_graph, pooled_connect
+        from preflight.schemas import FlightRequest
+
+        req = FlightRequest(
+            departure=args.departure.upper(), destination=args.destination.upper(),
+            off_block=datetime.fromisoformat(args.off_block.replace("Z", "+00:00")),
+        )
+        llm = verifier = None
+        if args.llm:
+            from preflight.llm import load_llm
+            from preflight.verify.ground import load_verifier
+
+            llm, verifier = load_llm(), load_verifier()
+            if llm is None:
+                print("error: no LLM available (is `ollama serve` running?)", file=sys.stderr)
+                return 3
+        deps = Deps(connect=pooled_connect(get_pool),
+                    retriever=None if args.no_precedent else load_retriever(),
+                    verifier=verifier, llm=llm)
+        options: Options = {"precedent": not args.no_precedent, "verify": llm is not None,
+                            "narrative": llm is not None}
+        try:
+            bres = bench(build_graph(deps), req, options=options, runs=args.runs,
+                         warmup=not args.no_warmup)
+        finally:
+            close_pool()
+        print(render_markdown(bres, label=args.label))
         return 0
 
     if args.cmd == "schedule":

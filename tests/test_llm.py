@@ -199,3 +199,74 @@ def test_narrative_survives_a_failed_model_call():
     out, stats = with_narrative(_briefing(), FakeLLM({"narrative": LLMUnavailable("down")}),
                                 FakeVerifier(lambda p, h: 1.0))
     assert stats.failed_calls == 1 and len(out.findings[0].claims) == 1
+
+
+# ---------------------------------------------------------------- concurrency
+
+def test_fan_out_preserves_order_and_bounds_workers():
+    import threading
+    import time
+
+    from preflight.llm import fan_out
+
+    active, peak, lock = 0, 0, threading.Lock()
+
+    def slow(x):
+        nonlocal active, peak
+        with lock:
+            active += 1
+            peak = max(peak, active)
+        time.sleep(0.02)
+        with lock:
+            active -= 1
+        return x * 2
+
+    assert fan_out(slow, [3, 1, 2], workers=2) == [6, 2, 4]
+    assert peak == 2
+    assert fan_out(slow, [], workers=4) == []
+    assert fan_out(slow, [5], workers=4) == [10]      # one item: no pool
+
+
+def test_narrative_verifies_all_findings_in_one_batch():
+    """Sentences from every finding go to the verifier together, and each finding still
+    gets only its own sentences back."""
+    from preflight.brief.core import notam_findings
+
+    fs = notam_findings("KSFO", "departure", [parse_notam(n) for n in DEMO_NOTAMS[:2]])
+    b = Briefing(request=FlightRequest(departure="KSFO", destination="KJFK", off_block=T0),
+                 generated_at=T0, findings=tuple(fs))
+    calls = []
+
+    class Batching(FakeVerifier):
+        def entailment(self, pairs):
+            calls.append(len(pairs))
+            return super().entailment(pairs)
+
+    llm = FakeLLM({"narrative": {"sentences": ["Sentence about this finding."]}})
+    out, stats = with_narrative(b, llm, Batching(lambda p, h: 0.9))
+    assert len(calls) == 1 and calls[0] >= 2                 # one batch for both findings
+    assert stats.findings == 2 and stats.kept == 2
+    for f in out.findings:
+        assert sum(1 for c in f.claims if c.author == "llm") == 1
+
+
+def test_narrative_failed_call_on_one_finding_does_not_affect_the_other():
+    from preflight.brief.core import notam_findings
+
+    fs = notam_findings("KSFO", "departure", [parse_notam(n) for n in DEMO_NOTAMS[:2]])
+    b = Briefing(request=FlightRequest(departure="KSFO", destination="KJFK", off_block=T0),
+                 generated_at=T0, findings=tuple(fs))
+
+    class Flaky:
+        name = "flaky"
+        n = 0
+
+        def complete_json(self, system, user, schema, *, max_tokens=400):
+            self.n += 1
+            if self.n == 1:
+                raise LLMUnavailable("first call fails")
+            return {"sentences": ["Only the second finding gets prose."]}
+
+    out, stats = with_narrative(b, Flaky(), FakeVerifier(lambda p, h: 1.0))
+    assert stats.failed_calls == 1 and stats.kept == 1
+    assert sum(1 for f in out.findings for c in f.claims if c.author == "llm") == 1

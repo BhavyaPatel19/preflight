@@ -19,9 +19,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from preflight.llm import LLM, LLMUnavailable
+from preflight.llm import LLM, LLMUnavailable, fan_out
 from preflight.safety.injection import detect
-from preflight.schemas import Briefing, Claim, Finding
+from preflight.schemas import Briefing, Citation, Claim, Finding
 from preflight.verify.ground import _pairs_for, figures_supported
 from preflight.verify.nli import Verifier
 
@@ -122,34 +122,50 @@ def with_narrative(
     if llm is None or verifier is None:
         return briefing, None
     stats = NarrativeStats(model=llm.name)
-    findings: list[Finding] = []
-    for f in briefing.findings:
-        core_citations = tuple(cit for c in f.claims if c.author == "core" for cit in c.citations)
-        if not core_citations or f.category == "notam":
-            findings.append(f)
-            continue
-        stats.findings += 1
+
+    def eligible(f: Finding) -> tuple[Citation, ...]:
+        core = tuple(cit for c in f.claims if c.author == "core" for cit in c.citations)
+        return () if f.category == "notam" else core
+
+    def generate(f: Finding) -> list[str] | None:
         try:
-            sentences = narrate_finding(llm, f)
+            return narrate_finding(llm, f)
         except (LLMUnavailable, ValueError):
+            return None
+
+    # One model call per finding, all in flight together; then one verifier batch over
+    # every generated sentence, since the NLI model is fastest on a full batch.
+    idx = [i for i, f in enumerate(briefing.findings) if eligible(f)]
+    stats.findings = len(idx)
+    generated = fan_out(lambda i: generate(briefing.findings[i]), idx)
+
+    candidates: dict[int, list[Claim]] = {}                 # finding index → its sentences
+    spans: dict[int, list[tuple[int, int]]] = {}            # finding index → pair slices
+    pairs: list[tuple[str, str]] = []
+    for i, sentences in zip(idx, generated, strict=True):
+        if sentences is None:
             stats.failed_calls += 1
+            continue
+        f = briefing.findings[i]
+        candidates[i] = [Claim(text=s, citations=eligible(f), author="llm") for s in sentences]
+        stats.generated += len(sentences)
+        spans[i] = []
+        for c in candidates[i]:
+            ps = _pairs_for(f, c)
+            spans[i].append((len(pairs), len(pairs) + len(ps)))
+            pairs.extend(ps)
+    scores = verifier.entailment(pairs) if pairs else []
+
+    findings: list[Finding] = []
+    for i, f in enumerate(briefing.findings):
+        if not candidates.get(i):
             findings.append(f)
             continue
-        candidates = [Claim(text=s, citations=core_citations, author="llm") for s in sentences]
-        stats.generated += len(candidates)
-        if not candidates:
-            findings.append(f)
-            continue
-        pairs = [p for c in candidates for p in _pairs_for(f, c)]
-        per = [len(_pairs_for(f, c)) for c in candidates]
-        scores = verifier.entailment(pairs)
         kept: list[Claim] = []
-        k = 0
-        for c, n in zip(candidates, per, strict=True):
+        for c, (lo, hi) in zip(candidates[i], spans[i], strict=True):
             gated = [s if figures_supported(h, p) else 0.0
-                     for (p, h), s in zip(pairs[k:k + n], scores[k:k + n], strict=True)]
-            best = max(gated) if n else 0.0
-            k += n
+                     for (p, h), s in zip(pairs[lo:hi], scores[lo:hi], strict=True)]
+            best = max(gated) if gated else 0.0
             if best >= threshold:
                 kept.append(c.model_copy(update={"verified": True,
                                                  "entailment_score": round(best, 4)}))

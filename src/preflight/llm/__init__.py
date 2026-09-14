@@ -14,6 +14,8 @@ Both backends take the same JSON schema: Ollama's ``format`` and Anthropic's
 
 from __future__ import annotations
 
+from collections.abc import Callable, Sequence
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Protocol, runtime_checkable
 
 from preflight.config import settings
@@ -50,4 +52,20 @@ def load_llm() -> LLM | None:
     return None
 
 
-__all__ = ["LLM", "LLMUnavailable", "load_llm"]
+def fan_out[T, R](fn: Callable[[T], R], items: Sequence[T], *,
+                  workers: int | None = None) -> list[R]:
+    """``[fn(x) for x in items]`` with up to ``workers`` calls in flight; results in order.
+
+    Per-finding model calls are independent, and a batching server (Ollama with
+    ``OLLAMA_NUM_PARALLEL``, or a hosted API) serves them concurrently for close to
+    the cost of one. ``fn`` must handle its own errors: an exception in any call
+    propagates after the others finish.
+    """
+    workers = min(workers or settings().llm_concurrency, len(items))
+    if workers <= 1:
+        return [fn(x) for x in items]
+    with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="llm") as ex:
+        return list(ex.map(fn, items))
+
+
+__all__ = ["LLM", "LLMUnavailable", "fan_out", "load_llm"]

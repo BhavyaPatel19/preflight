@@ -133,7 +133,7 @@ Built in the open, six sprints over twelve weeks.
 | 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟢 done — corpus, golden set, measured |
 | 4 | LangGraph orchestration, LLM layer, grounding, abstention | 🟢 done — graph with Postgres checkpointer over gather → precedent → verify → narrate |
 | 5 | Time-travel eval harness + CI regression gate | 🟡 600-case set built; coverage-first scorer; local LLM judge run on 304 precedent pairs; κ awaits the human sheet |
-| 6 | Delay forecasting, cost/latency, UI, MCP server | 🟡 forecasting, UI and MCP server done; cost/latency waits on the LLM layer |
+| 6 | Delay forecasting, cost/latency, UI, MCP server | 🟢 done — forecasting, UI, MCP server; latency pass halved the full briefing (49.5 → 25.4 s p50, local model) |
 
 **Working today**
 
@@ -208,14 +208,16 @@ CI gate will enforce.
 | Abstention | correct abstention on data-gap cases | ≥ 0.90 | — |
 | Safety | injection detector on 60 adversarial NOTAMs: recall · false positives on benign | 100% | **1.000 · 0.000** (detector; LLM resistance scored against the same set later) — [details](evals/safety/RESULTS.md) |
 | Judge | LLM-judge vs human agreement (Cohen's κ) on precedent relevance | ≥ 0.70 | — (judge run on 304 pairs; 100-row sheet awaits human labels — [how](evals/precedent/README.md)) |
-| Cost | p50 $/briefing · p95 latency | < $0.08 · 25 s | — |
+| Cost | p50 $/briefing · p95 latency, full briefing with precedent + narrative | < $0.08 · 25 s | **$0 · 26.2 s** local `qwen3:14b` on an M5 (was 53.2 s) · 4.0 s without the model — [details](evals/latency/RESULTS.md) |
 
 The κ row matters as much as the rest: an LLM judge nobody validated is a number nobody should trust.
 
-The forecast, grounding and narrative rows are met. The narrative row is measured on a local model at
+The forecast, grounding and narrative rows are met; latency is within a second of target. The narrative row is measured on a local model at
 zero cost; the same command with `PREFLIGHT_LLM=anthropic` produces the frontier comparison row. The retrieval numbers are below target and that is the point of having them: the first run of the
 harness found the lexical ranking function was both slow and bad, and fixing it moved hybrid from
-*worse* than dense to better (`evals/retrieval/HISTORY.md`). Candidate-pool size is the next knob.
+*worse* than dense to better; the latency pass then found the SQL was sequentially scanning the
+corpus, and fixing *that* was checked against the same harness before it was kept
+(`evals/retrieval/HISTORY.md`). The embedder is the next knob.
 
 ---
 
@@ -297,11 +299,17 @@ preflight status                    # last ingest run per source
 **LLM layer** — local and free. Ollama runs only while you start it:
 
 ```bash
-brew install ollama && ollama serve &          # not a login service; stop it with `pkill ollama`
-ollama pull qwen3:14b                          # 9.3 GB; qwen3:8b if memory is tight
+brew install ollama && ollama pull qwen3:14b   # 9.3 GB; qwen3:8b if memory is tight
+make ollama-start                              # `ollama serve` with request batching; not a login service
 preflight brief KSFO KJFK --alt KBOS --off-block 2026-09-12T14:00Z --llm
 preflight eval narrative                       # the model's unsupported-claim rate
+preflight bench KSFO KJFK --off-block 2026-09-12T14:00Z --llm   # p50/p95 per stage
+make ollama-stop                               # frees the 11 GB
 ```
+
+`make ollama-start` sets `OLLAMA_NUM_PARALLEL=4`: the briefing issues its per-finding model calls
+concurrently, and without that flag Ollama serialises them (measured in
+[`evals/latency/RESULTS.md`](evals/latency/RESULTS.md)).
 
 To compare against Claude later: `uv sync --extra llm`, set `ANTHROPIC_API_KEY` and
 `PREFLIGHT_LLM=anthropic`, re-run `preflight eval narrative`. Same code, same harness.
@@ -351,7 +359,9 @@ searched.
 | `preflight eval safety` | injection detector: recall on the red-team set, false positives on benign NOTAMs |
 | `preflight eval narrative` | unsupported-claim rate of the configured model's prose, with the dropped sentences listed |
 | `preflight eval precedent` | LLM judge over (hazard, prior report) pairs; `--score` reports κ against the human sheet |
-| `make db-start` / `make db-stop` | native Postgres on :5433 |
+| `preflight bench` | p50/p95 wall time per graph stage over repeated briefings, with or without the model |
+| `make db-start` / `make db-stop` | native Postgres on :5433, started with 2 GB `shared_buffers` (the corpus's lexical channel needs its tsvectors resident) |
+| `make ollama-start` / `make ollama-stop` | Ollama with request batching (`OLLAMA_NUM_PARALLEL=4`) |
 | `make up` / `make down` | the Docker stack on :5432 |
 | `make demo` | decode the bundled NOTAMs |
 
@@ -395,6 +405,7 @@ src/preflight/
   evals/grounding.py    true-claim acceptance vs corruption rejection, threshold sweep
   evals/narrative.py    generated / kept / dropped per model and finding kind
   evals/precedent.py    judge, human sheet, Cohen's κ, attached-precedent precision
+  evals/latency.py      per-stage p50/p95 bench over the graph's node timings
   verify/               NLI verifier (nli.py) and claim-level grounding policy (ground.py)
   safety/               injection detector — weighted, named signals; leetspeak/zero-width aware
   llm/                  LLM protocol; Ollama (default, local) and Anthropic (dormant) backends
@@ -412,6 +423,7 @@ evals/forecast/         RESULTS.md — MASE / pinball per forecaster and per air
 evals/grounding/        RESULTS.md — verifier acceptance / rejection per claim kind and threshold
 evals/safety/           injections.jsonl (60 adversarial NOTAMs, 6 families), RESULTS.md
 evals/narrative/        RESULTS.md (latest run), HISTORY.md — three runs, what each changed and taught
+evals/latency/          RESULTS.md — before/after per stage, what each change was worth, where the rest is
 evals/precedent/        pairs.jsonl, labels.csv (the human sheet), verdicts.json, RESULTS.md
 tests/                  129 tests; markers: db, live, ml
 data/samples/           bundled sample NOTAMs (real corpora are gitignored under data/raw)

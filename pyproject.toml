@@ -71,10 +71,12 @@ python_version = "3.12"
 strict = true
 files = ["src/preflight"]
 
-# APScheduler 3.x ships no type information; the ML extras are optional and absent in CI.
+# APScheduler 3.x ships no type information; the ML extras (and numpy with them) are optional
+# and absent in CI.
 [[tool.mypy.overrides]]
 module = [
     "apscheduler.*", "torch", "torch.*", "sentence_transformers", "sentence_transformers.*",
     "chronos", "chronos.*", "transformers", "transformers.*", "anthropic", "anthropic.*",
+    "numpy", "numpy.*",
 ]
 ignore_missing_imports = true

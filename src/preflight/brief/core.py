@@ -8,6 +8,7 @@ from psycopg import Connection
 
 from preflight.config import settings
 from preflight.db import notams as ndb
+from preflight.db import runs as rdb
 from preflight.db import weather as wdb
 from preflight.decode.contractions import expand
 from preflight.forecast.delay import climatology, local_time
@@ -367,6 +368,14 @@ def build_briefing(
         records = ndb.active_during(conn, icao, start, end)
         considered += len(records)
         findings.extend(notam_findings(icao, role, records))
+        # Nothing in force is a finding of sorts; nothing ever archived is a gap. A briefing
+        # that is silent about NOTAMs because it never had any reads as "no hazards".
+        if not records and ndb.count_for(conn, icao) == 0:
+            abstentions.append(Abstention(
+                topic=f"{icao} NOTAMs", reason="no_coverage",
+                detail=f"No NOTAMs on record for {icao}; the archive does not cover this "
+                       "airport, so NOTAM hazards were not assessed.",
+            ))
 
         metar = wdb.latest(conn, icao, "METAR")
         taf = wdb.latest(conn, icao, "TAF")
@@ -377,11 +386,30 @@ def build_briefing(
         findings.extend(wx)
         abstentions.extend(gaps)
 
-        ete = timedelta(minutes=req.ete_minutes) if req.ete_minutes else timedelta(hours=3)
-        delay = delay_finding(conn, icao, role, _utc(req.off_block) + ete)
-        if delay is not None:
-            findings.append(delay)
-            considered += 1
+        if role != "departure":
+            ete = timedelta(minutes=req.ete_minutes) if req.ete_minutes else timedelta(hours=3)
+            delay = delay_finding(conn, icao, role, _utc(req.off_block) + ete)
+            if delay is not None:
+                findings.append(delay)
+                considered += 1
+            else:
+                abstentions.append(Abstention(
+                    topic=f"{icao} arrival delay", reason="no_coverage",
+                    detail=f"No arrival-delay history for {icao} in the BTS record; no "
+                           "delay climatology given.",
+                ))
+
+    # NOTAMs the decoder rejected are not in the table at all, so no airport loop can see
+    # them. The ingest run counted them; say so once, for the whole briefing.
+    last = rdb.latest(conn, "notams")
+    if last is not None and int(last.counts.get("unparseable", 0)) > 0:
+        n = int(last.counts["unparseable"])
+        abstentions.append(Abstention(
+            topic="NOTAM decoding", reason="parse_failure",
+            detail=f"{n} NOTAM{'s' if n != 1 else ''} in the latest fetch ({last.source}, "
+                   f"{_fmt(_utc(last.finished_at))}) could not be decoded and "
+                   f"{'are' if n != 1 else 'is'} not assessed.",
+        ))
 
     return Briefing(
         request=req,

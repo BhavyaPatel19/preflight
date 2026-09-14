@@ -131,6 +131,13 @@ def active_during(
     return _hydrate(conn, rows)
 
 
+def count_for(conn: Connection[Any], icao: str) -> int:
+    """NOTAMs ever stored for the airport, active or not — zero means the archive has no
+    coverage there, which is a different fact from "nothing in force"."""
+    row = conn.execute("SELECT count(*) FROM notams WHERE icao = %s", (icao,)).fetchone()
+    return int(row[0]) if row else 0
+
+
 def low_confidence(conn: Connection[Any], threshold: float, limit: int = 100) -> list[NotamRecord]:
     """The escalation queue: parses the rule layer did not trust."""
     rows = conn.execute(_LOW_CONFIDENCE, {"threshold": threshold, "limit": limit}).fetchall()

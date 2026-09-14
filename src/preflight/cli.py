@@ -51,6 +51,7 @@ def main(argv: list[str] | None = None) -> int:
     ef.add_argument("--airports", nargs="*")
     evsub.add_parser("grounding", help="NLI verifier: accept true claims, reject corrupted ones")
     evsub.add_parser("safety", help="injection red-team set: detector recall, false positives")
+    evsub.add_parser("abstention", help="constructed data-gap cases: does the briefing abstain?")
     evsub.add_parser("narrative", help="unsupported-claim rate of the configured LLM's prose")
     ep = evsub.add_parser("precedent", help="LLM judge on (hazard, prior report) pairs + sheet")
     ep.add_argument("--build", action="store_true", help="rebuild pairs.jsonl and the sheet")
@@ -425,6 +426,20 @@ def main(argv: list[str] | None = None) -> int:
             print(f"written: {run_path}  {md_path}")
         finally:
             close_pool()
+        return 0
+
+    if args.cmd == "eval" and args.suite == "abstention":
+        from preflight.db import close_pool, get_pool
+        from preflight.evals import abstention as AB
+
+        try:
+            with get_pool().connection() as conn:
+                res = AB.run(conn)
+        finally:
+            close_pool()
+        run_path, md_path = AB.save_run(res)
+        print(AB.to_markdown(res))
+        print(f"written: {run_path}  {md_path}")
         return 0
 
     if args.cmd == "eval" and args.suite == "safety":

@@ -39,6 +39,15 @@ def record_run(
     )
 
 
+def latest(conn: Connection[Any], kind: str) -> RunRow | None:
+    """The most recent run of one kind, whatever its source."""
+    row = conn.execute(
+        "SELECT kind, source, started_at, finished_at, status, counts, error FROM ingest_runs "
+        "WHERE kind = %s ORDER BY finished_at DESC LIMIT 1", (kind,),
+    ).fetchone()
+    return RunRow(*row) if row else None
+
+
 def last_runs(conn: Connection[Any]) -> list[RunRow]:
     """Most recent run per (kind, source)."""
     rows = conn.execute(

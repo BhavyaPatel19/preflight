@@ -37,5 +37,8 @@ def render_text(b: Briefing) -> str:
         lines.append(f"       {a.detail}  [{a.reason}]")
         lines.append("")
 
-    lines.append(f"sources considered: {b.sources_considered} · {b.latency_ms} ms")
+    tail = f"sources considered: {b.sources_considered} · {b.latency_ms} ms"
+    if b.trace_id:
+        tail += f" · id {b.trace_id}"
+    lines.append(tail)
     return "\n".join(lines)

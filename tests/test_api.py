@@ -66,3 +66,17 @@ def test_stream_get_emits_start_findings_done(client, db):    # db: skip without
     assert {"findings", "abstentions", "sources_considered", "latency_ms"} <= set(done)
     assert done["findings"] == events.count("finding")
     assert done["abstentions"] == events.count("abstention")
+
+
+@pytest.mark.db
+def test_briefing_by_id_round_trip(client, db):
+    off = {"precedent": "false", "verify": "false", "narrative": "false"}
+    r = client.post("/brief", params=off, json={"departure": "KSFO", "destination": "KJFK",
+                                                 "off_block": "2026-09-12T14:00:00Z"})
+    assert r.status_code == 200
+    tid = r.json()["trace_id"]
+    assert tid
+    again = client.get(f"/briefings/{tid}")
+    assert again.status_code == 200 and again.json()["trace_id"] == tid
+    assert again.json()["request"]["departure"] == "KSFO"
+    assert client.get("/briefings/nope").status_code == 404

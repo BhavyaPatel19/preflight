@@ -20,6 +20,8 @@ dependencies = [
     "pgvector>=0.3",
     "apscheduler>=3.11,<4",
     "mcp>=1.2",
+    "langgraph>=1.0",
+    "langgraph-checkpoint-postgres>=2.0",
 ]
 
 [project.optional-dependencies]

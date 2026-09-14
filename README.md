@@ -131,7 +131,7 @@ Built in the open, six sprints over twelve weeks.
 | 1 | Foundation — schemas, rule decoder, ingestion, archive, deterministic briefing, scheduler | 🟢 done |
 | 2 | Fine-tuned NOTAM entity extractor → HF Hub | ⬜ waits on a real NOTAM corpus |
 | 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟢 done — corpus, golden set, measured |
-| 4 | LLM layer, grounding, abstention | 🟡 local LLM layer (query rewriting + verified narrative), grounding, abstention done; orchestration graph next |
+| 4 | LangGraph orchestration, LLM layer, grounding, abstention | 🟢 done — graph with Postgres checkpointer over gather → precedent → verify → narrate |
 | 5 | Time-travel eval harness + CI regression gate | 🟡 600-case set built; coverage-first scorer; local LLM judge run on 304 precedent pairs; κ awaits the human sheet |
 | 6 | Delay forecasting, cost/latency, UI, MCP server | 🟡 forecasting, UI and MCP server done; cost/latency waits on the LLM layer |
 
@@ -174,6 +174,12 @@ Built in the open, six sprints over twelve weeks.
 - **Untrusted input** — NOTAM text is data, never instructions. An injection detector (transparent
   weighted signals, every verdict names them) scores each NOTAM at ingest and records it; a 60-case
   red-team set across six attack families is what the LLM layer will be measured against.
+- **Orchestrate** — the stages run as a LangGraph `StateGraph` (gather → precedent → verify →
+  narrate) with a Postgres checkpointer: state is saved after every node, a failed run resumes
+  from its last good stage instead of starting over, and every briefing has an id —
+  `GET /briefings/{id}` or `preflight brief --resume ID` returns it from the checkpoint in ~3 s
+  rather than the ~50 s it took to compute. Which stages run is decided at the edges from the
+  request's options and what is available.
 - **MCP** — `preflight mcp` exposes `brief`, `decode_notam`, `search_precedent` and `status` as
   Model Context Protocol tools over stdio, so Claude Desktop or Claude Code can call the system
   directly.
@@ -226,10 +232,9 @@ harness found the lexical ranking function was both slow and bad, and fixing it 
                                                                   └ supervisor (S4)   ┘   filter
 ```
 
-The deterministic core (Sprint 1) is the floor: cited findings from records, abstentions on gaps.
-Sprint 4's LangGraph supervisor fans out to specialists that add precedent, forecasts and prose on
-top of it — every claim they make still has to trace to a record, and the verifier drops the ones
-that don't.
+The deterministic core is the floor: cited findings from records, abstentions on gaps. The graph
+adds precedent, verification and model-written prose on top of it — every claim still has to trace
+to a record, and the verifier drops the model's sentences that don't.
 
 ### Decisions worth arguing about
 
@@ -325,7 +330,7 @@ Then ask: *"Brief KSFO to KJFK departing 0230Z tomorrow, alternate KBOS."* The m
 first call that needs them.
 
 **API and UI** — `preflight serve`, then open http://localhost:8000. Endpoints: `POST /decode`,
-`POST /brief`, `GET|POST /brief/stream` (SSE), `GET /health`. The retrieval models load once at
+`POST /brief`, `GET|POST /brief/stream` (SSE), `GET /briefings/{id}`, `GET /health`. The retrieval models load once at
 startup when the ML extras are installed; without them the briefing states that precedent was not
 searched.
 
@@ -394,6 +399,7 @@ src/preflight/
   safety/               injection detector — weighted, named signals; leetspeak/zero-width aware
   llm/                  LLM protocol; Ollama (default, local) and Anthropic (dormant) backends
   brief/narrate.py      precedent-query rewriting and verified narrative — the LLM's two jobs
+  graph.py              LangGraph StateGraph over the stages; Postgres checkpointer; run/resume by id
   forecast/delay.py     climatology, seasonal-naive, Chronos-Bolt, MASE/pinball, airport time zones
   api/                  FastAPI: /decode, /brief, /brief/stream, and static/index.html (the UI)
   mcp_server.py         the same capabilities as MCP tools over stdio (`preflight mcp`)

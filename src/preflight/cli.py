@@ -101,6 +101,7 @@ def main(argv: list[str] | None = None) -> int:
                    help="skip the prior-report search (faster; no model load)")
     b.add_argument("--verify", action="store_true",
                    help="run the NLI grounding verifier over every factual claim")
+    b.add_argument("--resume", metavar="ID", help="resume/reload a checkpointed briefing by id")
     b.add_argument("--llm", action="store_true",
                    help="use the configured model for precedent queries and narrative "
                         "(implies --verify; unsupported sentences are dropped)")
@@ -153,18 +154,19 @@ def main(argv: list[str] | None = None) -> int:
                     SourceUnavailable,
                 )
 
-                src: NotamSource
+                notam_src: NotamSource
                 if args.file:
-                    src = FileSource(*args.file)
+                    notam_src = FileSource(*args.file)
                 elif args.source == "nasa-dip":
                     from preflight.config import settings
 
-                    src = NasaDipSource(settings().nasa_dip_base_url, settings().nasa_dip_token)
+                    cfg = settings()
+                    notam_src = NasaDipSource(cfg.nasa_dip_base_url, cfg.nasa_dip_token)
                 else:
                     print("error: give --file PATH or --source nasa-dip ICAO...", file=sys.stderr)
                     return 2
                 try:
-                    print(asyncio.run(ingest_notams(src, args.icao)))
+                    print(asyncio.run(ingest_notams(notam_src, args.icao)))
                 except SourceUnavailable as e:
                     print(f"source unavailable: {e}", file=sys.stderr)
                     return 3
@@ -175,8 +177,16 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "brief":
         from datetime import datetime
 
-        from preflight.brief import build_briefing, load_retriever, render_text, with_precedent
+        from preflight.brief import load_retriever, render_text
+        from preflight.config import settings
         from preflight.db import close_pool, get_pool
+        from preflight.graph import (
+            Deps,
+            build_graph,
+            pooled_connect,
+            postgres_checkpointer,
+            run_briefing,
+        )
         from preflight.schemas import FlightRequest
 
         req = FlightRequest(
@@ -185,33 +195,36 @@ def main(argv: list[str] | None = None) -> int:
             off_block=datetime.fromisoformat(args.off_block.replace("Z", "+00:00")),
             aircraft_type=args.aircraft_type, ete_minutes=args.ete,
         )
+        llm = None
+        if args.llm:
+            from preflight.llm import load_llm
+
+            llm = load_llm()
+            if llm is None:
+                print("warning: no LLM available (is `ollama serve` running?); "
+                      "continuing without narrative", file=sys.stderr)
+        verifier = None
+        if args.verify or llm is not None:
+            from preflight.verify.ground import load_verifier
+
+            verifier = load_verifier()
+        deps = Deps(connect=pooled_connect(get_pool),
+                    retriever=None if args.no_precedent else load_retriever(),
+                    verifier=verifier, llm=llm)
         try:
-            llm = None
-            if args.llm:
-                from preflight.llm import load_llm
-
-                llm = load_llm()
-                if llm is None:
-                    print("warning: no LLM available (is `ollama serve` running?); "
-                          "continuing without narrative", file=sys.stderr)
-            with get_pool().connection() as conn:
-                briefing = build_briefing(conn, req)
-                if not args.no_precedent:
-                    briefing = with_precedent(conn, briefing, load_retriever(), llm=llm)
-            if args.verify or llm is not None:
-                from preflight.verify.ground import load_verifier, with_verification
-
-                verifier = load_verifier()
-                briefing = with_verification(briefing, verifier)
-                if llm is not None:
-                    from preflight.brief import with_narrative
-
-                    briefing, ns = with_narrative(briefing, llm, verifier)
-                    if ns:
-                        print(f"narrative: {ns.model} wrote {ns.generated} sentences, "
-                              f"kept {ns.kept}, dropped {ns.dropped}", file=sys.stderr)
+            with postgres_checkpointer(settings().database_url) as saver:
+                graph = build_graph(deps, saver)
+                briefing, state = run_briefing(
+                    graph, req, options={"precedent": not args.no_precedent,
+                                         "verify": bool(args.verify or llm),
+                                         "narrative": llm is not None},
+                    thread_id=args.resume,
+                )
         finally:
             close_pool()
+        for line in state.get("trace", []):
+            print(f"· {line}", file=sys.stderr)
+        print(f"· briefing id {briefing.trace_id}", file=sys.stderr)
         print(briefing.model_dump_json(indent=2) if args.json else render_text(briefing))
         return 0
 

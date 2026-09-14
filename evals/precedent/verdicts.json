@@ -1,0 +1,1195 @@
+{
+ "fixture-notam-58087537": {
+  "relevant": false,
+  "reason": "The prior report discusses issues related to communication between tower and approach control, personnel distractions, and organizational oversight. However, it does not directly relate to a runway closure due to work in progress, which is "
+ },
+ "fixture-notam-27930281": {
+  "relevant": false,
+  "reason": "The prior report describes an incident involving an improper approach leading to a runway overrun and collision during takeoff/land. While this involves a runway-related outcome, the specific hazard in the current scenario is a closed\u8dd1\u9053 (25"
+ },
+ "fixture-notam-58188481": {
+  "relevant": false,
+  "reason": "The prior report describes an error related to landing at the incorrect airport after canceling an instrument flight plan, which is not directly related to the hazard of a closed runway during preflight briefing. The nature of the hazards ("
+ },
+ "fixture-notam-71679223": {
+  "relevant": false,
+  "reason": "The prior report involves a collision with trees due to failure to maintain glide path in variable wind conditions during a VFR pattern final approach. The current hazard is an unserviceable ILS, which would typically be addressed with a VD"
+ },
+ "fixture-notam-25422861": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot failed to establish and maintain a proper glidepath, which is directly related to the hazard of an unserviceable ILS. Both involve approach and landing phases, and the failure to maintain"
+ },
+ "fixture-notam-64921754": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot had an improper glidepath during a night approach, leading to a collision with terrain short of the runway. This is directly relevant to the hazard described, which involves an unserviceb"
+ },
+ "fixture-notam-72922061": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot failed to maintain a proper glide path during an approach, leading to an undershoot and collision with terrain. This is directly relevant to the hazard described, which involves an unserv"
+ },
+ "fixture-notam-75616352": {
+  "relevant": true,
+  "reason": "The prior report involves a failure to maintain situational awareness and terrain clearance during an approach, which is a plausible consequence of a PAPI (Precision Approach Path Indicator) being unserviceable. The PAPI provides visual gla"
+ },
+ "fixture-notam-53992228": {
+  "relevant": true,
+  "reason": "The prior report involves an inoperative PAPI, which is the same hazard described in the current situation. The accident occurred due to the pilot's failure to maintain a proper glidepath, which could have been corrected if the PAPI hadbeen"
+ },
+ "fixture-notam-61430238": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot had an improper glidepath during a night approach, leading to a collision with terrain short of the runway. This is directly related to the hazard of an unserviceable PAPI (Precision Aer\u00f6"
+ },
+ "fixture-notam-97724613": {
+  "relevant": true,
+  "reason": "The prior report discusses a situation where PAPI (Precision Approach Path Indicator) equipment is misaligned, leading to potential safety issues during approach and landing, particularly in low visibility or dark conditions. This is highly"
+ },
+ "fixture-notam-32542222": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot made a wrong turn during taxi due to fatigue and confusion, which is a similar operational error that could occur when taxiway closures are in effect. The hazard involves a closed taxiway"
+ },
+ "fixture-notam-01229284": {
+  "relevant": true,
+  "reason": "The prior report describes a ground conflict during taxiing due to ATC clearance issues, which is a similar operational situation and phase of flight (taxiing) as the hazard involving a closed taxiway. The issue of potential conflicts andAT"
+ },
+ "fixture-notam-51668908": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a crew misinterpreted taxiway instructions and proceeded onto an active taxiway, leading to confusion and potential safety risks. This is directly relevant to the hazard described, which involves"
+ },
+ "fixture-notam-21530425": {
+  "relevant": true,
+  "reason": "The prior report describes confusion due to poor signage and charting at an airport (ORD), leading to a taxiway and runway incursion. This is directly relevant to the current hazard, which involves a closed taxiway (K) at KORD, as both deal"
+ },
+ "fixture-notam-10798083": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot failed to establish a stabilized approach, leading to a runway excursion. This is directly relevant to the hazard of a closed runway (KBOS: Runway 15L/33R closed, permanent), as a closed/"
+ },
+ "fixture-notam-53338443": {
+  "relevant": true,
+  "reason": "The prior report describes a runway overrun due to improper approach and failure to perform a go-around, which is a plausible consequence for a crew facing a closed runway situation. The hazard involves a closed runway, and the prior report"
+ },
+ "fixture-notam-08231537": {
+  "relevant": true,
+  "reason": "The prior report describes an unstabilized approach and failure to go around, leading to a runway overrun on a wet surface. This is relevant to the hazard of a closed runway (15L/33R at KBOS), as it highlights the risks associated with poor"
+ },
+ "fixture-notam-08529019": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot had an improper glidepath during a night approach, leading to a collision with terrain short of the runway. This is a similar operational situation and outcome (undershooting the runway,\u649e"
+ },
+ "fixture-notam-00925853": {
+  "relevant": false,
+  "reason": "The prior report describes a low-altitude flight accident involving pilot distraction and failure to monitor the environment, specifically related to a wire. The hazard described is an unserviceable VOR at KIAH, which is a navigation aid\u5931\u6548,"
+ },
+ "fixture-notam-38834103": {
+  "relevant": false,
+  "reason": "The prior report involves a pilot's failure to obtain a preflight weather briefing, leading to turbulence and altitude issues during cruise. The hazard described is an unserviceable VOR at KIAH, which relates to navigation equipment failure"
+ },
+ "fixture-notam-32521025": {
+  "relevant": false,
+  "reason": "The prior report describes a loss of situational awareness and visual horizon leading to an unrecognized descent and terrain impact, which is related to environmental and psychological factors during low-level maneuvering. However, the hazd"
+ },
+ "fixture-notam-80414599": {
+  "relevant": false,
+  "reason": "The prior report describes a collision with mountainous terrain due to failure to monitor the environment, loss of control, and improper airspeed and angle of attack management. This is unrelated to a VOR unserviceability hazard, which pert"
+ },
+ "fixture-notam-80950829": {
+  "relevant": true,
+  "reason": "The prior report involves an incident where inadequate runway lighting contributed to an accident, which is directly related to the hazard described (ALS 16C unserviceable). Both involve issues with airport lighting affecting operations, in"
+ },
+ "fixture-notam-91955840": {
+  "relevant": true,
+  "reason": "The prior report describes a loss of directional control during takeoff, resulting in a runway excursion and collision with runway lights. This is directly relevant to the hazard of an unserviceable ALS (Approach Light System) on a runway, "
+ },
+ "fixture-notam-96497292": {
+  "relevant": false,
+  "reason": "The prior report involves a runway excursion due to failure to maintain directional control during landing in variable wind conditions. The hazard described is an unserviceable approach light (ALS 16C) at KSEA, which is unrelated to wind or"
+ },
+ "fixture-notam-22061153": {
+  "relevant": true,
+  "reason": "The prior report describes a loss of directional control during takeoff, resulting in a runway excursion and collision with an approach lighting system. This is directly related to the hazard of an unserviceable ALS (Approach LightingSystem"
+ },
+ "fixture-notam-01051584": {
+  "relevant": true,
+  "reason": "The prior report involves a pilot selecting an inadequate runway for the conditions, which is a similar operational situation to the hazard described (runway closure due to work in progress). Both involve runway availability and decision\u2010\u2010\u2010"
+ },
+ "fixture-notam-94017501": {
+  "relevant": false,
+  "reason": "The prior report discusses issues related to communication between tower and approach control, and organizational issues in ATC, but it does not directly relate to a runway closure due to work in progress. The hazard described involves a\u8dd1\u9053\u95ed"
+ },
+ "fixture-notam-40738380": {
+  "relevant": false,
+  "reason": "The prior report describes an error related to landing at the incorrect airport after canceling an instrument flight plan, which is not directly related to the hazard of a closed runway during preflight briefing. The nature of the hazards ("
+ },
+ "fixture-notam-97513976": {
+  "relevant": true,
+  "reason": "The prior report involves an unserviceable runway lighting system at an airport, which is directly related to the hazard described (unserviceable LOC 09 at KMIA). Both involve issues with airport lighting that could affect approach and safe"
+ },
+ "fixture-notam-75209359": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a crew intercepted the wrong localizer (Runway 12 instead of Runway 09) due to failure to update the course setting after a runway change. This directly relates to the current hazard, which is an"
+ },
+ "fixture-notam-28986238": {
+  "relevant": false,
+  "reason": "The prior report involves a coordination error between tower and approach control leading to loss of separation during departure, which is not the same type of hazard as an unserviceable localizer. The hazard described is related to naviga\u019f"
+ },
+ "fixture-notam-14027480": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a crew failed to intercept a localizer due to high ATC workload and poor situational awareness, which is directly related to the hazard of an unserviceable localizer. The operational context and "
+ },
+ "fixture-notam-69010595": {
+  "relevant": true,
+  "reason": "The prior report involves an icy taxiway contributing to an accident during taxiing, which is a similar operational situation and hazard (surface condition affecting taxiing) to the current hazard of a closed taxiway due to snow removal. It"
+ },
+ "fixture-notam-71673599": {
+  "relevant": true,
+  "reason": "The prior report involves snow-related hazards at an airport, specifically snow covering runway lights and contributing to an accident. This is directly relevant to the current hazard of snow removal on a taxiway, as both involve snow on an"
+ },
+ "fixture-notam-75161026": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot lost directional control while taxiing on a snow-covered surface, leading to a collision with terrain. This is directly relevant to the current hazard, which involves a closed taxiway due"
+ },
+ "fixture-notam-21717015": {
+  "relevant": true,
+  "reason": "The prior report involves a loss of control on the ground during taxiing on a snow-covered taxiway, which is directly related to the current hazard of a closed taxiway due to snow removal. Both situations involve snow-covered taxiways and a"
+ },
+ "fixture-notam-54272009": {
+  "relevant": true,
+  "reason": "The prior report involves a flight instructor failing to review NOTAMs, leading to landing on a closed runway. This directly relates to the current hazard of Runway 08 being closed, and the consequence of landing on a closed runway is a plu"
+ },
+ "fixture-notam-93550966": {
+  "relevant": true,
+  "reason": "The prior report involves a pilot failing to recognize a tailwind during landing, leading to a delayed go-around and incorrect use of landing gear and flaps. This is relevant to a hazard involving runway closure, as it highlights potential\u8bef"
+ },
+ "fixture-notam-97406656": {
+  "relevant": true,
+  "reason": "The prior report describes a runway excursion caused by the pilot's failure to maintain directional control during takeoff, which could be influenced by environmental factors such as wind. This is relevant to the hazard of a closed runway ("
+ },
+ "fixture-notam-53444812": {
+  "relevant": false,
+  "reason": "The prior report discusses issues related to communication between ATC personnel and organizational oversight, which are not directly related to the hazard of a closed runway. The hazard involves a runway closure, while the prior report is "
+ },
+ "fixture-notam-88636619": {
+  "relevant": false,
+  "reason": "The prior report describes a terrain-related accident due to inadequate monitoring and communication, which is not directly related to the hazard of an unserviceable HIRL (High Intensity Runway Lighting) at KIAD. The hazard involves runway\u706f"
+ },
+ "fixture-notam-92052716": {
+  "relevant": false,
+  "reason": "The prior report describes a hazard involving a wet runway contributing to a loss of control during takeoff. The current hazard involves an unserviceable HIRL (High Intensity Runway Lighting) system. These are different types of hazards (w\u6e7f"
+ },
+ "fixture-notam-56866149": {
+  "relevant": false,
+  "reason": "The prior report describes an incident involving spatial disorientation, brownout conditions, and poor visibility due to a sand/dust storm, which are not related to the hazard of an unserviceable HIRL (High Intensity Runway Light) at KIAD. "
+ },
+ "fixture-notam-38908490": {
+  "relevant": false,
+  "reason": "The prior report describes an incident involving high winds, a short downhill runway, and loss of control on the ground. The hazard in question is an unserviceable HIRL (High Intensity Runway Light) at KIAD. These are different types of haz"
+ },
+ "fixture-notam-78299073": {
+  "relevant": false,
+  "reason": "The prior report involves a coordination error between tower and approach control leading to loss of separation during departures, whereas the current hazard is a runway closure at KATL. The nature of the hazards and the phases of flight do"
+ },
+ "fixture-notam-04360617": {
+  "relevant": false,
+  "reason": "The prior report describes a landing short of the runway due to failure to maintain the proper approach path, which is a different type of hazard compared to a closed runway. The closed runway hazard involves runway availability and access,"
+ },
+ "fixture-notam-81542518": {
+  "relevant": false,
+  "reason": "The prior report describes a landing short of the runway due to failure to attain the proper approach path, which is related to approach and landing performance. However, the hazard in question involves a closed runway, which is a different"
+ },
+ "fixture-notam-10791343": {
+  "relevant": false,
+  "reason": "The prior report describes an incident involving a pilot's inadequate approach, delayed decision to abort landing, and improper flap configuration during an attempted aborted landing, resulting in impact with trees. This is unrelated to the"
+ },
+ "fixture-notam-05010518": {
+  "relevant": true,
+  "reason": "The prior report involves a pilot failing to use available information about taxi routes, leading to a navigation error and ground collision. This is directly relevant to the current hazard, which involves a closed taxiway. A crew facing a\u95ed"
+ },
+ "fixture-notam-24455119": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot made a wrong turn during taxiing, which could be related to the hazard of a closed taxiway (Taxiway B). A crew facing this hazard could plausibly encounter a similar error, such as misjud"
+ },
+ "fixture-notam-52718491": {
+  "relevant": false,
+  "reason": "The prior report describes a loss of directional control due to snowy/icy terrain during a taxi roll, which is a different type of hazard (environmental/terrain condition) compared to the current hazard (taxiway closure). The phase of the\u98de\u884c"
+ },
+ "fixture-notam-66599152": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot failed to maintain directional control during taxi, leading to a runway excursion and impact with terrain. This is directly relevant to the hazard of a closed taxiway (Taxiway B), as it\u6d89\u53ca"
+ },
+ "fixture-notam-42356394": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot had incorrect glide path and landing flare, leading to a collision with obstacles and a hard landing. This is directly relevant to the hazard of unserviceable PAPI lights, which can lead "
+ },
+ "fixture-notam-52435722": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot failed to properly execute an approach, leading to a long landing and a collision with an airport perimeter fence. This is relevant to the hazard of an unserviceable PAPI (which provides "
+ },
+ "fixture-notam-93297993": {
+  "relevant": true,
+  "reason": "The prior report involves an inoperative PAPI, which is the same hazard described in the current situation. The accident occurred due to the pilot's failure to maintain a proper glidepath, which could have been corrected if the PAPI hadbeen"
+ },
+ "fixture-notam-68873023": {
+  "relevant": false,
+  "reason": "The prior report involves a balloon accident due to inadequate preflight planning and FAA oversight, which is unrelated to the hazard of a PAPI (Precision Approach Path Indicator) being unserviceable at an airport. The hazards and phases of"
+ },
+ "fixture-notam-77611287": {
+  "relevant": true,
+  "reason": "The prior report describes an unstabilized approach and failure to go around, leading to a runway overrun on a wet surface. This is relevant to the hazard of a closed runway (work in progress), as it highlights the risks associated with run"
+ },
+ "fixture-notam-09901566": {
+  "relevant": false,
+  "reason": "The prior report describes an incident involving an unstabilized approach and a runway excursion, but it does not specifically relate to a closed runway or the operational challenge of navigating around a closed runway during takeoff or\u964d\u843d. "
+ },
+ "fixture-notam-17335668": {
+  "relevant": true,
+  "reason": "The prior report involves a pilot failing to recognize a tailwind during landing, leading to a delayed go-around and incorrect use of landing gear and flaps. This is relevant to the hazard of runway closure due to work in progress, as both "
+ },
+ "fixture-notam-94813029": {
+  "relevant": false,
+  "reason": "The prior report describes a runway excursion caused by a loss of control during a go-around and delayed action by the instructor. While it involves a runway-related incident, the specific hazard in the current scenario is a closed runway ("
+ },
+ "ntsb-case-31757899": {
+  "relevant": true,
+  "reason": "The prior report describes a situation involving environmental issues related to runway conditions (slush contaminated runway) and weather conditions below published approach minimums, which are similar to the hazard described (runway/landi"
+ },
+ "ntsb-case-02481300": {
+  "relevant": true,
+  "reason": "The prior report involves an environmental issue related to the runway/landing area condition (snow/slush/ice covered), which is directly related to the hazard described (runway environmental issues). Both involve challenges with the runway"
+ },
+ "ntsb-case-04131972": {
+  "relevant": true,
+  "reason": "The prior report describes a situation involving runway condition and the lack of accurate information about it, which is directly related to the hazard described (runway environmental issues). The report also mentions the impact of runway/"
+ },
+ "ntsb-case-54739543": {
+  "relevant": true,
+  "reason": "The prior report describes a situation involving a wet runway, which is directly related to the environmental issue of runway/landing area condition. It also mentions consequences such as not maintaining the glide path and a runway excusion"
+ },
+ "ntsb-case-85720560": {
+  "relevant": true,
+  "reason": "The prior report describes a takeoff wildlife encounter (deer) that resulted in a loss of control, veering off the runway, and substantial damage. This is a direct operational situation and outcome that a crew facing a similar hazard (wildl"
+ },
+ "ntsb-case-42126228": {
+  "relevant": true,
+  "reason": "The prior report describes a wildlife encounter (non-bird) during the landing roll, which is a similar type of hazard as the one mentioned in the preflight briefing (takeoff wildlife encounter). Both incidents involve wildlife encounters, a"
+ },
+ "ntsb-case-86971943": {
+  "relevant": true,
+  "reason": "The prior report describes a takeoff wildlife encounter (a deer) during the takeoff roll, resulting in damage to the aircraft and an aborted takeoff. This is directly relevant to the hazard described, which involves a wildlife encounter (a\u975e"
+ },
+ "ntsb-case-08122376": {
+  "relevant": true,
+  "reason": "The prior report describes a takeoff wildlife encounter (bird strike) during the takeoff phase, which is the same hazard and phase of flight as the one described in the current hazard. The outcome of the incident (aborted takeoff, runwayexc"
+ },
+ "ntsb-case-34090235": {
+  "relevant": true,
+  "reason": "The prior report describes a birdstrike during enroute-cruise phase of flight, leading to structural failure, loss of control, and an accident. This is directly relevant to the hazard of an unknown birdstrike at EGCB, as it illustrates a pl"
+ },
+ "ntsb-case-91235442": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike during the enroute-cruise phase of flight, which is a similar operational situation to the unknown birdstrike hazard at EGCB. Both involve bird strikes and their potential impact on flight safety, so"
+ },
+ "ntsb-case-92871169": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike during cruise that led to a loss of control and collision with terrain, which is directly related to the hazard of an unknown bird strike at EGCB. Both involve bird strikes during flight and their\u540e\u679c,"
+ },
+ "ntsb-case-93717032": {
+  "relevant": true,
+  "reason": "The prior report describes a birdstrike during an approach for a precautionary landing, leading to a pitch-up reaction and an inadvertent stall. This is a similar operational situation and consequence (stall due to birdstrike) that a crew\u9762\u5bf9"
+ },
+ "ntsb-case-31584166": {
+  "relevant": true,
+  "reason": "The prior report involves a birdstrike during the enroute phase of flight, similar to the hazard described (birdstrike during climb to cruise). The report also highlights an evasive maneuver leading to a collision with a tree, which is a pl"
+ },
+ "ntsb-case-34168586": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike that resulted in a loss of control during maneuvering flight, which is a similar operational situation and consequence to the hazard described (birdstrike during climb to cruise). Both involve birdst"
+ },
+ "ntsb-case-34207085": {
+  "relevant": false,
+  "reason": "The prior report describes a controlled flight into terrain during cruise flight due to failure to maintain adequate altitude in dark night conditions. This is a different type of hazard (terrain collision during cruise) compared to the one"
+ },
+ "ntsb-case-60916358": {
+  "relevant": true,
+  "reason": "The prior report describes an inadvertent bird encounter during cruise flight, which is the same phase of flight and type of hazard (birdstrike) as the one mentioned in the hazard description. The outcome (substantial damage to the wing) is"
+ },
+ "ntsb-case-37460680": {
+  "relevant": true,
+  "reason": "The prior report involves a landing incident under night conditions with non-standard runway lighting, which is directly related to the hazard described (runway lighting issues at KSNC). Both involve environmental factors affecting landing,"
+ },
+ "ntsb-case-06485021": {
+  "relevant": true,
+  "reason": "The prior report involves a failure to activate runway lights due to incorrect action by the pilot, which is directly related to the hazard described (runway lighting issues at KSNC). Both involve the same phase of flight (taxiing) and the "
+ },
+ "ntsb-case-87302000": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot failed to maintain directional control during takeoff, leading to a runway excursion and collision with an approach lighting system. This is directly related to the hazard of runway light"
+ },
+ "ntsb-case-92144303": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot failed to maintain directional control during takeoff, leading to a runway excursion and collision with runway lights. This directly relates to the hazard described (runway lighting and a"
+ },
+ "ntsb-case-25672896": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike during takeoff that caused a left engine stall/surge, similar to the hazard described (takeoff birdstrike). It includes operational consequences such as loss of thrust, engine fluctuations, and the\u673a\u7ec4"
+ },
+ "ntsb-case-43779454": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike during takeoff, which is the same hazard mentioned in the current scenario. It also details the consequences of the bird strike, including a decision to land without sufficient runway remaining, a\u8dd1\u9053\u903e"
+ },
+ "ntsb-case-35237053": {
+  "relevant": false,
+  "reason": "The prior report describes an incident involving engine failure due to magneto failure, pilot error, and collision with trees. While the collision with trees is an environmental issue, it is not related to a birdstrike. The primary hazard ("
+ },
+ "ntsb-case-17593878": {
+  "relevant": false,
+  "reason": "The prior report describes an aborted landing resulting in a runway excursion and collision with a canal, which involves different operational errors and outcomes compared to the hazard of a runway incursion involving a vehicle, aircraft,\u6216\u4eba"
+ },
+ "ntsb-case-90000058": {
+  "relevant": false,
+  "reason": "The prior report describes an incident related to failure to follow procedures during pre-departure, specifically missing a DG manifest due to poor task management and CRM. This is unrelated to a runway incursion hazard, which involves a\u822a\u7a7a\u5668"
+ },
+ "ntsb-case-64011948": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a vehicle was present on the runway during an approach, leading to a touch and go landing due to the crew not seeing the vehicle. This is directly related to the hazard of a runway incursion by a"
+ },
+ "ntsb-case-20880305": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where the crew had inadequate situational awareness due to changes in airport configuration and missed communications, leading to a potential runway incursion scenario. This aligns with the hazard of a"
+ },
+ "ntsb-case-61890364": {
+  "relevant": true,
+  "reason": "The prior report involves a runway incursion scenario where the pilot misjudged the position of ground equipment, leading to an aborted go-around and a runway excursion. This is directly relevant to the hazard described, which includes a 'p"
+ },
+ "ntsb-case-95009689": {
+  "relevant": false,
+  "reason": "The prior report describes a tailwind encounter during takeoff leading to an aborted takeoff and collision with a ditch, which is a different type of hazard (tailwind) compared to the runway incursion hazard described in the current prefl  "
+ },
+ "ntsb-case-50555741": {
+  "relevant": true,
+  "reason": "The prior report describes a runway incursion during a takeoff roll that resulted in a rejected takeoff, which is the same type of hazard (runway incursion during takeoff) and outcome (rejected takeoff) as the one described in the hazard."
+ },
+ "ntsb-case-43585848": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot delayed the decision to abort takeoff and failed to properly conduct a rejected takeoff, leading to a runway overrun. This is directly relevant to the hazard described, which involves a '"
+ },
+ "ntsb-case-55103119": {
+  "relevant": true,
+  "reason": "The prior report involves a failure to activate runway lights due to incorrect action by the pilot, which is directly related to the hazard described (runway lighting issues at KSUS). Both involve the same type of hazard (runway lighting) \u0438"
+ },
+ "ntsb-case-39338524": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot failed to maintain directional control during takeoff, leading to a runway excursion and collision with an approach lighting system. This is directly related to the hazard involving runwy"
+ },
+ "ntsb-case-69443837": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot failed to maintain directional control during takeoff, leading to a runway excursion and collision with runway lights. This directly relates to the hazard involving runway lighting and an"
+ },
+ "ntsb-case-30783918": {
+  "relevant": true,
+  "reason": "The prior report involves environmental issues related to visibility (brownout conditions and sand/dust storm), which are similar to the hazard described (lighting issues at KSUS due to environmental factors). Both involve challenges with\u89c6\u89c9"
+ },
+ "ntsb-case-16783101": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike during enroute cruise that led to a loss of control and collision with terrain, which is a similar hazard (bird strike) and consequence (loss of control) to the one mentioned in the hazard at KSFB (a"
+ },
+ "ntsb-case-67486670": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike during descent, which is a similar hazard (birdstrike) and phase of flight (descent) to the hazard mentioned in the preflight briefing (initial climb). Although the phases of flight differ slightly,\u9e1f"
+ },
+ "ntsb-case-88354612": {
+  "relevant": true,
+  "reason": "The prior report describes a birdstrike during initial climb, which is the same hazard and phase of flight as the one mentioned in the preflight briefing. The outcome (substantial damage to the wing) is also a plausible consequence of the\u9e1f\u51fb"
+ },
+ "ntsb-case-90059135": {
+  "relevant": true,
+  "reason": "The prior report describes a birdstrike during approach, which is a similar hazard (birdstrike) and phase of flight (approach) to the one mentioned in the hazard (initial climb). Although the phases of flight differ slightly, the core issue"
+ },
+ "ntsb-case-09659440": {
+  "relevant": false,
+  "reason": "The prior report describes a situation involving reduced forward visibility due to bright sunlight, which is an environmental issue affecting pilot vision. This is not the same as a malfunction in the aircraft's exterior lighting system, as"
+ },
+ "ntsb-case-85451214": {
+  "relevant": false,
+  "reason": "The prior report describes an accident caused by excessive elevator input during a rapid descent under night lighting conditions, leading to a breakup of the airplane. While it involves lighting conditions, the primary hazard in the current"
+ },
+ "ntsb-case-01472983": {
+  "relevant": false,
+  "reason": "The prior report describes a failure to identify a heliport in dark night conditions, leading to a landing attempt and impact with trees and terrain. This involves issues with identification, decision-making, and situational awareness in a\u4f4e"
+ },
+ "ntsb-case-49128376": {
+  "relevant": false,
+  "reason": "The prior report describes an incident involving reduced visibility, low ceilings, and failure to maintain altitude, which is not directly related to an exterior lighting system malfunction. The hazards and operational contexts differ, so a"
+ },
+ "ntsb-case-56767652": {
+  "relevant": true,
+  "reason": "The prior report involves a bird strike affecting equipment (specifically, the windshield and related systems), which is directly related to the hazard described (wildlife affecting equipment and the ability to respond/compensate). Both are"
+ },
+ "ntsb-case-68634922": {
+  "relevant": true,
+  "reason": "The prior report describes an in-flight loss of control due to a bird strike, which is directly related to the hazard of wildlife (specifically birds) affecting equipment and the ability to respond/compensate. Both involve the same type of\u9e1f"
+ },
+ "ntsb-case-38041269": {
+  "relevant": false,
+  "reason": "The prior report describes a hazard related to unsecured cockpit items interacting with flight controls, which is a different type of hazard (equipment security) compared to the wildlife hazard mentioned in the current scenario. The phases,"
+ },
+ "ntsb-case-31671439": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot failed to maintain helicopter control and terrain clearance while avoiding wildlife during a hover, which is directly related to the hazard of wildlife affecting equipment and the ability"
+ },
+ "ntsb-case-24200205": {
+  "relevant": false,
+  "reason": "The prior report describes a runway overrun and landing gear collapse due to a failed go-around and insufficient landing distance, which is not the same type of hazard as a runway incursion during landing or landing roll. The prior report's"
+ },
+ "ntsb-case-02415240": {
+  "relevant": true,
+  "reason": "The prior report describes a situation during the landing roll where the pilot failed to identify the end of the runway, leading to a runway excursion, collision with terrain, and landing gear collapse. This is directly related to the given"
+ },
+ "ntsb-case-32461673": {
+  "relevant": true,
+  "reason": "The prior report describes a runway incursion during the landing phase, which led to a go-around and a forced landing due to terrain. This is a similar operational situation and consequence to the hazard described (runway incursion during a"
+ },
+ "ntsb-case-40474310": {
+  "relevant": true,
+  "reason": "The prior report involves a runway incursion involving ground equipment (a ground spray rig) and a pilot's misjudgment leading to an aborted go-around and a runway excursion. This is directly relevant to the hazard described (runway incursi"
+ },
+ "ntsb-case-01626169": {
+  "relevant": true,
+  "reason": "The prior report describes a wildlife encounter (a deer) during landing, resulting in damage to the aircraft's engine. This is directly relevant to the hazard described (wildlife encounter during landing), as it involves the same type of\u52a8\u7269,"
+ },
+ "ntsb-case-60880217": {
+  "relevant": true,
+  "reason": "The prior report describes a wildlife encounter (a deer) during the landing roll, resulting in damage to the aircraft, which is directly relevant to the hazard described (wildlife encounter during landing roll). Both involve similar hazards"
+ },
+ "ntsb-case-33362907": {
+  "relevant": true,
+  "reason": "The prior report describes a wildlife encounter (a deer) during the landing roll (takeoff roll following a touch-and-go), which is a similar phase of flight and type of hazard (wildlife impact) as the one described in the hazard. Both cases"
+ },
+ "ntsb-case-49859125": {
+  "relevant": false,
+  "reason": "The prior report describes a loss of directional control due to a malfunctioning brake master cylinder, which is a mechanical failure, not a wildlife encounter. The environmental hazard in the current scenario involves wildlife during the\u843d\u5730"
+ },
+ "ntsb-case-61667517": {
+  "relevant": true,
+  "reason": "The prior report involves environmental issues related to runway/landing area condition and awareness of condition, which aligns with the hazard described. It also includes factors such as flight crew decision-making, information processing"
+ },
+ "ntsb-case-13245247": {
+  "relevant": false,
+  "reason": "The prior report involves a pilot's failure to communicate weather conditions and request MSAW monitoring, which relates to personnel issues and weather conditions. The hazard described is about awareness of runway/landing area conditions, "
+ },
+ "ntsb-case-87026980": {
+  "relevant": true,
+  "reason": "The prior report describes a situation involving runway condition awareness and the impact of environmental factors on operations, which aligns with the hazard described (KSFO: runway \u2014 Environmental issues-Operating environment-Airport\u8bbe\u65bd\u8bbe\u8ba1"
+ },
+ "ntsb-case-79438791": {
+  "relevant": false,
+  "reason": "The prior report describes a terrain-related incident involving failure to monitor rising terrain and lack of communication, which is not the same type of hazard as the one described in the preflight briefing (runway/landing area condition,"
+ },
+ "ntsb-case-76270479": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where runway lighting contributed to an operational error by the flight crew, specifically failing to identify the correct runway for landing. This is directly relevant to the hazard described, which\u6d89\u53ca"
+ },
+ "ntsb-case-39451204": {
+  "relevant": true,
+  "reason": "The prior report involves a collision with a lighted tower during night visual meteorological conditions, which is related to runway lighting and environmental issues affecting flight operations. This is a similar operational situation and "
+ },
+ "ntsb-case-84755866": {
+  "relevant": true,
+  "reason": "The prior report describes a situation involving inoperative runway lights, which is directly related to the hazard of lighting issues at KJVY. Additionally, it includes environmental factors such as weather below approach minimums and a sl"
+ },
+ "ntsb-case-34006030": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where low visibility led to a decision to descend below the decision altitude without appropriate visual references, resulting in controlled flight into terrain. This is directly related to the hazard,"
+ },
+ "ntsb-case-90342150": {
+  "relevant": true,
+  "reason": "The prior report involves a bird strike affecting the helicopter's windshield and related systems, which is directly related to the hazard of wildlife (specifically birds) impacting the aircraft. Both the hazard and the prior report involve"
+ },
+ "ntsb-case-95600488": {
+  "relevant": false,
+  "reason": "The prior report describes a failure to identify a heliport in dark night conditions, leading to a landing attempt and impact with trees and terrain. This involves issues related to visibility, identification, and decision-making in low-ill"
+ },
+ "ntsb-case-86271187": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot failed to maintain helicopter control and terrain clearance while avoiding wildlife during a hover, which is directly related to the hazard of wildlife affecting personnel during flight. "
+ },
+ "ntsb-case-49691886": {
+  "relevant": false,
+  "reason": "The prior report describes a collision with power lines during low-altitude maneuvering, which is a different type of hazard (wire) compared to the wildlife hazard at KBDN. While both involve environmental objects, the nature of the hazard,"
+ },
+ "ntsb-case-24158604": {
+  "relevant": true,
+  "reason": "The prior report involves a collision during takeoff, which is a similar outcome to a runway incursion. Both situations occur during the takeoff phase and involve proximity to the active runway, making it a relevant precedent for a crew\u9762\u5bf9 a"
+ },
+ "ntsb-case-16231695": {
+  "relevant": true,
+  "reason": "The prior report describes a situation involving a runway incursion and communication issues between controllers and aircraft, which is directly related to the hazard of a taxi-into takeoff position runway incursion. The report highlights a"
+ },
+ "ntsb-case-22516353": {
+  "relevant": false,
+  "reason": "The prior report describes an Anti-Ice system malfunction and related performance data issues, which are unrelated to the hazard of a runway incursion during taxiing. The nature of the hazards and the operational situations differ, making\u5b83\u4e0d"
+ },
+ "ntsb-case-33640099": {
+  "relevant": true,
+  "reason": "The prior report involves a loss of control on the ground during taxiing, which is a similar operational situation to the hazard described (runway incursion during taxiing into takeoff position). Both involve directional control issues and,"
+ },
+ "ntsb-case-33620205": {
+  "relevant": false,
+  "reason": "The prior report describes an incident involving inadequate operational control procedures and poor visibility conditions (whiteout and flat light), which led to a departure below minimums. This is related to environmental conditions and a "
+ },
+ "ntsb-case-05090047": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot failed to maintain helicopter control and terrain clearance while avoiding wildlife during a hover, which is directly related to the hazard of wildlife affecting aircraft control and the "
+ },
+ "ntsb-case-74712500": {
+  "relevant": false,
+  "reason": "The prior report describes an incident involving inclement weather (snow, freezing rain, reduced visibility) leading to spatial disorientation and loss of control. This is a weather-related hazard, not a wildlife hazard. The nature of the\u98ce\u9669"
+ },
+ "ntsb-case-95034212": {
+  "relevant": true,
+  "reason": "The prior report describes a wildlife encounter (a deer collision) during landing, which is the same type of hazard (wildlife) and phase of flight (landing) as the current hazard. It also includes a loss of control on the ground, which is a"
+ },
+ "ntsb-case-67255480": {
+  "relevant": true,
+  "reason": "The prior report describes a wildlife encounter (cattle) during landing, which is the same type of hazard (wildlife on the runway) and phase of flight (landing) as the current hazard. The outcome (loss of control leading to a nosed over and"
+ },
+ "ntsb-case-69708841": {
+  "relevant": false,
+  "reason": "The prior report describes a situation involving wind gusts and a pilot's failure to maintain directional control during landing, leading to an overrun. This is not the same kind of hazard as encountering wildlife during landing (non-bird),"
+ },
+ "ntsb-case-61453075": {
+  "relevant": false,
+  "reason": "The prior report describes a bird strike during takeoff following a touch-and-go landing, which is a different phase of flight compared to the hazard described (wildlife encounter during landing-flare/touchdown). Additionally, the outcome ("
+ },
+ "ntsb-case-37070973": {
+  "relevant": false,
+  "reason": "The prior report describes a wake turbulence encounter and loss of control during landing, which is a different type of hazard (aircraft wake turbulence) compared to the wildlife encounter (non-bird) described in the hazard. While both are "
+ },
+ "ntsb-case-89668105": {
+  "relevant": true,
+  "reason": "The prior report describes a situation involving a runway incursion and a pilot's misjudgment of an object's position, leading to an aborted go-around and a runway excursion. This is directly relevant to the hazard described, which involves"
+ },
+ "ntsb-case-62604088": {
+  "relevant": true,
+  "reason": "The prior report describes a runway incursion during landing, leading to a go-around and subsequent forced landing due to terrain clearance issues. This is a similar operational situation and outcome that a crew facing a runway incursion (e"
+ },
+ "ntsb-case-08336217": {
+  "relevant": true,
+  "reason": "The prior report describes a runway incursion involving a ground crewman and a vehicle being struck by a landing airplane, which is directly related to the hazard of a runway incursion during the landing-landing roll phase. The error and\u540e\u679c\uff08"
+ },
+ "ntsb-case-52401276": {
+  "relevant": true,
+  "reason": "The prior report describes a loss of directional control during the landing roll, leading to a runway excursion and collision with terrain. This is directly related to the hazard of a runway incursion during the landing roll phase, as both "
+ },
+ "ntsb-case-95800229": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot was unable to activate a pilot-controlled lighting system at a private airport, which is directly related to the hazard involving airport lighting and its effect on operations. Both the-h"
+ },
+ "ntsb-case-26821221": {
+  "relevant": true,
+  "reason": "The prior report involves a pilot failing to maintain directional control during landing due to gusting wind, which is an environmental issue affecting operation, similar to the hazard described (lighting issues affecting operation). Both\u6d89\u53ca"
+ },
+ "ntsb-case-46757599": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where inadequate runway lighting at night contributed to an accident, which is directly related to the hazard of airport lighting affecting operations. Both involve the same environmental issue and a\u76f8\u4f3c"
+ },
+ "ntsb-case-93524781": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where low light conditions contributed to a pilot's failure to locate the airport, leading to a collision with powerlines during a go-around. This is directly related to the hazard of airport lighting,"
+ },
+ "ntsb-case-16284672": {
+  "relevant": true,
+  "reason": "The prior report describes a situation involving a rejected takeoff and a collision during takeoff, which is directly related to the hazard of a rejected takeoff and a runway incursion. Both involve similar phases of flight (takeoff) and a "
+ },
+ "ntsb-case-24812028": {
+  "relevant": true,
+  "reason": "The prior report involves a runway incursion during takeoff, which is directly related to the hazard described (runway incursion during takeoff at KJFK). The report highlights the importance of air traffic control systems (ASDE-X) and the\u53ca\u65f6"
+ },
+ "ntsb-case-50253057": {
+  "relevant": true,
+  "reason": "The prior report involves a rejected takeoff leading to a runway excursion, which is a similar operational situation and outcome to the hazard described (rejected takeoff and runway incursion). Both involve takeoff aborts and potential loss"
+ },
+ "ntsb-case-10310548": {
+  "relevant": false,
+  "reason": "The prior report describes a near mid-air collision involving light sport aircraft and another aircraft on a different departure leg, which is a different type of hazard (air traffic conflict) compared to the runway incursion hazard (takeof"
+ },
+ "ntsb-case-17705211": {
+  "relevant": false,
+  "reason": "The prior report describes an incident involving an abnormal runway contact during the landing flare, leading to a hard landing and runway excursion. While it involves the landing flare phase of flight, the cause is attributed to pilot task"
+ },
+ "ntsb-case-37809304": {
+  "relevant": false,
+  "reason": "The prior report describes a loss of control and hard landing due to improper flare in crosswind conditions, which is a different type of hazard (crosswind) compared to the wildlife encounter (non-bird) mentioned in the current hazard. The\u76f8"
+ },
+ "ntsb-case-91348426": {
+  "relevant": false,
+  "reason": "The prior report describes a landing flare issue caused by strong gusting wind conditions, leading to a bounced landing and runway excursion. While it involves environmental factors (wind) and landing phase, it does not involve a wildlife ("
+ },
+ "ntsb-case-36812971": {
+  "relevant": false,
+  "reason": "The prior report describes a hard landing, bounced landing, loss of directional control, and runway excursion due to improper landing flare. While it involves a landing phase and environmental factors (fence and terrain), it does not relate"
+ },
+ "ntsb-case-90732279": {
+  "relevant": true,
+  "reason": "The prior report describes an incident involving an enroute birdstrike, which is the same type of hazard mentioned in the current preflight briefing. The operational situation, error, and outcome (bird impact, evasive action, damage, and a "
+ },
+ "ntsb-case-04000603": {
+  "relevant": false,
+  "reason": "The prior report describes spatial disorientation due to deteriorating weather conditions, which is a different type of hazard compared to a birdstrike. The phases of flight and the nature of the hazards are not the same, making it not a pl"
+ },
+ "ntsb-case-25188492": {
+  "relevant": true,
+  "reason": "The prior report describes an in-flight bird strike during descent, which is the same phase of flight and hazard type (birdstrike) as the one mentioned in the hazard. The outcome (damage to the aircraft and the crew's response) is also plau"
+ },
+ "ntsb-case-89097118": {
+  "relevant": false,
+  "reason": "The prior report discusses issues related to low visibility, pilot decision-making, and altitude maintenance, which are not directly related to the hazard of a birdstrike during enroute flight. The nature of the hazards and their impact on\u98db"
+ },
+ "ntsb-case-85311063": {
+  "relevant": false,
+  "reason": "The prior report describes a situation involving inaccurate takeoff performance calculations and failure to maintain directional control during an aborted takeoff. While this relates to takeoff phase issues, it does not directly address a\u8dd1\u9053"
+ },
+ "ntsb-case-26061156": {
+  "relevant": false,
+  "reason": "The prior report describes a collision during takeoff/landing, involving altitude not being maintained, incorrect use of aircraft handling, and environmental factors such as tailwind and trees. While it involves an operational error and an "
+ },
+ "ntsb-case-79235196": {
+  "relevant": false,
+  "reason": "The prior report describes a hazard involving a flooded runway and loss of control during takeoff, which is a different type of hazard (environmental/wet surface) compared to the current hazard (runway incursion by vehicle, aircraft, or a 3"
+ },
+ "ntsb-case-29969150": {
+  "relevant": true,
+  "reason": "The prior report involves a takeoff-related incident (runway excursion and overrun) which is a similar phase of flight and outcome to the hazard described (runway incursion during takeoff). Both involve takeoff and potential loss of control"
+ },
+ "ntsb-case-21320392": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where environmental factors (sun glare and crosswind) contributed to a pilot's failure to abort a landing, which is directly related to the hazard described (runway condition issues due to an operating"
+ },
+ "ntsb-case-52309067": {
+  "relevant": true,
+  "reason": "The prior report describes a situation involving environmental issues, specifically a slush-contaminated runway and weather conditions below approach minimums, which are similar to the hazard described (runway condition contributed to the\u4e8b\u6545"
+ },
+ "ntsb-case-61589617": {
+  "relevant": true,
+  "reason": "The prior report involves an environmental issue related to runway conditions (wet surface) and a tailwind, which contributed to a failure to maintain a proper glide path and ultimately led to an aborted landing attempt. This is directly\u76f8\u5173\u5230"
+ },
+ "ntsb-case-87145078": {
+  "relevant": true,
+  "reason": "The prior report describes a situation involving a muddy runway condition, which is directly related to the hazard of runway/landing area condition contributing to an outcome. Both involve environmental issues related to runway conditions, "
+ },
+ "ntsb-case-79479956": {
+  "relevant": true,
+  "reason": "The prior report involves an issue with runway lighting and the pilot's failure to activate it, which is directly related to the hazard described (taxiway lighting contributing to an outcome). Both involve environmental issues related to\u673a\u573a\u8bbe"
+ },
+ "ntsb-case-00353270": {
+  "relevant": true,
+  "reason": "The prior report describes a situation during taxiing where taxiway lighting was non-existent, and the aircraft's lighting was inadequate, leading to the crew relying on external light sources and navigation software. This aligns with the '"
+ },
+ "ntsb-case-35490739": {
+  "relevant": true,
+  "reason": "The prior report involves environmental issues related to light conditions (glare) and a pilot's failure to use available information, leading to a navigation error during taxiing. This is directly relevant to the hazard described (taxiway/"
+ },
+ "ntsb-case-36118931": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot failed to maintain directional control during taxi, leading to a runway excursion and impact with terrain. This is directly related to the hazard of taxiway lighting issues, as poor taxiw"
+ },
+ "ntsb-case-16878226": {
+  "relevant": false,
+  "reason": "The prior report describes a loss of control on the ground during takeoff and a collision with terrain, which is a different type of hazard compared to a runway incursion involving a vehicle, aircraft, or person. The prior report does not p"
+ },
+ "ntsb-case-62525272": {
+  "relevant": false,
+  "reason": "The prior report discusses a pilot's failure to follow published airport guidance related to go-arounds, landings, and takeoffs with unfavorable winds. This is unrelated to a runway incursion involving a vehicle, aircraft, or person during "
+ },
+ "ntsb-case-76521120": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike during enroute-cruise that led to an in-flight loss of control, which is a similar operational situation and consequence (effect on equipment and operation) as the hazard described at KPIE involving\u9e1f"
+ },
+ "ntsb-case-41904991": {
+  "relevant": true,
+  "reason": "The prior report describes a birdstrike during the traffic pattern phase of flight, resulting in damage to the wing and requiring the pilot to respond and land safely. This is a similar operational situation and consequence to the hazard at"
+ },
+ "ntsb-case-08150337": {
+  "relevant": true,
+  "reason": "The prior report describes a birdstrike during low-level maneuvering, which resulted in damage to the aircraft and required landing. This is directly relevant to the hazard described (birdstrike during maneuvering at KPIE), as it involves a"
+ },
+ "ntsb-case-41006029": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike during maneuvering flight, which is the same type of hazard (birdstrike) and phase of flight (maneuvering) as the one mentioned in the hazard. The outcome (substantial damage to the wing) is also apl"
+ },
+ "ntsb-case-65500598": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike-related incident involving damage to aircraft equipment (specifically, the windshield system) and operational issues that could affect flight safety. This aligns with the hazard described (birdstrike"
+ },
+ "ntsb-case-24842175": {
+  "relevant": false,
+  "reason": "The prior report discusses a crash involving fuel spillage, fire, and non-crash-resistant cabin components, which is unrelated to the hazard of birdstrike during low-altitude flying. The nature of the hazard, phase of flight, and outcomes ("
+ },
+ "ntsb-case-88303983": {
+  "relevant": false,
+  "reason": "The prior report describes a failure to identify a heliport in dark night conditions, leading to a landing attempt and impact with trees and terrain. This involves personnel issues, decision-making, and environmental conditions (dark night)"
+ },
+ "ntsb-case-17809642": {
+  "relevant": true,
+  "reason": "The prior report describes a birdstrike during enroute cruise, resulting in part separation and loss of control, which is a similar operational situation and consequence to the hazard described (birdstrike during low-altitude flying). The\u76f8\u540c"
+ },
+ "ntsb-case-10372496": {
+  "relevant": false,
+  "reason": "The prior report describes an accident involving a pilot losing control during a low-altitude aerobatic maneuver, which is unrelated to the hazard of a birdstrike during climb to cruise. The nature of the hazard, phase of flight, and type/\u00ad"
+ },
+ "ntsb-case-54743372": {
+  "relevant": false,
+  "reason": "The prior report describes a loss of control due to airspeed exceedances and potential pilot incapacitation from coronary artery disease, which is unrelated to the hazard of a birdstrike during climb to cruise. The nature of the hazard and "
+ },
+ "ntsb-case-41964687": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike during enroute cruise, leading to a loss of control and collision with terrain, which is a similar hazard (bird strike) and phase of flight (enroute) as the current hazard. The outcome (loss of\u63a7\u5236) is"
+ },
+ "ntsb-case-54733907": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike during cruise flight, which is the same phase of flight and type of hazard (birdstrike) as the current hazard (birdstrike during climb to cruise). The outcome (damage to the wing and return to the\u673a\u573a)"
+ },
+ "ntsb-case-35185758": {
+  "relevant": false,
+  "reason": "The prior report describes a loss of control during initial climb due to gusting wind conditions, which is a different type of hazard (weather-related) compared to the wildlife hazard (birdstrike) mentioned in the current situation. While a"
+ },
+ "ntsb-case-93536309": {
+  "relevant": true,
+  "reason": "The prior report involves a birdstrike during flight, similar to the hazard described (birdstrike during initial climb), and includes an evasive maneuver that led to a collision with an object (tree). This demonstrates a plausible outcome ("
+ },
+ "ntsb-case-79094374": {
+  "relevant": true,
+  "reason": "The prior report describes a loss of directional control during the initial climb, which led to a collision with vegetation. This is a plausible outcome for a crew facing a birdstrike during the initial climb, as the birdstrike could have\u5e72\u6270"
+ },
+ "ntsb-case-77798197": {
+  "relevant": true,
+  "reason": "The prior report describes a loss of control during initial climb, which is the same phase of flight as the hazard (initial climb birdstrike). The failure to maintain directional control could plausibly occur in a birdstrike scenario, and a"
+ },
+ "ntsb-case-92197920": {
+  "relevant": true,
+  "reason": "The prior report describes a loss of directional control during the landing roll, leading to a runway excursion and collision with terrain. This is directly related to the hazard of a runway incursion during the landing roll phase, as both "
+ },
+ "ntsb-case-70865055": {
+  "relevant": false,
+  "reason": "The prior report describes a runway overrun due to a long/fast landing and maintenance issues, which is a different type of hazard (runway overrun) compared to the described hazard (runway incursion). The phases of flight and consequences ("
+ },
+ "ntsb-case-58676162": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot lost directional control during the landing roll, leading to an exit from the runway and impact with terrain. This is directly relevant to the hazard described (runway incursion during a "
+ },
+ "ntsb-case-27139050": {
+  "relevant": false,
+  "reason": "The prior report describes a bounced landing and runway excursion due to improper flare and loss of directional control in gusting wind conditions. This is not the same kind of hazard as a runway incursion involving a vehicle, aircraft, or\u4eba"
+ },
+ "ntsb-case-46602750": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike during takeoff, which is the same hazard mentioned in the preflight briefing. It also includes a sequence of events involving a rejected takeoff, loss of control on the ground, runway excursion, and\u9f3b"
+ },
+ "ntsb-case-75265366": {
+  "relevant": false,
+  "reason": "The prior report describes an incident involving fuel system issues and maintenance errors, which is unrelated to the hazard of a birdstrike during takeoff. The nature of the hazard, the phase of flight, and the contributing factors differ,"
+ },
+ "ntsb-case-36258621": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike during maneuvering flight that resulted in a loss of control, which is a similar operational situation and consequence to the hazard described (birdstrike during takeoff). Both involve bird strikes,\u867d"
+ },
+ "ntsb-case-44336626": {
+  "relevant": false,
+  "reason": "The prior report describes a hard landing due to improper flare in crosswind conditions, which is a different type of hazard (crosswind) compared to the wildlife encounter (non-bird) mentioned in the current hazard. While both occurred at a"
+ },
+ "ntsb-case-16072460": {
+  "relevant": false,
+  "reason": "The prior report describes a hard landing and runway excursion caused by a pilot's high flare and failure to execute a go-around. While this is a landing-related incident, it does not involve a wildlife encounter (non-bird) as described in "
+ },
+ "ntsb-case-56586714": {
+  "relevant": false,
+  "reason": "The prior report describes an incident involving improper pitch control during the landing flare, resulting in a hard landing. This is related to pilot performance and aircraft control, not a wildlife encounter. The hazard in question is a "
+ },
+ "ntsb-case-99720137": {
+  "relevant": false,
+  "reason": "The prior report describes a landing flare and directional control issue caused by the pilot's improper technique, not a wildlife encounter. The hazard in question involves a wildlife encounter during landing, which is a different type of\u98ce\u9669"
+ },
+ "ntsb-case-02786551": {
+  "relevant": true,
+  "reason": "The prior report describes a situation involving environmental issues related to runway conditions (slush contaminated runway), weather conditions below approach minimums, and inoperative lights, which are similar to the hazard described (K"
+ },
+ "ntsb-case-02168925": {
+  "relevant": true,
+  "reason": "The prior report involves an environmental issue related to the runway condition (snow/slush/ice covered) and its effect on operations, which is directly related to the hazard described (runway condition - effect on operation). Both involve"
+ },
+ "ntsb-case-68361708": {
+  "relevant": true,
+  "reason": "The prior report involves environmental issues related to weather conditions (low visibility) and the pilot's decision-making in those conditions, which is directly relevant to the hazard described (runway operations affected by runway/land"
+ },
+ "ntsb-case-95590577": {
+  "relevant": false,
+  "reason": "The prior report describes a terrain-related incident involving inadequate monitoring of rising terrain and poor crew communication, which is not the same type of hazard as the one described in the current briefing (runway/landing area\u6761\u4ef6). "
+ },
+ "ntsb-case-13831387": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot failed to maintain helicopter control and terrain clearance while evading wildlife during a hover, which is directly related to the hazard of wildlife affecting aircraft control and the\u73af\u5883"
+ },
+ "ntsb-case-06521280": {
+  "relevant": false,
+  "reason": "The prior report discusses issues related to inadequate operational control procedures, decision-making, and environmental conditions such as whiteout and flat light, which are not directly related to wildlife hazards. The hazard described,"
+ },
+ "ntsb-case-18939143": {
+  "relevant": false,
+  "reason": "The prior report describes an incident involving inclement weather (snow, freezing rain, reduced visibility) leading to spatial disorientation and loss of control. This is a weather-related hazard, not a wildlife hazard. The types of hazard"
+ },
+ "ntsb-case-82097650": {
+  "relevant": true,
+  "reason": "The prior report involves a bird strike affecting aircraft equipment, specifically the windshield and related systems, which is directly related to the hazard described (wildlife affecting the ability to respond/compensate and effect on equ"
+ },
+ "ntsb-case-30604227": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where reduced forward visibility due to bright light (sun) contributed to an accident during low-altitude maneuvering. This is directly related to the hazard described (lighting issues affecting the\u98de\u884c\u5458"
+ },
+ "ntsb-case-21573014": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where environmental conditions (sun glare) partially obscured the pilot's vision, leading to a loss of visual reference during approach and ultimately a collision with terrain or an object. This is a\u76f8\u4f3c"
+ },
+ "ntsb-case-90046382": {
+  "relevant": true,
+  "reason": "The prior report involves environmental issues related to visibility (brownout conditions and sand/dust storm) and challenges during approach and landing, which are similar to the hazard described (lighting issues and environmental factors)"
+ },
+ "ntsb-case-57526431": {
+  "relevant": true,
+  "reason": "The prior report involves an environmental issue related to approach aid coverage/availability (specifically, the absence of forward-facing lights on an aircraft), which is directly related to the hazard described (lighting issues during an"
+ },
+ "ntsb-case-36870796": {
+  "relevant": true,
+  "reason": "The prior report describes a birdstrike during an approach that led to a pilot's incorrect action (pitch-up reaction), resulting in a stall. This is directly relevant to the hazard described (birdstrike during approach), as it involves the "
+ },
+ "ntsb-case-71026082": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike during takeoff, which is the same type of hazard (birdstrike) and involves similar consequences (loss of control, runway excursion, and collision with terrain). The phase of flight (takeoff) and the "
+ },
+ "ntsb-case-02859834": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike during cruise that led to a loss of control and collision with terrain, which is a similar hazard (bird strike) and outcome (loss of control) to the one described in the hazard. Both involve birdstri"
+ },
+ "ntsb-case-57229417": {
+  "relevant": true,
+  "reason": "The prior report describes a birdstrike during an approach in dark night conditions, which is the same type of hazard (birdstrike) and phase of flight (approach). The outcome (windshield damage and pilot's inability to see and avoid the\u9e1f)is"
+ },
+ "ntsb-case-06518552": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike during enroute cruise that led to a loss of control and uncontrolled descent, which is a similar operational situation and consequence to the hazard described (birdstrike during approach). Both cases"
+ },
+ "ntsb-case-17615600": {
+  "relevant": false,
+  "reason": "The prior report describes an encounter with a downburst during an instrument approach, which is a weather-related hazard, not a birdstrike. While both incidents occurred during the initial approach phase of an IFR approach, the nature of 2"
+ },
+ "ntsb-case-82943681": {
+  "relevant": true,
+  "reason": "The prior report involves a birdstrike during the approach phase, similar to the hazard described, and the pilot's evasive maneuver led to a collision with a tree, which is a plausible consequence of a birdstrike at low altitude. The phases"
+ },
+ "ntsb-case-80924683": {
+  "relevant": false,
+  "reason": "The prior report describes spatial disorientation during a missed approach in instrument meteorological conditions, leading to a stall. This is unrelated to the hazard of a birdstrike during an approach. The nature of the hazards and their "
+ },
+ "ntsb-case-74723109": {
+  "relevant": false,
+  "reason": "The prior report describes a loss of control due to airspeed exceedances and potential pilot incapacitation from coronary artery disease. This is not the same kind of hazard (birdstrike) or phase of flight (descent is mentioned, but the key"
+ },
+ "ntsb-case-38120448": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike during enroute cruise that led to a loss of control and uncontrolled descent, which is a similar hazard (birdstrike) and phase of flight (enroute) as the one described in the hazard. The consequences"
+ },
+ "ntsb-case-88698767": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike during enroute cruise that led to an in-flight loss of control, which is a similar hazard (birdstrike) and phase of flight (enroute) as the one mentioned in the hazard. The findings also align with '"
+ },
+ "ntsb-case-06469448": {
+  "relevant": true,
+  "reason": "The prior report describes an incident involving a birdstrike during enroute descent, which is the same type of hazard (birdstrike) and phase of flight (enroute) as the one mentioned in the hazard description. The outcome (damage to the air"
+ },
+ "ntsb-case-59771483": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot failed to maintain directional control during an aborted landing, leading to a runway excursion. This is directly related to the hazard described, which involves runway conditions and the"
+ },
+ "ntsb-case-44004894": {
+  "relevant": true,
+  "reason": "The prior report involves an environmental issue related to runway conditions (wet surface) and a pilot's decision-making during an approach, which could be relevant to a similar hazard involving runway conditions. The outcome of the prior-"
+ },
+ "ntsb-case-19405093": {
+  "relevant": true,
+  "reason": "The prior report describes a situation involving environmental issues related to runway conditions (slush contaminated runway) and weather conditions below approach minimums, which are similar to the hazard described (runway condition and\u73af\u5883"
+ },
+ "ntsb-case-59549998": {
+  "relevant": true,
+  "reason": "The prior report describes a situation involving a pilot's failure to inspect the landing platform, which relates to the environmental issue of runway/landing area condition. This is the same general hazard category and phase of flight (pre"
+ },
+ "ntsb-case-73041710": {
+  "relevant": false,
+  "reason": "The prior report describes an issue related to improper installation of flight control components and maintenance errors, which is unrelated to the hazard of birdstrike during the VFR pattern downwind phase. The nature of the hazards andthe"
+ },
+ "ntsb-case-87193433": {
+  "relevant": true,
+  "reason": "The prior report describes a birdstrike during the VFR pattern downwind leg, which is the same phase of flight and hazard (birdstrike) as the one mentioned in the hazard description. The outcome (substantial damage to the wing) is also a pl"
+ },
+ "ntsb-case-54165571": {
+  "relevant": true,
+  "reason": "The prior report describes a birdstrike during the VFR pattern final approach phase, resulting in a loss of control, aerodynamic stall, and spin \u2014 outcomes that are directly relevant to the hazard described (birdstrike during approach). The"
+ },
+ "ntsb-case-70851613": {
+  "relevant": true,
+  "reason": "The prior report describes a birdstrike during the approach phase in the VFR pattern, which is the same hazard and phase of flight as the one mentioned in the current hazard. Both involve birdstrikes affecting the operation, and the outcome"
+ },
+ "ntsb-case-86185137": {
+  "relevant": false,
+  "reason": "The prior report describes a hard landing and runway excursion caused by a high flare and failure to execute a go-around. While this is a landing-related incident, it does not involve a wildlife encounter (non-bird) and is not directly tied"
+ },
+ "ntsb-case-34553396": {
+  "relevant": false,
+  "reason": "The prior report describes an incident involving an abnormal runway contact during the landing flare, leading to a hard landing and runway excursion. While it involves the landing flare phase of flight, the cause is attributed to pilot task"
+ },
+ "ntsb-case-60910181": {
+  "relevant": false,
+  "reason": "The prior report describes a landing flare issue caused by gusting wind conditions, leading to a bounced landing and runway excursion. While it involves environmental factors and landing performance, it does not involve a wildlife encounter"
+ },
+ "ntsb-case-62131840": {
+  "relevant": false,
+  "reason": "The prior report describes a hard landing and loss of directional control due to gusting wind conditions and delayed action by the flight instructor. This is not the same kind of hazard as encountering wildlife during landing, although both"
+ },
+ "ntsb-case-49514279": {
+  "relevant": true,
+  "reason": "The prior report describes a situation involving environmental issues, specifically gusty crosswind weather conditions and rocky terrain adjacent to the runway, which are similar to the hazard described (runway environmental issues). It is,"
+ },
+ "ntsb-case-47418591": {
+  "relevant": true,
+  "reason": "The prior report describes a runway incursion that led to a go-around and a forced landing due to terrain, which is a similar operational situation and outcome that could be encountered by a crew facing environmental issues related to the\u8dd1\u9053"
+ },
+ "ntsb-case-28373619": {
+  "relevant": true,
+  "reason": "The prior report describes a situation involving a hard landing, loss of directional control, and a runway excursion, which are related to runway/landing area conditions and environmental factors. These are similar to the hazard described, "
+ },
+ "ntsb-case-53016600": {
+  "relevant": true,
+  "reason": "The prior report involves a landing flare issue in strong gusting wind conditions, leading to a bounced landing and runway excursion. This aligns with the hazard described, which involves environmental issues related to runway conditions. A"
+ },
+ "ntsb-case-08986232": {
+  "relevant": true,
+  "reason": "The prior report describes a runway incursion involving a vehicle and an aircraft, which is directly related to the hazard described (runway incursion during landing or taxiing). The situation involves similar operational risks and could pl"
+ },
+ "ntsb-case-61202138": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot misidentified a taxiway as the intended runway, leading to a collision with terrain and objects during landing. This is directly related to the hazard described, which involves runway inc"
+ },
+ "ntsb-case-54022765": {
+  "relevant": false,
+  "reason": "The prior report describes an incident involving adverse weather, ATC communication, aircraft malfunction, and procedural errors during landing and taxiing. However, it does not specifically mention a runway incursion involving a vehicle,\u822a\u7a7a"
+ },
+ "ntsb-case-79714540": {
+  "relevant": true,
+  "reason": "The prior report describes a situation involving a runway incursion with another aircraft on the runway, which is the same type of hazard mentioned in the current briefing. It also involves a similar phase of flight (taxiing and landing) as"
+ },
+ "ntsb-case-61218534": {
+  "relevant": true,
+  "reason": "The prior report describes a birdstrike during an approach, resulting in damage to the windshield and reduced visibility, which is directly related to the hazard described (birdstrike during approach). Both involve environmental issues with"
+ },
+ "ntsb-case-66550926": {
+  "relevant": true,
+  "reason": "The prior report describes a birdstrike during the downwind leg of the traffic pattern, which is the same phase of flight and type of hazard (birdstrike) as the one mentioned in the current hazard. This makes it a relevant precedent for a\u98de\u884c"
+ },
+ "ntsb-case-92013246": {
+  "relevant": true,
+  "reason": "The prior report involves a birdstrike during the approach phase, similar to the hazard described, and the pilot's evasive maneuver led to a collision with a tree, which is a plausible consequence of a birdstrike at low altitude. The phases"
+ },
+ "ntsb-case-59777290": {
+  "relevant": true,
+  "reason": "The prior report describes a birdstrike during the downwind leg of the traffic pattern, which is the same phase of flight and hazard (birdstrike) as the one mentioned in the hazard description. The outcome (substantial damage to the wing)pl"
+ },
+ "ntsb-case-42468088": {
+  "relevant": true,
+  "reason": "The prior report describes a birdstrike during maneuvering flight, which is the same type of hazard (birdstrike) and phase of flight (maneuvering) as the one mentioned in the hazard description. The outcome (substantial damage to the wing) "
+ },
+ "ntsb-case-13238989": {
+  "relevant": true,
+  "reason": "The prior report describes an in-flight collision with a bird during maneuvering, which is the same type of hazard (birdstrike) and phase of flight (maneuvering) as the one mentioned in the hazard. The outcome (substantial damage to the air"
+ },
+ "ntsb-case-97431955": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike during cruise that led to a loss of control, which is directly related to the hazard of a bird strike during maneuvering. Both involve bird strikes affecting flight safety and operational outcomes, a"
+ },
+ "ntsb-case-05612271": {
+  "relevant": true,
+  "reason": "The prior report describes an in-flight birdstrike during cruise flight, which is a similar phase of flight and hazard type (birdstrike) as the maneuvering birdstrike hazard mentioned. Both involve bird impacts on the aircraft and their eff"
+ },
+ "ntsb-case-23232528": {
+  "relevant": true,
+  "reason": "The prior report involves a failure to maintain directional control during an aborted takeoff, which is related to the hazard of a runway incursion during takeoff. Both situations occur during the takeoff phase and involve potential loss of"
+ },
+ "ntsb-case-72507819": {
+  "relevant": false,
+  "reason": "The prior report describes a collision during takeoff/landing, involving altitude not being maintained, incorrect use of aircraft handling, and environmental factors such as tailwind and trees. While it involves an operational error and an "
+ },
+ "ntsb-case-32788533": {
+  "relevant": false,
+  "reason": "The prior report describes a hazard involving a flooded runway and loss of control during takeoff, which is a different type of hazard (environmental/wet surface) compared to the current hazard (runway incursion by vehicle, aircraft, or a 3"
+ },
+ "ntsb-case-76415813": {
+  "relevant": true,
+  "reason": "The prior report describes a takeoff-related incident involving a runway excursion and incorrect action selection by the pilot, which is a plausible consequence of a runway incursion during takeoff. Both incidents occur during the takeoff/\u200b"
+ },
+ "ntsb-case-87355373": {
+  "relevant": true,
+  "reason": "The prior report describes a runway incursion involving a ground vehicle (tractor) on a runway during the landing rollout phase, which is the same type of hazard (runway incursion) and phase of flight (landing) as the one described in the K"
+ },
+ "ntsb-case-38794313": {
+  "relevant": false,
+  "reason": "The prior report discusses taxiing procedures, taxi lights, and monitoring traffic, but it does not specifically address a runway incursion involving a vehicle, aircraft, or person on the runway during landing. The context and type of risk,"
+ },
+ "ntsb-case-66763540": {
+  "relevant": false,
+  "reason": "The prior report describes an aborted landing resulting in a runway excursion and collision with a canal, which involves different operational errors and outcomes compared to the hazard of a runway incursion involving a vehicle, aircraft,\u6216\u4eba"
+ },
+ "ntsb-case-33843033": {
+  "relevant": true,
+  "reason": "The prior report describes a runway incursion involving a ground vehicle leading to a collision during the landing roll, which is directly related to the hazard of a runway incursion involving a vehicle, aircraft, or person during landing. "
+ },
+ "ntsb-case-97769152": {
+  "relevant": true,
+  "reason": "The prior report describes a takeoff wildlife encounter (a deer) during the takeoff roll, resulting in damage to the aircraft and an aborted takeoff. This is directly relevant to the hazard described (wildlife encounter during takeoff), as\u5b83"
+ },
+ "ntsb-case-87146460": {
+  "relevant": true,
+  "reason": "The prior report describes a takeoff wildlife encounter involving a deer, which is a non-bird animal, and resulted in a collision during takeoff. This is directly relevant to the hazard described (wildlife encounter during takeoff), as it\u6d89\u53ca"
+ },
+ "ntsb-case-00979465": {
+  "relevant": true,
+  "reason": "The prior report describes a takeoff wildlife encounter (deer) that resulted in a loss of control, veering off the runway, and substantial damage. This is directly relevant to the hazard described (takeoff wildlife encounter, non-bird), as\u5b83"
+ },
+ "ntsb-case-82183797": {
+  "relevant": true,
+  "reason": "The prior report describes a wildlife encounter (a deer) during a landing, which is a similar phase of flight (landing) and involves a non-bird animal, similar to the hazard described (wildlife encounter during takeoff). Both involve the 'A"
+ },
+ "ntsb-case-47975139": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot failed to maintain helicopter control and terrain clearance while evading wildlife during hover, which is directly related to the hazard of wildlife affecting aircraft control and safety."
+ },
+ "ntsb-case-83959678": {
+  "relevant": false,
+  "reason": "The prior report describes an incident involving inadequate operational control procedures and poor visibility conditions (whiteout and flat light), which led to a departure below minimums. This is related to environmental conditions and a1"
+ },
+ "ntsb-case-93356080": {
+  "relevant": false,
+  "reason": "The prior report describes an incident involving inclement weather (snow, freezing rain, reduced visibility) leading to spatial disorientation and loss of control. This is a weather-related hazard, not a wildlife or animal-related hazard.\u867d\u7136"
+ },
+ "ntsb-case-59536048": {
+  "relevant": true,
+  "reason": "The prior report discusses a bird strike affecting equipment (specifically, the windshield and rotor system), which is directly related to the hazard described (wildlife affecting the ability to respond/compensate and effect on equipment)."
+ },
+ "ntsb-case-84572697": {
+  "relevant": false,
+  "reason": "The prior report describes an incident related to lack of IFR clearance and communication issues at a non-towered airport, which is not directly related to the hazard of inoperative flight compartment lighting. The nature of the hazard and\u5176"
+ },
+ "ntsb-case-78857024": {
+  "relevant": false,
+  "reason": "The prior report involves a fuel-related issue (low fuel level and fuel exhaustion), which is a different type of hazard compared to the inoperative flight compartment lighting system. The operational situations, errors, and outcomes arenot"
+ },
+ "ntsb-case-03804510": {
+  "relevant": false,
+  "reason": "The prior report describes a situation involving inoperative flight instruments (attitude indicator and horizontal situation indicator) leading to spatial disorientation and pilot error. This is related to instrument failure and pilot's use"
+ },
+ "ntsb-case-79735963": {
+  "relevant": false,
+  "reason": "The prior report describes an inoperative obstruction light on a wind turbine, which is an environmental issue affecting visibility, not an inoperative flight compartment lighting system on the aircraft. The hazards are different in nature,"
+ },
+ "ntsb-case-21953254": {
+  "relevant": true,
+  "reason": "The prior report involves a failure to brief the pilot about a closed runway, which relates to the hazard described in the preflight briefing about runway conditions and awareness of runway condition information. Both involve environmental/"
+ },
+ "ntsb-case-30255993": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where the pilot lacked accurate information about the runway condition, which is directly related to the hazard described (runway condition awareness and availability of related information). Both the "
+ },
+ "ntsb-case-12251156": {
+  "relevant": true,
+  "reason": "The prior report involves a ground crew member failing to visually check the runway before crossing it, resulting in a collision with an airplane. This relates to the hazard described, which involves runway conditions and awareness of those"
+ },
+ "ntsb-case-66516753": {
+  "relevant": true,
+  "reason": "The prior report involves a pilot's failure to inspect the landing platform, which relates to the hazard of runway/landing area condition awareness. Both the hazard and the prior report involve environmental issues related to runway/landing"
+ },
+ "ntsb-case-27517716": {
+  "relevant": true,
+  "reason": "The prior report involves an environmental issue related to inadequate markings (heliport surface and obstruction near the landing area), which is similar to the hazard described (inadequate obstruction markings/lighting at KPAE). Both are "
+ },
+ "ntsb-case-08707405": {
+  "relevant": false,
+  "reason": "The prior report describes a runway excursion caused by a pilot's misjudgment of speed and distance on final approach, as well as a collision with trees. While it involves environmental factors (e.g., tailwind, trees), the primary hazard in"
+ },
+ "ntsb-case-09944974": {
+  "relevant": true,
+  "reason": "The prior report involves an inoperative obstruction light on a wind turbine, which is directly related to the hazard described (lighting issues at KPAE). Both cases involve environmental issues related to obstruction markings/lighting and,"
+ },
+ "ntsb-case-65873524": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where a pilot failed to execute a missed approach procedure in a timely manner, leading to a collision with a light pole and controlled flight into terrain. This is directly related to the hazard of 'K"
+ },
+ "ntsb-case-75498108": {
+  "relevant": true,
+  "reason": "The prior report involves a failure to maintain directional control during an aborted takeoff, which is related to the hazard of a runway incursion during takeoff. Both situations occur during the takeoff phase and involve potential loss of"
+ },
+ "ntsb-case-49802712": {
+  "relevant": false,
+  "reason": "The prior report describes a hazard involving a flooded runway and loss of control during takeoff, which is a different type of hazard (environmental/wet surface) compared to the current hazard (runway incursion by vehicle, aircraft, or a 3"
+ },
+ "ntsb-case-18016459": {
+  "relevant": true,
+  "reason": "The prior report describes a runway incursion during the landing phase, which led to a go-around and a forced landing due to terrain clearance issues. This is a similar operational situation and consequence (go-around, forced landing) thata"
+ },
+ "ntsb-case-74638930": {
+  "relevant": true,
+  "reason": "The prior report describes a takeoff-related incident involving a runway excursion and incorrect action selection by the pilot, which is a plausible consequence of a runway incursion during takeoff. Both incidents occur during the takeoff/\u200b"
+ },
+ "ntsb-case-30195748": {
+  "relevant": true,
+  "reason": "The prior report describes a miscommunication scenario involving takeoff clearance and potential confusion with another aircraft on final approach, which is similar to the hazard described (runway incursion during initial climb). Both cases"
+ },
+ "ntsb-case-58390034": {
+  "relevant": true,
+  "reason": "The prior report describes a runway incursion that led to a go-around and a forced landing due to terrain clearance issues, which is a similar operational situation and outcome that a crew facing a runway incursion during initial climb or a"
+ },
+ "ntsb-case-64767482": {
+  "relevant": true,
+  "reason": "The prior report describes a runway incursion involving a vehicle and a departing aircraft, which is a similar operational situation to the hazard described (runway incursion during initial climb or taxiing into takeoff position). Both are "
+ },
+ "ntsb-case-04636989": {
+  "relevant": true,
+  "reason": "The prior report describes a runway incursion scenario involving another aircraft (Aircraft Y) during a go-around, which is a similar operational situation to the hazard described (runway incursion during initial climb or taxiing into takeo"
+ },
+ "ntsb-case-10958715": {
+  "relevant": true,
+  "reason": "The prior report involves environmental issues related to visibility (brownout conditions and sand/dust storm) and their impact on pilot decision-making and spatial disorientation, which are similar to the hazard described (lighting issues,"
+ },
+ "ntsb-case-12114718": {
+  "relevant": true,
+  "reason": "The prior report describes a situation where low visibility led to a decision to descend below the decision altitude without proper visual references, resulting in controlled flight into terrain. This is directly related to the hazard of 'K"
+ },
+ "ntsb-case-62864554": {
+  "relevant": true,
+  "reason": "The prior report describes a situation involving inoperative runway lights, which is directly related to the hazard of lighting issues at the airport. It also mentions environmental conditions (slush on the runway and weather below approach"
+ },
+ "ntsb-case-84804749": {
+  "relevant": true,
+  "reason": "The prior report involves a lighting failure during an approach at night, leading to a bounced landing and runway excursion. This is directly related to the hazard described, which involves runway lighting and its effect on personnel, as it"
+ },
+ "ntsb-case-93418532": {
+  "relevant": true,
+  "reason": "The prior report describes an in-flight bird strike that led to a loss of control, which is directly related to the hazard of wildlife (specifically birds) affecting operations. Both involve the same type of hazard (bird strikes) and the en"
+ },
+ "ntsb-case-18821106": {
+  "relevant": true,
+  "reason": "The prior report discusses a bird strike and its effects on the aircraft, specifically mentioning the lack of windshield resistance to bird strikes. This is directly related to the hazard described, which involves wildlife (birds) and their"
+ },
+ "ntsb-case-54457044": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike during enroute cruise that led to a loss of control, which is directly related to the hazard of wildlife (specifically birds) affecting operations and the ability to respond. Both involve the same or"
+ },
+ "ntsb-case-87720837": {
+  "relevant": true,
+  "reason": "The prior report describes a bird strike, which is the same type of hazard (wildlife) and involves an effect on operation (loss of control). The phase of flight (maneuvering) and the consequence (loss of control) are similar to the hazard's"
+ },
+ "_judge": "ollama/qwen3:14b"
+}

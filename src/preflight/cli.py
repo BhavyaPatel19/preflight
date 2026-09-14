@@ -46,6 +46,10 @@ def main(argv: list[str] | None = None) -> int:
     er.add_argument("--no-rerank", action="store_true", help="skip the reranker config")
     er.add_argument("--candidates", type=int, default=40)
     er.add_argument("--kind", choices=["synopsis", "identifier"], help="run only one query set")
+    ee = evsub.add_parser("embedder", help="embedder ablation on a corpus subset, in memory")
+    ee.add_argument("--models", nargs="+", help="sentence-transformers ids (first = baseline)")
+    ee.add_argument("--size", type=int, default=40_000, help="subset size in chunks")
+    ee.add_argument("--limit", type=int, help="only the first N synopsis queries (quick check)")
     ef = evsub.add_parser("forecast", help="Chronos-Bolt vs seasonal-naive vs climatology backtest")
     ef.add_argument("--days", type=int, default=14)
     ef.add_argument("--airports", nargs="*")
@@ -489,6 +493,21 @@ def main(argv: list[str] | None = None) -> int:
             print(f"written: {run_path}  {md_path}")
         finally:
             close_pool()
+        return 0
+
+    if args.cmd == "eval" and args.suite == "embedder":
+        from preflight.db import close_pool, get_pool
+        from preflight.evals import embedder as EM
+
+        try:
+            with get_pool().connection() as conn:
+                res = EM.run(conn, models=tuple(args.models) if args.models else EM.DEFAULT_MODELS,
+                             size=args.size, limit=args.limit)
+        finally:
+            close_pool()
+        run_path, md_path = EM.save_run(res)
+        print(EM.to_markdown(res))
+        print(f"written: {run_path}  {md_path}")
         return 0
 
     if args.cmd == "eval" and args.suite == "forecast":

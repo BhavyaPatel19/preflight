@@ -10,6 +10,7 @@ for every run is under `runs/` (gitignored — the numbers that matter are here)
 | 3 | 2026-09-12 18:48 | step 11 | pg17 native | AND-semantics for ≤ 4-term queries; strict airport filter for identifier queries | — | — | — | — | **0.746 / 0.774** | — |
 | 4 | 2026-09-12 19:11 | step 11 | pg17 native | **final full run** at the step-11 retrieval code (recorded sha is the step-12 checkout; retrieval code identical) — `RESULTS.md` | 0.315 | 0.294 | 0.379 | **0.405** | 0.746 / 0.772 | 424 ms |
 | 5 | 2026-09-12 20:08 | main | pg17 native | experiment: **100 candidates** per channel instead of 40 (`--candidates 100`) — not adopted | 0.315 | 0.294 | 0.388 | 0.391 | 0.748 / 0.776 | 429 ms |
+| 6 | 2026-09-14 05:47 | step 22 | pg17 native | **index-driven SQL**: per-channel filters instead of a materialised `pool` CTE; dense channel is now an HNSW scan (`ef_search=1000`, iterative) instead of an exact sort — `RESULTS.md` | 0.310 | 0.294 | 0.373 | **0.402** | 0.746 / 0.774 | 217 ms |
 
 ## What each run taught
 
@@ -33,6 +34,16 @@ gets slightly *worse* (0.405 → 0.391): the reranker is handed more noise to pr
 doubles (p50 1.4 s → 2.7 s). Recall@20 does not move. So the ceiling is not the pool — for roughly
 40% of synopsis queries the target narrative is not in the top 100 chunks of either channel. That
 points at the embedder. Kept at 40.
+
+**Run 6: same quality, a quarter of the latency — and the dense channel had been exact by
+accident.** The latency pass (`evals/latency/RESULTS.md`) found that the shared `pool` CTE was
+materialised, so both channels sequentially scanned the corpus; the dense channel was therefore an
+*exact* kNN (sort of 200k rows on disk). Filtering each channel directly lets the dense channel use
+the HNSW index, which is approximate: recall@40 against exact was 0.80 at `ef_search=100` and 0.97
+at 1000, so 1000 it is. Re-running the full eval shows the cost of that approximation: dense
+nDCG@10 0.315 → 0.310, and after fusion and reranking nothing measurable (0.405 → 0.402, Recall@20
+unchanged at 0.607, identifier P@10 0.772 → 0.774). Dense p50 472 → 46 ms, hybrid 631 → 266 ms,
+hybrid+rerank 1405 → 1100 ms; the reranker is now most of the cost.
 
 **Still open.** The measured upgrade path is now the embedder: `bge-large-en-v1.5` or `bge-m3`,
 re-embed the corpus (~1–2 h), re-run. Recall@20 is the number to watch.

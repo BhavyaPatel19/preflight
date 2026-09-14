@@ -195,3 +195,14 @@ def test_index_documents_batches_across_docs(db):
         "JOIN documents d ON d.id = c.document_id WHERE d.external_id LIKE 'test-batch-%'"
     ).fetchone()
     assert row[0] == n_chunks and row[1] == n_chunks and row[2] is True
+
+
+def test_hybrid_filters_are_only_the_ones_requested():
+    """The SQL carries no dead predicates: the planner must see plain, index-driven filters."""
+    assert corpus._filters(None, None, None, False) == ""
+    assert corpus._filters("KSFO", None, None, False) == "AND (c.icao = %(icao)s OR c.icao IS NULL)"
+    assert corpus._filters("KSFO", None, None, True) == "AND c.icao = %(icao)s"
+    assert "d.source = %(source)s" in corpus._filters(None, "ntsb", None, False)
+    assert "NOT LIKE %(exclude)s" in corpus._filters(None, None, "%Synopsis%", False)
+    sql = corpus._HYBRID.format(filters=corpus._filters("KSFO", "ntsb", "%x%", False))
+    assert "pool" not in sql and sql.count("c.icao = %(icao)s") == 2    # once per channel

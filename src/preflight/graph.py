@@ -12,8 +12,8 @@ verify, narrate — becomes a node over one typed state, wired as a LangGraph
 * **Explicit control flow.** Which stages run is a property of the request
   (``options``) and of what is available (``deps``), decided at the edges,
   not buried in call sites.
-* **One place to trace.** Every node records what it did in ``trace``; the
-  briefing carries ``trace_id`` = ``thread_id``.
+* **One place to trace.** Every node records what it did in ``trace`` and how
+  long it took in ``timings``; the briefing carries ``trace_id`` = ``thread_id``.
 
 The nodes are thin. All behaviour lives in the modules they call, which keep
 their own tests; the graph tests cover ordering, skipping, and resumption.
@@ -26,6 +26,7 @@ from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from time import perf_counter
 from typing import Any, TypedDict
 
 from langgraph.checkpoint.base import BaseCheckpointSaver
@@ -50,6 +51,7 @@ class BriefingState(TypedDict, total=False):
     options: Options
     briefing: dict[str, Any]          # Briefing, JSON form
     trace: list[str]
+    timings: dict[str, int]           # node name → wall milliseconds
     narrative_stats: dict[str, Any] | None
 
 
@@ -70,6 +72,16 @@ def _briefing(state: BriefingState) -> Briefing:
 
 def _put(b: Briefing, note: str, state: BriefingState) -> BriefingState:
     return {"briefing": b.model_dump(mode="json"), "trace": [*state.get("trace", []), note]}
+
+
+def _timed(name: str, node: Callable[[BriefingState], BriefingState]) -> Any:
+    """Record the node's wall time in ``timings`` (state keys are replaced, so merge)."""
+    def run(state: BriefingState) -> BriefingState:
+        t0 = perf_counter()
+        out = node(state)
+        out["timings"] = {**state.get("timings", {}), name: int((perf_counter() - t0) * 1000)}
+        return out
+    return run
 
 
 def build_graph(deps: Deps, checkpointer: BaseCheckpointSaver[Any] | None = None) -> Any:
@@ -122,10 +134,10 @@ def build_graph(deps: Deps, checkpointer: BaseCheckpointSaver[Any] | None = None
         return END
 
     g: StateGraph[BriefingState] = StateGraph(BriefingState)
-    g.add_node("gather", gather)
-    g.add_node("precedent", precedent)
-    g.add_node("verify", verify)
-    g.add_node("narrate", narrate)
+    g.add_node("gather", _timed("gather", gather))
+    g.add_node("precedent", _timed("precedent", precedent))
+    g.add_node("verify", _timed("verify", verify))
+    g.add_node("narrate", _timed("narrate", narrate))
     g.add_edge(START, "gather")
     g.add_conditional_edges("gather", after_gather, ["precedent", "verify", END])
     g.add_conditional_edges("precedent", after_precedent, ["verify", END])
@@ -143,6 +155,7 @@ def run_briefing(
     config = {"configurable": {"thread_id": thread_id}}
     initial: BriefingState = {
         "request": req.model_dump(mode="json"), "options": options or {}, "trace": [],
+        "timings": {},
     }
     # Resuming: a checkpoint for this thread means gather already ran; pass no new input.
     existing = graph.get_state(config)

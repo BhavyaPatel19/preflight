@@ -20,7 +20,7 @@ from typing import Any
 from psycopg import Connection
 
 from preflight.config import settings
-from preflight.llm import LLM
+from preflight.llm import LLM, fan_out
 from preflight.retrieval.search import Hit, Retriever
 from preflight.schemas import Abstention, Briefing, Citation, Claim, Finding, Severity
 
@@ -128,18 +128,23 @@ def with_precedent(
         )
         return briefing.model_copy(update={"abstentions": (*briefing.abstentions, gap)})
 
+    queries = {i: q for i, f in enumerate(briefing.findings) if (q := precedent_query(f))}
+    if llm is not None and queries:
+        # All rewrites in flight together; the template stays the fallback per finding.
+        from preflight.brief.narrate import rewrite_query
+
+        idx = list(queries)
+        rewritten = fan_out(lambda i: rewrite_query(llm, briefing.findings[i]), idx)
+        queries.update({i: r for i, r in zip(idx, rewritten, strict=True) if r})
+
     findings: list[Finding] = []
     considered = 0
     seen: set[str] = set()
-    for f in briefing.findings:
-        q = precedent_query(f)
+    for i, f in enumerate(briefing.findings):
+        q = queries.get(i)
         if q is None:
             findings.append(f)
             continue
-        if llm is not None:
-            from preflight.brief.narrate import rewrite_query
-
-            q = rewrite_query(llm, f) or q
         # Ask for more than k: several chunks of one report can rank together, and a
         # report is cited once per briefing.
         hits = retriever.search(conn, q, k=k * 3, icao=f.airport, rerank=True)

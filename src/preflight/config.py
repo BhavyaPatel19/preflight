@@ -62,6 +62,9 @@ class Settings(BaseSettings):
     ollama_url: str = Field(default="http://localhost:11434", alias="PREFLIGHT_OLLAMA_URL")
     ollama_model: str = Field(default="qwen3:14b", alias="PREFLIGHT_OLLAMA_MODEL")
     anthropic_model: str = Field(default="claude-opus-5", alias="PREFLIGHT_ANTHROPIC_MODEL")
+    # Per-finding model calls in flight at once. Only pays off when the server batches
+    # requests: start Ollama with OLLAMA_NUM_PARALLEL >= this (evals/latency/RESULTS.md).
+    llm_concurrency: int = Field(default=4, ge=1, alias="PREFLIGHT_LLM_CONCURRENCY")
 
     # Grounding verifier (NLI). A claim passes when P(entailment) against any of its
     # citations clears the threshold. See src/preflight/verify.

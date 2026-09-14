@@ -104,31 +104,27 @@ def lexical_query(text: str) -> str:
     return joiner.join(terms)
 
 
+# Each channel filters ``chunks`` directly so the planner can drive it from its own
+# index: the HNSW scan for ``ORDER BY embedding <=> q LIMIT n`` and the GIN index for
+# ``search_tsv @@ q``. An earlier version built a shared ``pool`` CTE for the filters;
+# Postgres materialised it, and both channels degraded to a sequential scan and sort
+# over the whole corpus (2–3 s per query instead of ~50 ms; see evals/latency).
 _HYBRID = """
-WITH params AS (
-    SELECT %(qvec)s::vector AS qvec,
-           to_tsquery('english', %(qor)s) AS q
-),
-pool AS (
-    SELECT c.id, c.embedding, c.search_tsv
-    FROM chunks c JOIN documents d ON d.id = c.document_id
-    WHERE (%(icao)s::text IS NULL OR c.icao = %(icao)s
-           OR (c.icao IS NULL AND NOT %(icao_strict)s))
-      AND (%(source)s::text IS NULL OR d.source = %(source)s)
-      AND (%(exclude)s::text IS NULL OR c.text NOT LIKE %(exclude)s)
-),
-dense AS (
-    SELECT p.id, row_number() OVER (ORDER BY p.embedding <=> params.qvec) AS rnk
-    FROM pool p, params
-    WHERE %(w_dense)s > 0 AND p.embedding IS NOT NULL
-    ORDER BY p.embedding <=> params.qvec
+WITH dense AS (
+    SELECT c.id, row_number() OVER (ORDER BY c.embedding <=> %(qvec)s::vector) AS rnk
+    FROM chunks c
+    WHERE %(w_dense)s > 0 AND c.embedding IS NOT NULL {filters}
+    ORDER BY c.embedding <=> %(qvec)s::vector
     LIMIT %(n)s
 ),
 lexical AS (
-    SELECT p.id, row_number() OVER (ORDER BY ts_rank(p.search_tsv, params.q) DESC) AS rnk
-    FROM pool p, params
-    WHERE %(w_lex)s > 0 AND %(qor)s <> '' AND p.search_tsv @@ params.q
-    ORDER BY ts_rank(p.search_tsv, params.q) DESC
+    SELECT c.id,
+           row_number() OVER (ORDER BY ts_rank(c.search_tsv, to_tsquery('english', %(qor)s)) DESC
+           ) AS rnk
+    FROM chunks c
+    WHERE %(w_lex)s > 0 AND %(qor)s <> ''
+      AND c.search_tsv @@ to_tsquery('english', %(qor)s) {filters}
+    ORDER BY ts_rank(c.search_tsv, to_tsquery('english', %(qor)s)) DESC
     LIMIT %(n)s
 ),
 fused AS (
@@ -152,6 +148,28 @@ ORDER BY f.score DESC, c.id
 LIMIT %(limit)s
 """
 
+# HNSW is approximate, and this index (default build parameters) needs a wide search to
+# match exact kNN: recall@40 against a sequential scan on 35 golden queries was 0.80 at
+# ef_search=100, 0.93 at 400, 0.97 at 1000 — still ~50 ms against ~2 s for the scan.
+# Iterative scan matters with filters: a plain scan stops after ``ef_search`` candidates,
+# and an airport filter that admits a fraction of them returns fewer than ``n`` rows.
+_HNSW_SETTINGS = "SET LOCAL hnsw.ef_search = 1000; SET LOCAL hnsw.iterative_scan = relaxed_order"
+
+
+def _filters(icao: str | None, source: str | None, exclude_like: str | None,
+             icao_strict: bool) -> str:
+    """Only the filters actually requested, so the planner sees plain predicates."""
+    parts = []
+    if icao is not None:
+        parts.append("AND c.icao = %(icao)s" if icao_strict
+                     else "AND (c.icao = %(icao)s OR c.icao IS NULL)")
+    if source is not None:
+        parts.append("AND EXISTS (SELECT 1 FROM documents d WHERE d.id = c.document_id "
+                     "AND d.source = %(source)s)")
+    if exclude_like is not None:
+        parts.append("AND c.text NOT LIKE %(exclude)s")
+    return " ".join(parts)
+
 
 def hybrid_search(
     conn: Connection[Any],
@@ -174,13 +192,16 @@ def hybrid_search(
     since an unknown airport is not a different airport)."""
     if query_vec is None:
         w_dense = 0.0
-    rows = conn.execute(_HYBRID, {
-        "qvec": list(query_vec) if query_vec is not None else [0.0] * 768,
-        "qor": lexical_query(query_text),
-        "icao": icao, "source": source, "exclude": exclude_like, "icao_strict": icao_strict,
-        "n": candidates, "k": rrf_k, "limit": limit,
-        "w_dense": w_dense, "w_lex": w_lex,
-    }).fetchall()
+    sql = _HYBRID.format(filters=_filters(icao, source, exclude_like, icao_strict))
+    with conn.transaction():
+        conn.execute(_HNSW_SETTINGS)
+        rows = conn.execute(sql, {
+            "qvec": list(query_vec) if query_vec is not None else [0.0] * 768,
+            "qor": lexical_query(query_text),
+            "icao": icao, "source": source, "exclude": exclude_like,
+            "n": candidates, "k": rrf_k, "limit": limit,
+            "w_dense": w_dense, "w_lex": w_lex,
+        }).fetchall()
     return [Candidate(*r) for r in rows]
 
 

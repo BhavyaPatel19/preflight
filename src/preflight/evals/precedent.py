@@ -38,6 +38,7 @@ from preflight.brief.narrate import rewrite_query
 from preflight.brief.precedent import precedent_query
 from preflight.config import settings
 from preflight.decode.notam import parse_notam
+from preflight.evals import summary
 from preflight.evals.briefing import load_cases
 from preflight.evals.grounding_notams import GROUNDING_NOTAMS
 from preflight.llm import LLM, LLMUnavailable
@@ -317,6 +318,11 @@ def to_markdown(res: dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def summarise(res: dict[str, Any]) -> dict[str, float | None]:
+    return {"attached_judge_relevant": res["attached"]["judge_relevant"],
+            "human_labelled": res["human"].get("labelled", 0),
+            "cohen_kappa": res["human"].get("kappa")}
+
 def save_run(res: dict[str, Any], verdicts: dict[str, dict[str, Any]]) -> tuple[Path, Path]:
     RUNS.mkdir(parents=True, exist_ok=True)
     stamp = res["ran_at"].replace(":", "").replace("-", "")[:15]
@@ -324,4 +330,5 @@ def save_run(res: dict[str, Any], verdicts: dict[str, dict[str, Any]]) -> tuple[
     p.write_text(json.dumps({**res, "verdicts": verdicts}, indent=2) + "\n")
     (DIR / "verdicts.json").write_text(json.dumps(verdicts, indent=1) + "\n")
     RESULTS.write_text(to_markdown(res))
+    summary.write("precedent", res, summarise(res), judge=res["judge"], pairs=res["pairs"])
     return p, RESULTS

@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Any
 
 from preflight.decode.notam import NotamParseError, parse_notam
+from preflight.evals import summary
 from preflight.evals.grounding_notams import GROUNDING_NOTAMS
 from preflight.safety.injection import detect
 
@@ -130,10 +131,16 @@ def to_markdown(res: dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def summarise(res: dict[str, Any]) -> dict[str, float | None]:
+    return {"detector_recall": res["detector_recall"],
+            "false_positive_rate": res["false_positive_rate"]}
+
 def save_run(res: dict[str, Any]) -> tuple[Path, Path]:
     RUNS.mkdir(parents=True, exist_ok=True)
     stamp = res["ran_at"].replace(":", "").replace("-", "")[:15]
     p = RUNS / f"{stamp}-{res['git_sha']}.json"
     p.write_text(json.dumps(res, indent=2) + "\n")
     RESULTS.write_text(to_markdown(res))
+    summary.write("safety", res, summarise(res), adversarial=res["adversarial"],
+                  benign=res["benign"])
     return p, RESULTS

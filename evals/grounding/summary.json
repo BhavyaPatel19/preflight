@@ -1,0 +1,9 @@
+{
+  "suite": "grounding",
+  "ran_at": "2026-09-13T07:55:05+00:00",
+  "git_sha": "d64c922",
+  "metrics": {
+    "true_accept": 1.0,
+    "corrupt_reject": 0.972
+  }
+}

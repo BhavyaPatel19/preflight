@@ -25,6 +25,7 @@ from preflight.brief.narrate import narrate_finding
 from preflight.config import settings
 from preflight.db import weather as wdb
 from preflight.decode.notam import parse_notam
+from preflight.evals import summary
 from preflight.evals.grounding_notams import GROUNDING_NOTAMS
 from preflight.llm import LLM, LLMUnavailable
 from preflight.schemas import Claim, Finding
@@ -150,6 +151,10 @@ def to_markdown(res: dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def summarise(res: dict[str, Any]) -> dict[str, float | None]:
+    return {"unsupported_rate": res["unsupported_rate"], "generated": res["generated"],
+            "failed_calls": res["failed_calls"]}
+
 def save_run(res: dict[str, Any]) -> tuple[Path, Path]:
     RUNS.mkdir(parents=True, exist_ok=True)
     stamp = res["ran_at"].replace(":", "").replace("-", "")[:15]
@@ -158,4 +163,5 @@ def save_run(res: dict[str, Any]) -> tuple[Path, Path]:
     p.write_text(json.dumps(res, indent=2) + "\n")
     RESULTS.parent.mkdir(parents=True, exist_ok=True)
     RESULTS.write_text(to_markdown(res))
+    summary.write("narrative", res, summarise(res), model=res["model"], verifier=res["verifier"])
     return p, RESULTS

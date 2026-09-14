@@ -1,6 +1,6 @@
 # Abstention evaluation
 
-Run at 2026-09-14T17:38:35+00:00 · 26 constructed cases, 20 with a data gap · synthetic route KZZY → KZZX alt KZZW, every case rolled back
+Run `258942f` at 2026-09-14T18:12:59+00:00 · 26 constructed cases, 20 with a data gap · synthetic route KZZY → KZZX alt KZZW, every case rolled back
 
 **Recall on data-gap cases: 1.000** · **false-abstention rate: 0.000**
 

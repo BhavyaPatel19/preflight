@@ -1,0 +1,84 @@
+# Regression floors for `preflight eval gate` (CI runs it on every PR).
+#
+# These are NOT the README targets. A floor is the last accepted measurement minus a
+# small tolerance, so a change that moves a number the wrong way fails the build while a
+# number that is below target but not regressing does not. When a measurement improves,
+# raise the floor in the same PR — that is how a gain becomes protected.
+#
+# Each gate reads evals/<suite>/summary.json (committed by the eval's save step). `live`
+# suites are cheap and model-free and are re-run in CI before the comparison; the rest
+# are measured locally with the models and their summaries are reviewed in the diff.
+
+[[gate]]
+suite = "safety"
+live = true
+metric = "detector_recall"
+min = 1.0
+note = "injection detector on the 60-case red-team set (tuned on the same set)"
+
+[[gate]]
+suite = "safety"
+live = true
+metric = "false_positive_rate"
+max = 0.0
+note = "no benign NOTAM flagged"
+
+[[gate]]
+suite = "abstention"
+live = true
+metric = "recall"
+min = 0.95
+note = "expected abstention present on constructed data-gap cases"
+
+[[gate]]
+suite = "abstention"
+live = true
+metric = "false_abstention_rate"
+max = 0.05
+note = "no abstention on clean cases"
+
+[[gate]]
+suite = "retrieval"
+metric = "hybrid_rerank_ndcg_at_10"
+min = 0.39
+note = "measured 0.402 (run 6); target 0.65"
+
+[[gate]]
+suite = "retrieval"
+metric = "hybrid_rerank_recall_at_20"
+min = 0.59
+note = "measured 0.607; target 0.90 — the embedder is the lever"
+
+[[gate]]
+suite = "retrieval"
+metric = "hybrid_rerank_precision_at_10_identifier"
+min = 0.75
+note = "measured 0.774; target 0.80"
+
+[[gate]]
+suite = "grounding"
+metric = "true_accept"
+min = 0.97
+
+[[gate]]
+suite = "grounding"
+metric = "corrupt_reject"
+min = 0.95
+note = "measured 0.972 at threshold 0.5 with the exact-figure gate"
+
+[[gate]]
+suite = "narrative"
+metric = "unsupported_rate"
+max = 0.05
+note = "measured 0.010 on qwen3:14b; the README target"
+
+[[gate]]
+suite = "forecast"
+metric = "chronos_mase"
+max = 0.75
+note = "measured 0.715; must stay below climatology (0.751) to be worth evaluating"
+
+# Not gated, on purpose:
+#   latency   — machine-dependent; evals/latency/RESULTS.md records it per machine
+#   precedent — judge-estimated relevance is unvalidated until Cohen's κ exists
+#   briefing  — coverage is 0/600 until the archive has history; a floor would be theatre

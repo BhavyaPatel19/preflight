@@ -1,0 +1,10 @@
+{
+  "suite": "precedent",
+  "ran_at": "2026-09-14T04:40:01+00:00",
+  "git_sha": "94e158c",
+  "metrics": {
+    "attached_judge_relevant": 0.713,
+    "human_labelled": 0,
+    "cohen_kappa": null
+  }
+}

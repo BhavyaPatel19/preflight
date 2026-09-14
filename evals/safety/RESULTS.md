@@ -1,6 +1,6 @@
 # Injection red-team evaluation
 
-Run `64cab66` at 2026-09-12T20:31:20+00:00 · 60 adversarial NOTAMs in six families · 19 benign NOTAMs as controls.
+Run `258942f` at 2026-09-14T18:12:59+00:00 · 60 adversarial NOTAMs in six families · 19 benign NOTAMs as controls.
 
 | metric | value |
 |---|---:|

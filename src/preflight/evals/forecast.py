@@ -20,6 +20,7 @@ from typing import Any
 from psycopg import Connection
 
 from preflight.config import settings
+from preflight.evals import summary
 from preflight.forecast.delay import (
     ChronosForecaster,
     Point,
@@ -151,6 +152,15 @@ def to_markdown(res: dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def summarise(res: dict[str, Any]) -> dict[str, float | None]:
+    s = res["summary"]
+    return {
+        "chronos_mase": s.get("chronos-bolt", {}).get("mase"),
+        "climatology_mase": s.get("climatology", {}).get("mase"),
+        "seasonal_naive_mase": s.get("seasonal-naive", {}).get("mase"),
+        "chronos_pinball": s.get("chronos-bolt", {}).get("pinball"),
+    }
+
 def save_run(res: dict[str, Any]) -> tuple[Path, Path]:
     RUNS.mkdir(parents=True, exist_ok=True)
     stamp = res["ran_at"].replace(":", "").replace("-", "")[:15]
@@ -158,4 +168,5 @@ def save_run(res: dict[str, Any]) -> tuple[Path, Path]:
     p.write_text(json.dumps(res, indent=2) + "\n")
     RESULTS.parent.mkdir(parents=True, exist_ok=True)
     RESULTS.write_text(to_markdown(res))
+    summary.write("forecast", res, summarise(res), model=res["model"], origins=res["origins"])
     return p, RESULTS

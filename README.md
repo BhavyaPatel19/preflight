@@ -132,7 +132,7 @@ Built in the open, six sprints over twelve weeks.
 | 2 | Fine-tuned NOTAM entity extractor → HF Hub | ⬜ waits on a real NOTAM corpus |
 | 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟢 done — corpus, golden set, measured |
 | 4 | LLM layer, grounding, abstention | 🟡 local LLM layer (query rewriting + verified narrative), grounding, abstention done; orchestration graph next |
-| 5 | Time-travel eval harness + CI regression gate | 🟡 600-case set built from NTSB (300 + 300 matched); scorer reports coverage honestly; judge + gate wait on an LLM key |
+| 5 | Time-travel eval harness + CI regression gate | 🟡 600-case set built; coverage-first scorer; local LLM judge run on 304 precedent pairs; κ awaits the human sheet |
 | 6 | Delay forecasting, cost/latency, UI, MCP server | 🟡 forecasting, UI and MCP server done; cost/latency waits on the LLM layer |
 
 **Working today**
@@ -201,7 +201,7 @@ CI gate will enforce.
 | Narrative | unsupported-claim rate of model-written sentences, `qwen3:14b` local | ≤ 0.05 | **0.010** (98 / 99 kept; 1 genuine catch) — [history](evals/narrative/HISTORY.md) |
 | Abstention | correct abstention on data-gap cases | ≥ 0.90 | — |
 | Safety | injection detector on 60 adversarial NOTAMs: recall · false positives on benign | 100% | **1.000 · 0.000** (detector; LLM resistance scored against the same set later) — [details](evals/safety/RESULTS.md) |
-| Judge | LLM-judge vs human agreement (Cohen's κ) | ≥ 0.70 | — |
+| Judge | LLM-judge vs human agreement (Cohen's κ) on precedent relevance | ≥ 0.70 | — (judge run on 304 pairs; 100-row sheet awaits human labels — [how](evals/precedent/README.md)) |
 | Cost | p50 $/briefing · p95 latency | < $0.08 · 25 s | — |
 
 The κ row matters as much as the rest: an LLM judge nobody validated is a number nobody should trust.
@@ -345,6 +345,7 @@ searched.
 | `preflight eval grounding` | NLI verifier on the briefing's own claims and one corrupted copy of each |
 | `preflight eval safety` | injection detector: recall on the red-team set, false positives on benign NOTAMs |
 | `preflight eval narrative` | unsupported-claim rate of the configured model's prose, with the dropped sentences listed |
+| `preflight eval precedent` | LLM judge over (hazard, prior report) pairs; `--score` reports κ against the human sheet |
 | `make db-start` / `make db-stop` | native Postgres on :5433 |
 | `make up` / `make down` | the Docker stack on :5432 |
 | `make demo` | decode the bundled NOTAMs |
@@ -388,6 +389,7 @@ src/preflight/
   evals/forecast.py     rolling-origin delay backtest
   evals/grounding.py    true-claim acceptance vs corruption rejection, threshold sweep
   evals/narrative.py    generated / kept / dropped per model and finding kind
+  evals/precedent.py    judge, human sheet, Cohen's κ, attached-precedent precision
   verify/               NLI verifier (nli.py) and claim-level grounding policy (ground.py)
   safety/               injection detector — weighted, named signals; leetspeak/zero-width aware
   llm/                  LLM protocol; Ollama (default, local) and Anthropic (dormant) backends
@@ -404,6 +406,7 @@ evals/forecast/         RESULTS.md — MASE / pinball per forecaster and per air
 evals/grounding/        RESULTS.md — verifier acceptance / rejection per claim kind and threshold
 evals/safety/           injections.jsonl (60 adversarial NOTAMs, 6 families), RESULTS.md
 evals/narrative/        RESULTS.md (latest run), HISTORY.md — three runs, what each changed and taught
+evals/precedent/        pairs.jsonl, labels.csv (the human sheet), verdicts.json, RESULTS.md
 tests/                  129 tests; markers: db, live, ml
 data/samples/           bundled sample NOTAMs (real corpora are gitignored under data/raw)
 ```

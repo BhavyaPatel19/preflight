@@ -52,6 +52,10 @@ def main(argv: list[str] | None = None) -> int:
     evsub.add_parser("grounding", help="NLI verifier: accept true claims, reject corrupted ones")
     evsub.add_parser("safety", help="injection red-team set: detector recall, false positives")
     evsub.add_parser("narrative", help="unsupported-claim rate of the configured LLM's prose")
+    ep = evsub.add_parser("precedent", help="LLM judge on (hazard, prior report) pairs + sheet")
+    ep.add_argument("--build", action="store_true", help="rebuild pairs.jsonl and the sheet")
+    ep.add_argument("--score", action="store_true", help="score the filled labels.csv (κ)")
+    ep.add_argument("--limit", type=int, help="judge only the first N pairs")
     eb = evsub.add_parser("briefing", help="time-travel briefing eval on NTSB-derived cases")
     eb.add_argument("--build", action="store_true", help="(re)build evals/briefing/golden.jsonl")
     eb.add_argument("--limit", type=int)
@@ -300,6 +304,49 @@ def main(argv: list[str] | None = None) -> int:
             ch = ("D" if h.in_dense else "-") + ("L" if h.in_lexical else "-")
             print(f"[{ch}] {h.ref:<28} fused={h.fused_score:.4f}{rr}")
             print(f"     {h.text[:160]}{'…' if len(h.text) > 160 else ''}")
+        return 0
+
+    if args.cmd == "eval" and args.suite == "precedent":
+        from preflight.db import close_pool, get_pool
+        from preflight.evals import precedent as P
+        from preflight.llm import load_llm
+
+        llm = load_llm()
+        try:
+            if args.score:
+                import json as _json
+
+                pairs = P.load_pairs()
+                verdicts = _json.loads((P.DIR / "verdicts.json").read_text())
+                res = P.summarize(pairs, verdicts, P.read_sheet(),
+                                  model=verdicts.get("_judge", "?"))
+                P.RESULTS.write_text(P.to_markdown(res))
+                print(P.to_markdown(res))
+                return 0
+            if llm is None:
+                print("error: no LLM available (ollama serve?)", file=sys.stderr)
+                return 3
+            if args.build or not P.PAIRS.exists():
+                from preflight.retrieval.embed import STEmbedder, STReranker
+                from preflight.retrieval.search import Retriever
+
+                with get_pool().connection() as conn:
+                    pairs = P.build_pairs(conn, Retriever(STEmbedder(), STReranker()), llm)
+                P.save_pairs(pairs)
+                n_rows = P.write_sheet(pairs)
+                print(f"pairs: {len(pairs)} → {P.PAIRS}; sheet: {n_rows} rows → {P.SHEET}")
+            pairs = P.load_pairs()
+            if args.limit:
+                pairs = pairs[: args.limit]
+            verdicts = P.judge_all(llm, pairs)
+            verdicts["_judge"] = llm.name  # type: ignore[assignment]
+            res = P.summarize(pairs, verdicts, P.read_sheet() if P.SHEET.exists() else {},
+                              model=llm.name)
+            run_path, md_path = P.save_run(res, verdicts)
+            print(P.to_markdown(res))
+            print(f"written: {run_path}  {md_path}")
+        finally:
+            close_pool()
         return 0
 
     if args.cmd == "eval" and args.suite == "narrative":

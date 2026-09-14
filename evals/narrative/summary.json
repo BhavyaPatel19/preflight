@@ -1,0 +1,10 @@
+{
+  "suite": "narrative",
+  "ran_at": "2026-09-13T07:55:45+00:00",
+  "git_sha": "d64c922",
+  "metrics": {
+    "unsupported_rate": 0.01,
+    "generated": 99,
+    "failed_calls": 0
+  }
+}

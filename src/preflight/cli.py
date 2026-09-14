@@ -52,6 +52,11 @@ def main(argv: list[str] | None = None) -> int:
     evsub.add_parser("grounding", help="NLI verifier: accept true claims, reject corrupted ones")
     evsub.add_parser("safety", help="injection red-team set: detector recall, false positives")
     evsub.add_parser("abstention", help="constructed data-gap cases: does the briefing abstain?")
+    eg = evsub.add_parser("gate", help="regression gate: committed summaries vs evals/gates.toml")
+    eg.add_argument("--live", action="store_true",
+                    help="re-run the model-free suites (safety, abstention) first")
+    eg.add_argument("--backfill", nargs="*", metavar="SUITE",
+                    help="write summary.json from the newest run file of these suites")
     evsub.add_parser("narrative", help="unsupported-claim rate of the configured LLM's prose")
     ep = evsub.add_parser("precedent", help="LLM judge on (hazard, prior report) pairs + sheet")
     ep.add_argument("--build", action="store_true", help="rebuild pairs.jsonl and the sheet")
@@ -427,6 +432,24 @@ def main(argv: list[str] | None = None) -> int:
         finally:
             close_pool()
         return 0
+
+    if args.cmd == "eval" and args.suite == "gate":
+        from preflight.evals import gate
+
+        if args.backfill:
+            for p in gate.backfill(args.backfill):
+                print(f"backfilled: {p}")
+        if args.live:
+            from preflight.db import close_pool, get_pool
+
+            try:
+                ran = gate.run_live(lambda: get_pool().connection())
+            finally:
+                close_pool()
+            print(f"live: {', '.join(ran)}")
+        outcomes = gate.evaluate(gate.load_gates())
+        print(gate.to_markdown(outcomes))
+        return 0 if gate.passed(outcomes) else 1
 
     if args.cmd == "eval" and args.suite == "abstention":
         from preflight.db import close_pool, get_pool

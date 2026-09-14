@@ -37,6 +37,7 @@ from psycopg import Connection
 
 from preflight.brief.core import build_briefing
 from preflight.config import settings
+from preflight.evals import summary
 from preflight.schemas import Briefing, FlightRequest, Severity
 
 GOLDEN = Path("evals/briefing/golden.jsonl")
@@ -308,10 +309,16 @@ def to_markdown(res: dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def summarise(res: dict[str, Any]) -> dict[str, float | None]:
+    return {"coverage_positive": res["coverage"]["positive"],
+            "coverage_negative": res["coverage"]["negative"],
+            "hazard_recall": res["hazard_recall"], "false_alarm_rate": res["false_alarm_rate"]}
+
 def save_run(res: dict[str, Any]) -> tuple[Path, Path]:
     RUNS.mkdir(parents=True, exist_ok=True)
     stamp = res["ran_at"].replace(":", "").replace("-", "")[:15]
     p = RUNS / f"{stamp}-{res['git_sha']}.json"
     p.write_text(json.dumps(res, indent=2) + "\n")
     RESULTS.write_text(to_markdown(res))
+    summary.write("briefing", res, summarise(res), cases=res["cases"])
     return p, RESULTS

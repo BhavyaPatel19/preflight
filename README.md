@@ -138,7 +138,7 @@ Built in the open, six sprints over twelve weeks.
 | 2 | Fine-tuned NOTAM entity extractor → HF Hub | ⬜ waits on a real NOTAM corpus |
 | 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟢 done — corpus, golden set, measured |
 | 4 | LangGraph orchestration, LLM layer, grounding, abstention | 🟢 done — graph with Postgres checkpointer over gather → precedent → verify → narrate |
-| 5 | Time-travel eval harness + CI regression gate | 🟡 600-case set built; coverage-first scorer; local LLM judge run on 304 precedent pairs; κ awaits the human sheet |
+| 5 | Time-travel eval harness + CI regression gate | 🟡 600-case set built; coverage-first scorer; **CI gate live** — 11 floors over 6 suites, two re-measured on every PR; local LLM judge run on 304 precedent pairs; κ awaits the human sheet |
 | 6 | Delay forecasting, cost/latency, UI, MCP server | 🟢 done — forecasting, UI, MCP server; latency pass halved the full briefing (49.5 → 25.4 s p50, local model) |
 
 **Working today**
@@ -364,6 +364,7 @@ searched.
 | `preflight eval grounding` | NLI verifier on the briefing's own claims and one corrupted copy of each |
 | `preflight eval safety` | injection detector: recall on the red-team set, false positives on benign NOTAMs |
 | `preflight eval abstention` | 26 constructed data-gap cases on a synthetic route, rolled back; recall and false-abstention rate |
+| `preflight eval gate [--live]` | every committed `summary.json` against the floors in `evals/gates.toml`; `--live` re-runs safety and abstention first. Non-zero exit on any failing gate |
 | `preflight eval narrative` | unsupported-claim rate of the configured model's prose, with the dropped sentences listed |
 | `preflight eval precedent` | LLM judge over (hazard, prior report) pairs; `--score` reports κ against the human sheet |
 | `preflight bench` | p50/p95 wall time per graph stage over repeated briefings, with or without the model |
@@ -376,6 +377,15 @@ CI runs on every push and PR against a `pgvector/pgvector:pg17` service containe
 `db/*.sql` first, so the `db`-marked tests run for real there. On a laptop without Postgres they
 skip. No model is ever downloaded in CI — retrieval tests use hash-based fakes behind the same
 protocols.
+
+**The eval gate.** A second CI job re-runs the two model-free suites (injection detector,
+constructed abstention cases) and then holds every eval's committed `summary.json` to the floors in
+[`evals/gates.toml`](evals/gates.toml). Floors are regression floors, not targets: the last
+accepted measurement minus a tolerance, raised in the same PR that improves a number. The suites
+that need models are measured locally and their summary is part of the diff a reviewer sees — the
+gate protects a measurement, it does not make one, and each row prints the commit it was measured
+at so a stale summary is visible. Latency (machine-dependent), precedent (judge unvalidated until
+κ) and the time-travel briefing eval (0/600 covered) are deliberately not gated.
 
 Migrations are plain SQL in `db/`, applied in filename order; the Postgres container applies them
 on first boot, `make db` applies them to an existing database.
@@ -414,6 +424,8 @@ src/preflight/
   evals/precedent.py    judge, human sheet, Cohen's κ, attached-precedent precision
   evals/latency.py      per-stage p50/p95 bench over the graph's node timings
   evals/abstention.py   constructed data-gap cases: expected abstention present, nothing spurious
+  evals/summary.py      one committed summary.json per suite — what the gate reads
+  evals/gate.py         floors from evals/gates.toml vs summaries; live re-run of the cheap suites
   verify/               NLI verifier (nli.py) and claim-level grounding policy (ground.py)
   safety/               injection detector — weighted, named signals; leetspeak/zero-width aware
   llm/                  LLM protocol; Ollama (default, local) and Anthropic (dormant) backends
@@ -425,6 +437,8 @@ src/preflight/
   cli.py                the `preflight` command
 db/*.sql                schema + migrations (pgvector, full-text, HNSW)
 docs/adr/               architecture decision records
+evals/gates.toml        regression floors per suite metric, with why each is (or is not) gated
+evals/*/summary.json    headline metrics of the latest run + commit + time; committed, diffed, gated
 evals/retrieval/        golden.jsonl (350 queries), RESULTS.md (latest run), HISTORY.md (what each run changed)
 evals/briefing/         golden.jsonl (600 cases), RESULTS.md — coverage, recall, false alarms
 evals/forecast/         RESULTS.md — MASE / pinball per forecaster and per airport

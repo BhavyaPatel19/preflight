@@ -20,6 +20,7 @@ the guard against gaming the first.
 from __future__ import annotations
 
 import json
+import subprocess
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
@@ -36,6 +37,7 @@ from preflight.db import notams as ndb
 from preflight.db import runs as rdb
 from preflight.db import weather as wdb
 from preflight.decode.notam import DEMO_NOTAMS, parse_notam
+from preflight.evals import summary
 from preflight.forecast import delay as delay_mod
 from preflight.schemas import Abstention, FlightRequest
 from preflight.sources.aviationweather import Metar, Taf
@@ -247,7 +249,7 @@ def run(conn: Connection[Any]) -> dict[str, Any]:
         g["hits"] += int(r.hit)
         g["spurious"] += int(bool(r.spurious))
     return {
-        "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
+        "ran_at": datetime.now(UTC).isoformat(timespec="seconds"), "git_sha": _git_sha(),
         "cases": len(results),
         "gap_cases": len(gap_cases),
         "recall": round(sum(r.hit for r in gap_cases) / len(gap_cases), 3) if gap_cases else None,
@@ -263,10 +265,19 @@ def run(conn: Connection[Any]) -> dict[str, Any]:
     }
 
 
+def _git_sha() -> str:
+    try:
+        return subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True,
+                              text=True, check=True).stdout.strip()
+    except Exception:  # noqa: BLE001
+        return "unknown"
+
+
 def to_markdown(res: dict[str, Any]) -> str:
     lines = [
         "# Abstention evaluation", "",
-        f"Run at {res['generated_at']} · {res['cases']} constructed cases, {res['gap_cases']} "
+        f"Run `{res['git_sha']}` at {res['ran_at']} · {res['cases']} constructed cases, "
+        f"{res['gap_cases']} "
         "with a data gap · synthetic route KZZY → KZZX alt KZZW, every case rolled back", "",
         f"**Recall on data-gap cases: {res['recall']:.3f}** · "
         f"**false-abstention rate: {res['false_abstention_rate']:.3f}**", "",
@@ -294,6 +305,9 @@ def to_markdown(res: dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def summarise(res: dict[str, Any]) -> dict[str, float | None]:
+    return {"recall": res["recall"], "false_abstention_rate": res["false_abstention_rate"]}
+
 def save_run(res: dict[str, Any]) -> tuple[Path, Path]:
     RUNS.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S")
@@ -301,4 +315,5 @@ def save_run(res: dict[str, Any]) -> tuple[Path, Path]:
     p.write_text(json.dumps(res, indent=2))
     RESULTS.parent.mkdir(parents=True, exist_ok=True)
     RESULTS.write_text(to_markdown(res))
+    summary.write("abstention", res, summarise(res), cases=res["cases"], gap_cases=res["gap_cases"])
     return p, RESULTS

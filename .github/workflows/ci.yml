@@ -49,13 +49,34 @@ jobs:
       - name: Test
         run: .venv/bin/python -m pytest
 
-  # Sprint 5 replaces this placeholder with the real gate: the 60-case smoke
-  # subset of the time-travel golden set, failing the build when hazard recall
-  # drops more than 2 points or p50 cost rises more than 15%.
+  # Regression gate: re-runs the model-free suites (injection detector, constructed
+  # abstention cases) against the service database, then holds every committed eval
+  # summary to the floors in evals/gates.toml. A number moving the wrong way fails the PR.
   eval-gate:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: preflight
+          POSTGRES_PASSWORD: preflight
+          POSTGRES_DB: preflight
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U preflight"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://preflight:preflight@localhost:5432/preflight
     steps:
       - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+      - run: uv python install 3.13
+      - run: uv sync --locked
+      - name: Apply schema
+        run: for f in db/*.sql; do psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"; done
       - name: Eval regression gate
-        run: echo "Not yet implemented — lands in Sprint 5."
+        run: .venv/bin/preflight eval gate --live | tee -a "$GITHUB_STEP_SUMMARY"

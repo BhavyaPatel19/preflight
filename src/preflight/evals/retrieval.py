@@ -42,6 +42,7 @@ from typing import Any
 from psycopg import Connection
 
 from preflight.config import settings
+from preflight.evals import summary
 from preflight.retrieval.embed import Embedder, Reranker
 from preflight.retrieval.search import Hit, Retriever
 
@@ -337,10 +338,23 @@ def to_markdown(res: dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def summarise(res: dict[str, Any]) -> dict[str, float | None]:
+    """Headline numbers for the gate: the deployed config, plus the rerank lift."""
+    best = res["configs"].get("hybrid+rerank") or res["configs"].get("hybrid") or {}
+    return {
+        "hybrid_rerank_ndcg_at_10": best.get("ndcg_at_10"),
+        "hybrid_rerank_recall_at_20": best.get("recall_at_20"),
+        "hybrid_rerank_precision_at_10_identifier": best.get("precision_at_10_identifier"),
+        "hybrid_rerank_latency_ms_p50": best.get("latency_ms_p50"),
+        "rerank_lift_ndcg_at_10": res.get("rerank_lift_ndcg_at_10"),
+    }
+
 def save_run(res: dict[str, Any]) -> tuple[Path, Path]:
     RUNS.mkdir(parents=True, exist_ok=True)
     stamp = res["ran_at"].replace(":", "").replace("-", "")[:15]
     run_path = RUNS / f"{stamp}-{res['git_sha']}.json"
     run_path.write_text(json.dumps(res, indent=2) + "\n")
     RESULTS.write_text(to_markdown(res))
+    summary.write("retrieval", res, summarise(res), embedding_model=res["embedding_model"],
+                  reranker_model=res["reranker_model"], corpus_chunks=res["corpus_chunks"])
     return run_path, RESULTS

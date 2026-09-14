@@ -28,6 +28,7 @@ from preflight.brief.core import delay_finding, notam_findings, weather_findings
 from preflight.config import settings
 from preflight.db import weather as wdb
 from preflight.decode.notam import parse_notam
+from preflight.evals import summary
 from preflight.schemas import Claim, Finding
 from preflight.verify.ground import _pairs_for, figures_supported
 from preflight.verify.nli import Verifier
@@ -215,10 +216,16 @@ def to_markdown(res: dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def summarise(res: dict[str, Any], threshold: str = "0.5") -> dict[str, float | None]:
+    at = res["overall"].get(threshold) or res["overall"].get(float(threshold)) or {}
+    return {"true_accept": at.get("true_accept"), "corrupt_reject": at.get("corrupt_reject")}
+
 def save_run(res: dict[str, Any]) -> tuple[Path, Path]:
     RUNS.mkdir(parents=True, exist_ok=True)
     stamp = res["ran_at"].replace(":", "").replace("-", "")[:15]
     p = RUNS / f"{stamp}-{res['git_sha']}.json"
     p.write_text(json.dumps(res, indent=2) + "\n")
     RESULTS.write_text(to_markdown(res))
+    summary.write("grounding", res, summarise(res), model=res["model"], threshold=0.5,
+                  items=res["items"])
     return p, RESULTS

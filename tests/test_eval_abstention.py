@@ -20,7 +20,7 @@ def test_case_set_is_well_formed():
 
 
 def test_markdown_lists_misses_and_spurious():
-    res = {"generated_at": "t", "cases": 2, "gap_cases": 1, "recall": 0.0,
+    res = {"ran_at": "t", "git_sha": "abc", "cases": 2, "gap_cases": 1, "recall": 0.0,
            "false_abstention_rate": 0.5,
            "by_gap": {"none": {"cases": 1, "hits": 1, "spurious": 1}},
            "misses": [{"case": "x:y", "expected": [("a", "b")], "got": []}],

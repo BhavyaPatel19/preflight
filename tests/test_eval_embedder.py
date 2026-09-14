@@ -23,6 +23,7 @@ def test_markdown_reports_delta_against_the_first_model():
 def test_score_model_ranks_by_cosine_and_dedups_documents(monkeypatch):
     """A fake embedder that maps a keyword to a one-hot vector; the target report's chunks share
     the query's keyword, so it must rank first and be counted once."""
+    pytest.importorskip("numpy")          # ships with the ML extras; absent in CI
     import preflight.retrieval.embed as embed_mod
 
     class Fake:

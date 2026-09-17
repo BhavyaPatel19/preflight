@@ -106,3 +106,100 @@ def test_build_golden_selects_eligible_reports_and_frequent_pairs(db):
     assert "test-g-1" in syn and "test-g-2" not in syn and "test-g-3" not in syn
     ident = {(q.icao, q.runway) for q in qs if q.kind == "identifier"}
     assert ("KZZY", "28R") in ident
+
+
+# ---------------------------------------------------------------- rewrite + misses
+
+def test_synopsis_rewriter_caches_and_falls_back(tmp_path):
+    from preflight.llm import LLMUnavailable
+
+    class LLM:
+        name = "fake"
+        calls = 0
+
+        def complete_json(self, system, user, schema, *, max_tokens=400):
+            self.calls += 1
+            if "broken" in user:
+                raise LLMUnavailable("down")
+            if "short" in user:
+                return {"query": "tiny"}
+            return {"query": "We were on the visual to 28R when the tower asked us to go around."}
+
+    llm = LLM()
+    cache = tmp_path / "rewrites.json"
+    qs = [R.Query("synopsis", "a", "Crew reported a go-around at ZZZ.", ("R1",)),
+          R.Query("synopsis", "b", "broken synopsis", ("R2",)),
+          R.Query("synopsis", "c", "short one", ("R3",)),
+          R.Query("identifier", "d", "runway 28R", (), icao="KZZY", runway="28R")]
+    out = R.synopsis_rewriter(llm, cache)(qs)
+    assert out["a"].startswith("We were on the visual")
+    assert out["b"] == "broken synopsis" and out["c"] == "short one"   # fallbacks: original text
+    assert "d" not in out and llm.calls == 3
+    # Cached: a second pass makes no model calls and reads the same answers.
+    again = R.synopsis_rewriter(llm, cache)(qs)
+    assert again == out and llm.calls == 3
+
+
+def test_run_records_first_rank_and_uses_rewrites_only_for_the_rewrite_config(monkeypatch):
+    seen: list[tuple[str, str]] = []
+
+    class FakeRetriever:
+        def __init__(self, *a, **kw):
+            pass
+
+        def search(self, conn, text, **kw):
+            seen.append((kw["mode"], text))
+            hit = R.Hit(1, 1, "asrs", "R1" if "rewritten" in text else "R9", None, 0, "t",
+                        None, 1.0, True, True)
+            return [hit]
+
+    monkeypatch.setattr(R, "Retriever", FakeRetriever)
+    monkeypatch.setattr(R, "analyse_misses", lambda conn, qs, fr: {"stub": True})
+
+    class Conn:
+        def execute(self, *a, **kw):
+            class Cur:
+                def fetchone(self):
+                    return (1, 1)
+            return Cur()
+
+    class Emb:
+        name = "e"
+
+        def encode(self, texts, *, query=False):
+            return [[0.0]]
+
+    class Rr:
+        name = "r"
+
+        def score(self, query, texts):
+            return [1.0 for _ in texts]
+
+    qs = [R.Query("synopsis", "q1", "original synopsis", ("R1",))]
+    # The rewrite config reranks, so a reranker must be present (the retriever is faked).
+    res = R.run(Conn(), Emb(), Rr(), qs, configs=(("hybrid", "hybrid", False),),
+                rewrites={"q1": "rewritten text"})
+    assert set(res["configs"]) == {"hybrid", "hybrid+rerank+rewrite"}
+    assert res["first_rank"]["hybrid"]["q1"] is None            # R9 ≠ R1
+    assert res["first_rank"]["hybrid+rerank+rewrite"]["q1"] == 1
+    assert ("hybrid", "original synopsis") in seen and ("hybrid", "rewritten text") in seen
+    assert "misses" not in res                                  # only computed for hybrid+rerank
+
+
+def test_markdown_renders_the_miss_analysis():
+    res = {"ran_at": "t", "git_sha": "abc", "corpus_documents": 1, "corpus_chunks": 2,
+           "embedding_model": "e", "reranker_model": "r", "candidates": 40, "rrf_k": 60,
+           "queries": {"synopsis": 2, "identifier": 0},
+           "configs": {"hybrid+rerank": {"recall_at_5": 0.5, "recall_at_10": 0.5,
+                                         "recall_at_20": 0.5, "mrr_at_20": 0.5, "ndcg_at_10": 0.5,
+                                         "latency_ms_p50": 1, "latency_ms_p95": 2,
+                                         "precision_at_10_identifier": 0.0}},
+           "misses": {"synopsis_queries": 2, "missed": 1, "miss_rate": 0.5,
+                      "by_synopsis_length": {"≤12 words": {"queries": 2, "missed": 1,
+                                                           "miss_rate": 0.5}},
+                      "by_target_chunks": {"4+ chunks": {"queries": 2, "missed": 1,
+                                                         "miss_rate": 0.5}},
+                      "examples": [{"id": "x", "synopsis": "S", "narrative_opens": "N"}]}}
+    md = R.to_markdown(res)
+    assert "1 of 2 synopsis queries, 50.0%" in md and "| ≤12 words | 2 | 0.500 |" in md
+    assert "| 4+ chunks | 2 | 0.500 |" in md and "*S* → “N…”" in md

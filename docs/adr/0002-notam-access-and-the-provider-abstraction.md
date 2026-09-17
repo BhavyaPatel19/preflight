@@ -1,6 +1,6 @@
 # ADR 0002 — NOTAM access is gated; build against a provider interface and archive forward
 
-**Status:** accepted · **Date:** 2026-09-11
+**Status:** accepted; amended 2026-09-17 (live feeds out of scope by choice) · **Date:** 2026-09-11
 
 ## Context
 
@@ -34,3 +34,29 @@ NOTAM *data* is public domain (US government work). *Access* to it is not open. 
 
 - NASA DIP access is granted → implement `NasaDipSource` from an observed response; schedule it hourly; the archive starts filling itself.
 - The FAA opens self-serve access → add a provider. Nothing else changes.
+
+## Amendment (2026-09-17): live feeds are out of scope by choice
+
+NASA DIP was not accessible. The alternative that exists — the FAA's SWIM Cloud Distribution
+Service, which publishes the NOTAM stream (AIM NMS) to anyone who registers and accepts the FAA
+Terms of Service — was examined as far as the acceptance screen and **declined**. The project's
+rule is *public data with no accounts, sign-ups or approvals*; every machine-readable NOTAM source
+(FAA API, SCDS, DIP, commercial) requires at least one of those, so live NOTAMs are out of scope,
+not pending.
+
+What this settles:
+
+- The `NotamSource` interface, the raw archive and the scheduler stay as built. `FileSource` is the
+  production path; `NasaDipSource` remains dormant code, not a plan.
+- The briefing already treats "no NOTAM on record for this airport" as a `no_coverage` abstention
+  (`evals/abstention`), so a route through an unarchived airport says so rather than reading as
+  "no hazards".
+- Sprint 2's extractor is trained on **synthetic NOTAMs** generated from the Q-code taxonomy and the
+  real formats in the repo, evaluated on the real-format samples we have, and labelled as such.
+- The time-travel evaluation scores the **weather slice** — weather-implicated NTSB events against
+  public historical METARs (Iowa State ASOS archive, no account) — and reports the NOTAM slices as
+  uncoverable rather than as zero.
+
+Revisit only if the rule changes. If it does, SCDS is the route: register, subscribe to *NOTAM
+Distribution → AIM NMS Publication* with no filters, connect through the FAA's Java Jumpstart Kit
+(JMS is the only authorised method), and the parser/loader plug in behind `NotamSource`.

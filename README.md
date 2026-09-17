@@ -135,7 +135,7 @@ Built in the open, six sprints over twelve weeks.
 | Sprint | Focus | State |
 |---|---|---|
 | 1 | Foundation — schemas, rule decoder, ingestion, archive, deterministic briefing, scheduler | 🟢 done |
-| 2 | Fine-tuned NOTAM entity extractor → HF Hub | ⬜ waits on a real NOTAM corpus |
+| 2 | Fine-tuned NOTAM entity extractor → HF Hub | ⬜ re-scoped: trained on synthetic NOTAMs from the Q-code taxonomy, evaluated on the real-format samples in the repo, labelled as such (live NOTAM feeds are out of scope — see below) |
 | 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟢 done — corpus, golden set, measured |
 | 4 | LangGraph orchestration, LLM layer, grounding, abstention | 🟢 done — graph with Postgres checkpointer over gather → precedent → verify → narrate |
 | 5 | Time-travel eval harness + CI regression gate | 🟡 600-case set built; coverage-first scorer; **CI gate live** — 11 floors over 6 suites, two re-measured on every PR; local LLM judge run on 304 precedent pairs; κ awaits the human sheet |
@@ -148,8 +148,8 @@ Built in the open, six sprints over twelve weeks.
   clause-scoped entities and an honest `decode_confidence` for escalation routing.
 - **Store** — Postgres 16 + pgvector; an "in force at this instant" query; a low-confidence
   escalation queue; every fetch archived raw before decode.
-- **Ingest** — METAR/TAF from aviationweather.gov; NOTAMs through a provider interface (text dumps
-  today, NASA DIP when access lands); hourly scheduler with a run log.
+- **Ingest** — METAR/TAF from aviationweather.gov; NOTAMs through a provider interface, from text
+  dumps (live feeds are out of scope by choice — see *Data sources*); hourly scheduler with a run log.
 - **Brief** — `preflight brief` / `POST /brief` / `GET /brief/stream`: ranked, cited findings and
   explicit abstentions, with **precedent**: for each actionable finding, prior ASRS/NTSB reports
   describing what went wrong for crews in those conditions, each citing the verbatim passage.
@@ -467,7 +467,7 @@ All public. Nothing in this repo is scraped.
 
 | Source | Provides | Access |
 |---|---|---|
-| FAA NOTAMs via **NASA DIP** | live NOTAMs, structured from the FAA SWIM feed | request access — [ADR 0002](docs/adr/0002-notam-access-and-the-provider-abstraction.md) |
+| FAA NOTAMs | bundled sample NOTAMs and user-supplied dump files, through a provider interface | live feeds **out of scope by choice** — every one (FAA API, SWIM/SCDS, NASA DIP, commercial) requires an account and approval; this project uses only data that needs neither — [ADR 0002](docs/adr/0002-notam-access-and-the-provider-abstraction.md) |
 | aviationweather.gov | METAR, TAF, PIREP, SIGMET, AIRMET | free, no key |
 | NASA ASRS | 47,723 de-identified incident reports with the full ASRS taxonomy, via [`elihoole/asrs-aviation-reports`](https://huggingface.co/datasets/elihoole/asrs-aviation-reports) | HF Hub, Apache-2.0 packaging over public-domain data |
 | NTSB aviation database | 27,986 investigations 2008→ with date, nearest airport, weather, light, phase and cause-flagged findings — the golden-set raw material | free bulk download (`avall.zip`) |
@@ -475,10 +475,15 @@ All public. Nothing in this repo is scraped.
 | FAA NASR | airports, runways, navaids (gazetteer) | free, 28-day cycle |
 | OpenSky Network | ADS-B traffic | free tier |
 
-> **On NOTAMs:** the FAA's NOTAM API is not open to the public, and its public search site refuses
-> programmatic requests. The data is public domain; access to it is not. Ingestion is written against
-> a provider interface so this doesn't leak into the rest of the system, and every fetch is archived
-> raw so the project builds its own history for the time-travel evaluation.
+> **On NOTAMs:** NOTAMs are public-domain safety notices, but every machine-readable source of them
+> — the FAA NOTAM API, the SWIM Cloud Distribution Service, NASA's DIP, commercial aggregators —
+> requires an account and an approval step, and the FAA's public search site refuses programmatic
+> requests. This project's rule is *public data, no sign-ups*, so live NOTAMs are out of scope, not
+> pending. The consequences are stated rather than hidden: the NOTAM layer runs on samples and
+> dumps; the briefing **abstains** for any airport the archive has never seen instead of implying
+> coverage; the extractor is trained on synthetic NOTAMs and says so; and the end-to-end eval scores
+> the slice it can — weather-implicated events, against public historical METARs. Ingestion stays
+> behind a provider interface, so a feed is a config change if that rule ever changes.
 
 ---
 

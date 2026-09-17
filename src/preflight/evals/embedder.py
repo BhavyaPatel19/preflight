@@ -14,6 +14,11 @@ numbers are therefore *higher* than the retrieval eval's (fewer distractors,
 exact search) and are not comparable to it; only the gap between models
 means anything. A model that wins here earns the full re-embed and the real
 eval; a model that does not is a few hours saved.
+
+What the first use taught (run 7 in ``evals/retrieval/HISTORY.md``): the subset
+prices ranking quality — nDCG and Recall@5 transferred — but overstates recall
+at depth, because 16× fewer distractors means the target competes with hundreds
+of near neighbours rather than thousands. Recall@20 here is an upper bound.
 """
 
 from __future__ import annotations
@@ -150,6 +155,13 @@ def to_markdown(res: dict[str, Any]) -> str:
         f"{res['passages']:,}-chunk subset and exact search instead of 316k chunks through "
         "HNSW — and are not comparable to it. Only the gap between rows is the finding. "
         "A model that wins here earns a full re-embed and the real eval.",
+        "",
+        "**What transferred (run 7, `evals/retrieval/HISTORY.md`):** the ranking gains did — "
+        "full-corpus dense nDCG@10 +0.04, Recall@5 +0.08 — and the Recall@20 gain did not "
+        "(+0.01 dense, flat after reranking). With 16× fewer distractors than the corpus, a "
+        "subset measures how well a model orders near neighbours, not how often the target is "
+        "anywhere in the top 20 of 316k chunks. Read the Recall@20 column here as an upper "
+        "bound, and the nDCG column as the number to believe.",
     ]
     return "\n".join(lines) + "\n"
 

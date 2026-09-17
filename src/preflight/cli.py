@@ -574,8 +574,10 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.cmd == "eval":
+        from preflight.config import settings
         from preflight.db import close_pool, get_pool
         from preflight.evals import retrieval as R
+        from preflight.llm import LLMUnavailable
         from preflight.retrieval.embed import STEmbedder, STReranker
 
         try:
@@ -595,14 +597,17 @@ def main(argv: list[str] | None = None) -> int:
                 if args.rewrite:
                     from preflight.llm import load_llm
 
+                    # Cached rewrites need no model; only uncached queries do.
                     llm = load_llm()
-                    if llm is None:
-                        print("error: --rewrite needs the LLM (is ollama running?)",
-                              file=sys.stderr)
+                    cfg = settings()
+                    slug = (llm.name if llm else f"ollama/{cfg.ollama_model}"
+                            ).replace("/", "-").replace(":", "-")
+                    try:
+                        rewrites = R.synopsis_rewriter(
+                            llm, R.GOLDEN.parent / f"rewrites-{slug}.json")(queries)
+                    except LLMUnavailable as e:
+                        print(f"error: --rewrite: {e} (start ollama)", file=sys.stderr)
                         return 3
-                    slug = llm.name.replace("/", "-").replace(":", "-")
-                    rewrites = R.synopsis_rewriter(
-                        llm, R.GOLDEN.parent / f"rewrites-{slug}.json")(queries)
                 res = R.run(conn, STEmbedder(), None if args.no_rerank else STReranker(),
                             queries, candidates=args.candidates, configs=configs,
                             rewrites=rewrites)

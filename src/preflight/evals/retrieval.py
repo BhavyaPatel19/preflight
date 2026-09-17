@@ -73,7 +73,8 @@ _REWRITE_SCHEMA: dict[str, Any] = {
 }
 
 
-def synopsis_rewriter(llm: LLM, cache: Path) -> Callable[[Sequence[Query]], dict[str, str]]:
+def synopsis_rewriter(llm: LLM | None, cache: Path
+                      ) -> Callable[[Sequence[Query]], dict[str, str]]:
     """Rewrite each synopsis into the register of the narrative it summarises.
 
     An ASRS synopsis is analyst shorthand ("Air carrier flight crew reported a runway
@@ -84,6 +85,9 @@ def synopsis_rewriter(llm: LLM, cache: Path) -> Callable[[Sequence[Query]], dict
     def rewrite_all(queries: Sequence[Query]) -> dict[str, str]:
         done: dict[str, str] = json.loads(cache.read_text()) if cache.exists() else {}
         todo = [q for q in queries if q.kind == "synopsis" and q.id not in done]
+        if todo and llm is None:
+            raise LLMUnavailable(f"{len(todo)} synopsis queries have no cached rewrite and no "
+                                 "LLM is available")
 
         def one(q: Query) -> tuple[str, str]:
             user = (
@@ -94,6 +98,7 @@ def synopsis_rewriter(llm: LLM, cache: Path) -> Callable[[Sequence[Query]], dict
                 f"Synopsis: {q.text}"
             )
             try:
+                assert llm is not None
                 out = llm.complete_json(_REWRITE_SYSTEM, user, _REWRITE_SCHEMA, max_tokens=220)
                 text = str(out.get("query", "")).strip()
             except (LLMUnavailable, ValueError):

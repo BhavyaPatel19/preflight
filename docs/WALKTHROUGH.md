@@ -62,9 +62,11 @@ candidates under the same filter. ADR 0001.
 switch exposed. A test that deleted the demo NOTAMs on every run. The NLI model reading `CLSD` as
 a contradiction of "closed". Each one is in a commit message with the fix and the test.
 
-**"What would you do next?"** Swap the embedder (`bge-large` / `bge-m3`) and re-run the retrieval
-harness — Recall@20 is the number to watch. Then the agent layer, gated by the grounding and
-injection harnesses that already exist.
+**"What would you do next?"** The embedder swap is done the way everything else here is done —
+priced first on a subset (`evals/embedder/RESULTS.md`: bge-large +0.127 Recall@20, bge-m3 +0.03),
+then re-embedded and re-measured on the real corpus (run 7 in `evals/retrieval/HISTORY.md`). Next
+is the lexical channel: a long OR query ranks ~100k chunks, and pruning it to its rarest terms
+is the kind of change the harness exists to judge. Then a validated judge (κ) for precedent.
 
 ## Honest scope
 

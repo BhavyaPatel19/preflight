@@ -80,10 +80,10 @@ def test_build_golden_selects_eligible_reports_and_frequent_pairs(db):
     from preflight.retrieval.search import DocInput, index_documents
 
     class Emb:
-        name, dim = "fake", 768
+        name, dim = "fake", 1024
 
         def encode(self, texts, *, query=False):
-            return [[0.0] * 768 for _ in texts]
+            return [[0.0] * 1024 for _ in texts]
 
     long_synopsis = "A synopsis long enough to count as a real query for the eligibility rule."
     narrative = " ".join(

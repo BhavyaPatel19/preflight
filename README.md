@@ -322,8 +322,8 @@ concurrently, and without that flag Ollama serialises them (measured in
 To compare against Claude later: `uv sync --extra llm`, set `ANTHROPIC_API_KEY` and
 `PREFLIGHT_LLM=anthropic`, re-run `preflight eval narrative`. Same code, same harness.
 
-**Retrieval** — needs the ML extras (~1.5 GB of model weights land in the Hugging Face cache on
-first use):
+**Retrieval** — needs the ML extras (~2.5 GB of model weights — `bge-large-en-v1.5`,
+`bge-reranker-base`, the NLI verifier — land in the Hugging Face cache on first use):
 
 ```bash
 uv sync --extra ml

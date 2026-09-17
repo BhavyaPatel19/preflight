@@ -203,7 +203,7 @@ CI gate will enforce.
 | Layer | Metric | Target | Measured |
 |---|---|---:|---:|
 | Extraction | macro entity F1 (RWY/TWY/NAVAID/OBST/AIRSPACE/TIME) | ≥ 0.92 | — |
-| Retrieval | Recall@20 / nDCG@10 — synopsis→narrative, 300 queries | ≥ 0.90 / 0.65 | 0.61 / 0.41 — [details](evals/retrieval/RESULTS.md); embedder ablation says `bge-large` is worth **+0.13 R@20** ([details](evals/embedder/RESULTS.md)) |
+| Retrieval | Recall@20 / nDCG@10 — synopsis→narrative, 300 queries | ≥ 0.90 / 0.65 | 0.60 / 0.41 — [details](evals/retrieval/RESULTS.md); `bge-large` lifted the dense channel (+0.04 nDCG) and left the reranked config unchanged — [what the ablation got wrong](evals/retrieval/HISTORY.md) |
 | Retrieval | P@10 on exact-identifier queries (`runway 28R` at an airport) | ≥ 0.80 | 0.77 |
 | Rerank | nDCG@10 lift over dense-only | +0.12 | +0.09 |
 | Forecast | MASE, 24 h arrival delay, rolling-origin backtest | < 0.85 | **0.715** Chronos-Bolt · 0.751 climatology · 1.067 seasonal-naive — [details](evals/forecast/RESULTS.md) |
@@ -223,9 +223,11 @@ zero cost; the same command with `PREFLIGHT_LLM=anthropic` produces the frontier
 harness found the lexical ranking function was both slow and bad, and fixing it moved hybrid from
 *worse* than dense to better; the latency pass then found the SQL was sequentially scanning the
 corpus, and fixing *that* was checked against the same harness before it was kept
-(`evals/retrieval/HISTORY.md`). The embedder is the next knob, and a subset ablation has priced
-it: `bge-large-en-v1.5` gains +0.127 Recall@20 over the current model, `bge-m3` +0.03, at 3.6× the
-embedding cost — the full re-embed is the next retrieval step.
+(`evals/retrieval/HISTORY.md`). The embedder was the next knob: a subset ablation priced
+`bge-large-en-v1.5` at +0.127 Recall@20, the full re-embed delivered +0.04 nDCG@10 on the dense
+channel and nothing measurable after reranking — the ablation had measured ranking quality, not
+recall at depth, and the history says so. Recall@20 at 0.60 is now a chunking or query-side
+question, not an embedder one.
 
 ---
 
@@ -322,8 +324,8 @@ concurrently, and without that flag Ollama serialises them (measured in
 To compare against Claude later: `uv sync --extra llm`, set `ANTHROPIC_API_KEY` and
 `PREFLIGHT_LLM=anthropic`, re-run `preflight eval narrative`. Same code, same harness.
 
-**Retrieval** — needs the ML extras (~1.5 GB of model weights land in the Hugging Face cache on
-first use):
+**Retrieval** — needs the ML extras (~2.5 GB of model weights — `bge-large-en-v1.5`,
+`bge-reranker-base`, the NLI verifier — land in the Hugging Face cache on first use):
 
 ```bash
 uv sync --extra ml

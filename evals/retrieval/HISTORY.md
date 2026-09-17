@@ -10,7 +10,8 @@ for every run is under `runs/` (gitignored — the numbers that matter are here)
 | 3 | 2026-09-12 18:48 | step 11 | pg17 native | AND-semantics for ≤ 4-term queries; strict airport filter for identifier queries | — | — | — | — | **0.746 / 0.774** | — |
 | 4 | 2026-09-12 19:11 | step 11 | pg17 native | **final full run** at the step-11 retrieval code (recorded sha is the step-12 checkout; retrieval code identical) — `RESULTS.md` | 0.315 | 0.294 | 0.379 | **0.405** | 0.746 / 0.772 | 424 ms |
 | 5 | 2026-09-12 20:08 | main | pg17 native | experiment: **100 candidates** per channel instead of 40 (`--candidates 100`) — not adopted | 0.315 | 0.294 | 0.388 | 0.391 | 0.748 / 0.776 | 429 ms |
-| 6 | 2026-09-14 05:47 | step 22 | pg17 native | **index-driven SQL**: per-channel filters instead of a materialised `pool` CTE; dense channel is now an HNSW scan (`ef_search=1000`, iterative) instead of an exact sort — `RESULTS.md` | 0.310 | 0.294 | 0.373 | **0.402** | 0.746 / 0.774 | 217 ms |
+| 6 | 2026-09-14 05:47 | step 22 | pg17 native | **index-driven SQL**: per-channel filters instead of a materialised `pool` CTE; dense channel is now an HNSW scan (`ef_search=1000`, iterative) instead of an exact sort | 0.310 | 0.294 | 0.373 | 0.402 | 0.746 / 0.774 | 217 ms |
+| 7 | 2026-09-17 09:26 | step 26 | pg17 native | **embedder → `bge-large-en-v1.5`** (1024-d; migration 007, full re-embed, index rebuilt with `ef_construction=128`) — `RESULTS.md` | **0.351** | 0.294 | **0.393** | **0.407** | 0.748 / 0.774 | 221 ms |
 
 ## What each run taught
 
@@ -53,5 +54,31 @@ chunks/s on this machine (base: 65), so the full re-embed is ~5 h and needs a mi
 column is `vector(768)`; large is 1024-d). That is the next retrieval step, and it is now a
 decision with a number behind it rather than a hope.
 
-**Still open.** Re-embed with `bge-large-en-v1.5`, rebuild the HNSW index, re-run this eval.
-Recall@20 is the number to watch; the ablation says to expect roughly +0.1.
+**Run 7: the embedder swap helped the dense channel and left the deployed config where it was.**
+Dense-only moved on every metric — nDCG@10 0.310 → 0.351, Recall@5 0.330 → 0.410, MRR@20 0.276 →
+0.321, identifier P@10 0.542 → 0.624 — which is the model doing what the ablation said: ranking
+the right passage higher among its neighbours. But hybrid+rerank, the config the briefing uses,
+is unchanged within noise: nDCG@10 0.402 → 0.407, Recall@20 0.607 → 0.597 (the standard error on
+300 queries is about ±0.028), identifier P@10 0.774 → 0.774. The rerank lift shrank from +0.091 to
++0.056 because the reranker now has less to fix, not because it got worse.
+
+The ablation's headline, **+0.127 Recall@20, did not transfer** — the full-corpus dense channel
+gained +0.010. The reason is the subset: 20k chunks is 16× fewer distractors than 316k, so a
+query's target competes with a few hundred near neighbours instead of a few thousand, and a
+model that orders near neighbours better looks like a model that finds more. Recall at depth in
+the real corpus is bounded by something the embedder did not change — roughly 40% of synopsis
+queries still have no target chunk in either channel's top 40. Recall@5 and nDCG, the
+top-of-ranking metrics, did transfer directionally (+0.08 and +0.04 dense). Lesson recorded in
+`evals/embedder`: a subset ablation prices *ranking quality*, not *recall at depth*; to price
+recall it needs the full corpus's distractor count.
+
+Kept anyway: the dense channel matters on its own when the reranker is off (the
+`--no-rerank` ablation, degraded environments), the cost was one-time (4.5 h; 2.5 GB index
+instead of 1.2), and the deployed numbers did not move the wrong way. Not a win, not a loss —
+a priced decision whose price turned out to be the accurate part.
+
+**Still open.** Recall@20 at 0.60 against a 0.90 target is now clearly not an embedder problem.
+The two remaining hypotheses are the chunking (a synopsis paraphrases the whole report; the
+target may be split across chunks that individually match weakly) and the query side (a synopsis
+is analyst shorthand — a rewrite into narrative register might retrieve better). Both are
+measurable with this harness.

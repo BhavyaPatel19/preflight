@@ -60,3 +60,13 @@ parameters each, ~2.2 GB each). On a laptop those turn a test run into a coffee 
 - The retrieval golden set exists and shows lexical recall on identifiers below target → `pg_search`.
 - nDCG@10 with `bge-m3` beats `bge-base` by more than the noise floor → swap the default.
 - Corpus passes ~1M chunks → revisit HNSW parameters (`m`, `ef_construction`) and ADR 0001.
+
+## Addendum (2026-09-16): embedder swapped to `bge-large-en-v1.5`
+
+Decision 4 named `bge-m3` as the upgrade path. The ablation that was supposed to justify it
+(`evals/embedder/RESULTS.md`: same 300 queries, a 20k-chunk subset, exact search) said otherwise:
+`bge-large-en-v1.5` +0.127 Recall@20 over `bge-base`, `bge-m3` +0.030. Large is the new default
+(migration 007: `chunks.embedding` → `vector(1024)`, refilled by `preflight corpus reembed`, index
+rebuilt by `preflight corpus reindex` with `ef_construction=128`). Cost: 3.6× the embedding time
+(~20 chunks/s on an M5; the full corpus is ~4.5 h) and 1.3 GB of weights instead of 0.4. The
+measured effect on the real corpus is run 7 in `evals/retrieval/HISTORY.md`.

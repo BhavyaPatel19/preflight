@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass, replace
 from datetime import date
+from time import perf_counter
 from typing import Any, Literal, NamedTuple
 
 from psycopg import Connection
@@ -148,3 +149,77 @@ def index_documents(
             flush()
     flush()
     return n_docs, n_chunks
+
+
+def reembed(
+    conn: Connection[Any], embedder: Embedder, *, batch: int = 128, source: str | None = None,
+    commit: bool = True, log: Callable[[str], None] | None = None,
+) -> int:
+    """Re-embed every chunk not already carrying ``embedder.name``.
+
+    Keyset-paginated over ``id`` so each batch is one index range scan however far along
+    the run is, and resumable for the same reason: rows already stamped with the model
+    are skipped. ``commit`` (per batch) is what makes a five-hour run survivable — pass
+    False only inside a transaction you own, such as a test's. ``source`` restricts the
+    pass to one document source. Drop the HNSW index first (migration 007 does) and
+    rebuild it after with ``reindex``: updating 316k vectors through a live index is the
+    slow path.
+    """
+    t0 = perf_counter()
+    done = last_id = 0
+    scope = "" if source is None else \
+        "AND document_id IN (SELECT id FROM documents WHERE source = %(source)s)"
+    params: dict[str, Any] = {"model": embedder.name, "source": source, "batch": batch}
+    row = conn.execute(
+        f"SELECT count(*) FROM chunks WHERE (embedding IS NULL "
+        f"OR embedding_model IS DISTINCT FROM %(model)s) {scope}", params,
+    ).fetchone()
+    todo = int(row[0]) if row else 0
+    while True:
+        rows = conn.execute(
+            f"SELECT id, text, embedding_model FROM chunks WHERE id > %(last)s {scope} "
+            "ORDER BY id LIMIT %(batch)s", {**params, "last": last_id},
+        ).fetchall()
+        if not rows:
+            break
+        last_id = rows[-1][0]
+        pending = [(i, t) for i, t, m in rows if m != embedder.name]
+        if not pending:
+            continue
+        vecs = embedder.encode([t for _, t in pending])
+        with conn.cursor() as cur:
+            cur.executemany(
+                "UPDATE chunks SET embedding = %s, embedding_model = %s WHERE id = %s",
+                [(list(v), embedder.name, i) for (i, _), v in zip(pending, vecs, strict=True)],
+            )
+        if commit:
+            conn.commit()
+        done += len(pending)
+        if log and (done // len(pending)) % 40 == 0:
+            rate = done / (perf_counter() - t0)
+            eta = (todo - done) / rate / 60 if rate else 0
+            log(f"{done:>7,} / {todo:,} chunks  {rate:5.1f}/s  ~{eta:4.0f} min left")
+    return done
+
+
+def reindex_statements(*, m: int = 16, ef_construction: int = 128,
+                       maintenance_work_mem: str = "4GB", workers: int = 4) -> list[str]:
+    """The SQL to (re)build the corpus HNSW index over the loaded table, in order."""
+    return [
+        f"SET maintenance_work_mem = '{maintenance_work_mem}'",
+        f"SET max_parallel_maintenance_workers = {int(workers)}",
+        "DROP INDEX IF EXISTS chunks_embedding_idx",
+        "CREATE INDEX chunks_embedding_idx ON chunks USING hnsw (embedding vector_cosine_ops) "
+        f"WITH (m = {int(m)}, ef_construction = {int(ef_construction)})",
+    ]
+
+
+def reindex(conn: Connection[Any], *, m: int = 16, ef_construction: int = 128,
+            maintenance_work_mem: str = "4GB", workers: int = 4) -> float:
+    """Run ``reindex_statements`` and commit. Minutes on the full corpus. Returns seconds."""
+    t0 = perf_counter()
+    for stmt in reindex_statements(m=m, ef_construction=ef_construction,
+                                   maintenance_work_mem=maintenance_work_mem, workers=workers):
+        conn.execute(stmt)
+    conn.commit()
+    return perf_counter() - t0

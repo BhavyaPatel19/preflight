@@ -19,6 +19,8 @@ from typing import Any, NamedTuple
 from psycopg import Connection
 from psycopg.types.json import Jsonb
 
+from preflight.config import settings
+
 _TOKEN = re.compile(r"[A-Za-z0-9][A-Za-z0-9/\-]*")
 
 
@@ -196,7 +198,7 @@ def hybrid_search(
     with conn.transaction():
         conn.execute(_HNSW_SETTINGS)
         rows = conn.execute(sql, {
-            "qvec": list(query_vec) if query_vec is not None else [0.0] * 768,
+            "qvec": list(query_vec) if query_vec is not None else [0.0] * settings().embedding_dim,
             "qor": lexical_query(query_text),
             "icao": icao, "source": source, "exclude": exclude_like,
             "n": candidates, "k": rrf_k, "limit": limit,

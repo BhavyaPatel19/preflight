@@ -86,6 +86,15 @@ def main(argv: list[str] | None = None) -> int:
     ca.add_argument("--title")
     ca.add_argument("--icao")
     cosub.add_parser("stats", help="document and chunk counts")
+    cr = cosub.add_parser("reembed", help="re-embed every chunk with the configured model "
+                                          "(resumable; drop the index first — migration 007)")
+    cr.add_argument("--model", help="sentence-transformers id (default: settings)")
+    cr.add_argument("--batch", type=int, default=128)
+    cr.add_argument("--source", choices=["asrs", "ntsb", "far_aim", "ops_note"],
+                    help="only this document source")
+    cx = cosub.add_parser("reindex", help="rebuild the corpus HNSW index over the loaded table")
+    cx.add_argument("--m", type=int, default=16)
+    cx.add_argument("--ef-construction", type=int, default=128)
     ci = cosub.add_parser("ingest", help="download, chunk, embed and index a corpus")
     ci.add_argument("corpus", choices=["asrs", "ntsb"])
     ci.add_argument("--limit", type=int, help="stop after N reports (for a first pass)")
@@ -338,6 +347,20 @@ def main(argv: list[str] | None = None) -> int:
                     from preflight.db.corpus import stats
 
                     print(stats(conn))
+                elif args.op == "reembed":
+                    from preflight.retrieval.embed import STEmbedder
+                    from preflight.retrieval.search import reembed
+
+                    emb = STEmbedder(args.model, batch_size=64)
+                    n_done = reembed(conn, emb, batch=args.batch, source=args.source,
+                                     log=lambda m: print(m, file=sys.stderr, flush=True))
+                    print(f"re-embedded {n_done:,} chunks with {emb.name}")
+                elif args.op == "reindex":
+                    from preflight.retrieval.search import reindex
+
+                    secs = reindex(conn, m=args.m, ef_construction=args.ef_construction)
+                    print(f"chunks_embedding_idx rebuilt (m={args.m}, "
+                          f"ef_construction={args.ef_construction}) in {secs / 60:.1f} min")
                 else:
                     from preflight.retrieval.embed import STEmbedder
                     from preflight.retrieval.search import index_document

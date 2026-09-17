@@ -10,13 +10,13 @@ from preflight.retrieval.embed import Embedder, Reranker
 from preflight.retrieval.search import Retriever, index_document
 from tests.fixtures_corpus import SYNTHETIC_NOTES
 
-DIM = 768
+DIM = 1024
 
 
 class HashEmbedder:
     """Deterministic bag-of-words hashing → similarity tracks term overlap."""
 
-    name = "fake-hash-768"
+    name = "fake-hash-1024"
     dim = DIM
 
     def encode(self, texts, *, query=False):
@@ -75,7 +75,7 @@ def test_index_document_chunks_and_embeds(indexed):
         "SELECT count(*), count(embedding), min(embedding_model) FROM chunks c "
         "JOIN documents d ON d.id = c.document_id WHERE d.external_id LIKE 'test-syn-%'"
     ).fetchone()
-    assert n == (5, 5, "fake-hash-768")
+    assert n == (5, 5, "fake-hash-1024")
 
 
 @pytest.mark.db
@@ -206,3 +206,47 @@ def test_hybrid_filters_are_only_the_ones_requested():
     assert "NOT LIKE %(exclude)s" in corpus._filters(None, None, "%Synopsis%", False)
     sql = corpus._HYBRID.format(filters=corpus._filters("KSFO", "ntsb", "%x%", False))
     assert "pool" not in sql and sql.count("c.icao = %(icao)s") == 2    # once per channel
+
+
+@pytest.mark.db
+def test_reembed_skips_rows_already_on_the_model_and_resumes(indexed):
+    """Rows carrying the target model are left alone; everything else is re-embedded and
+    stamped, and a second pass finds nothing to do.
+
+    Scoped to the fixture's source and run with ``commit=False``: ``reembed`` walks the whole
+    table and commits per batch by design, which inside a shared dev database is exactly
+    what a test must never do.
+    """
+    from preflight.retrieval.search import reembed
+
+    class Other(HashEmbedder):
+        name = "fake-hash-other"
+
+        def encode(self, texts, *, query=False):
+            return [[-x for x in v] for v in super().encode(texts, query=query)]
+
+    def count(model):
+        return indexed.execute(
+            "SELECT count(*) FROM chunks c JOIN documents d ON d.id = c.document_id "
+            "WHERE d.source = 'ops_note' AND c.embedding_model = %s", (model,)).fetchone()[0]
+
+    total = count(HashEmbedder.name)
+    assert total >= 5
+    indexed.execute(
+        "UPDATE chunks SET embedding_model = %s WHERE id = (SELECT min(c.id) FROM chunks c "
+        "JOIN documents d ON d.id = c.document_id WHERE d.source = 'ops_note' "
+        "AND c.embedding_model = %s)", (Other.name, HashEmbedder.name))
+    n = reembed(indexed, Other(), batch=2, source="ops_note", commit=False)
+    assert n == total - 1 and count(HashEmbedder.name) == 0
+    assert reembed(indexed, Other(), batch=2, source="ops_note", commit=False) == 0
+
+
+def test_reindex_statements_carry_the_build_parameters():
+    """The index build is minutes on the real table, so only its SQL is tested."""
+    from preflight.retrieval.search import reindex_statements
+
+    stmts = reindex_statements(m=24, ef_construction=200, maintenance_work_mem="2GB", workers=3)
+    assert stmts[0] == "SET maintenance_work_mem = '2GB'"
+    assert stmts[1] == "SET max_parallel_maintenance_workers = 3"
+    assert stmts[2].startswith("DROP INDEX IF EXISTS chunks_embedding_idx")
+    assert "hnsw (embedding vector_cosine_ops) WITH (m = 24, ef_construction = 200)" in stmts[3]

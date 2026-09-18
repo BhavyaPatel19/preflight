@@ -74,6 +74,9 @@ def main(argv: list[str] | None = None) -> int:
     eb = evsub.add_parser("briefing", help="time-travel briefing eval on NTSB-derived cases")
     eb.add_argument("--build", action="store_true", help="(re)build evals/briefing/golden.jsonl")
     eb.add_argument("--limit", type=int)
+    eb.add_argument("--backfill-weather", action="store_true",
+                    help="first pull each weather case's historical METARs from the Iowa State "
+                         "ASOS archive (public, no account) into the weather table")
 
     sc = sub.add_parser("schedule", help="run the ingest scheduler (hourly weather + NOTAMs)")
     sc.add_argument("--no-run-now", action="store_true", help="wait for the first tick")
@@ -565,6 +568,13 @@ def main(argv: list[str] | None = None) -> int:
                 cases = B.load_cases()
                 if args.limit:
                     cases = cases[: args.limit]
+                if args.backfill_weather:
+                    from preflight.sources.iem import IemAsos
+
+                    filled = B.backfill_weather(
+                        conn, cases, source=IemAsos(),
+                        log=lambda m: print(m, file=sys.stderr, flush=True))
+                    print(f"weather backfill: {filled}", file=sys.stderr)
                 res = B.run(conn, cases)
             run_path, md_path = B.save_run(res)
             print(B.to_markdown(res))

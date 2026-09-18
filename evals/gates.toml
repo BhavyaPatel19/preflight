@@ -87,4 +87,5 @@ note = "measured 0.715; must stay below climatology (0.751) to be worth evaluati
 # Not gated, on purpose:
 #   latency   — machine-dependent; evals/latency/RESULTS.md records it per machine
 #   precedent — judge-estimated relevance is unvalidated until Cohen's κ exists
-#   briefing  — coverage is 0/600 until the archive has history; a floor would be theatre
+#   briefing  — the weather slice is scored (117 cases: recall 0.19, false alarms 0.10) but a
+#               floor on 22 hits would fire on noise; gate it once the count is in the hundreds

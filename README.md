@@ -138,7 +138,7 @@ Built in the open, six sprints over twelve weeks.
 | 2 | Fine-tuned NOTAM entity extractor → HF Hub | ⬜ re-scoped: trained on synthetic NOTAMs from the Q-code taxonomy, evaluated on the real-format samples in the repo, labelled as such (live NOTAM feeds are out of scope — see below) |
 | 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟢 done — corpus, golden set, measured |
 | 4 | LangGraph orchestration, LLM layer, grounding, abstention | 🟢 done — graph with Postgres checkpointer over gather → precedent → verify → narrate |
-| 5 | Time-travel eval harness + CI regression gate | 🟡 600-case set built; coverage-first scorer; **CI gate live** — 11 floors over 6 suites, two re-measured on every PR; local LLM judge run on 304 precedent pairs; κ awaits the human sheet |
+| 5 | Time-travel eval harness + CI regression gate | 🟡 600-case set built; **weather slice scored** (117 cases against public historical METARs: recall 0.19, false alarms 0.10 — and why the ceiling is low); NOTAM slices uncoverable by choice; **CI gate live** — 12 floors over 6 suites; κ awaits the human sheet |
 | 6 | Delay forecasting, cost/latency, UI, MCP server | 🟢 done — forecasting, UI, MCP server; latency pass halved the full briefing (49.5 → 25.4 s p50, local model) |
 
 **Working today**
@@ -207,8 +207,8 @@ CI gate will enforce.
 | Retrieval | P@10 on exact-identifier queries (`runway 28R` at an airport) | ≥ 0.80 | 0.77 |
 | Rerank | nDCG@10 lift over dense-only | +0.12 | +0.09 |
 | Forecast | MASE, 24 h arrival delay, rolling-origin backtest | < 0.85 | **0.715** Chronos-Bolt · 0.751 climatology · 1.067 seasonal-naive — [details](evals/forecast/RESULTS.md) |
-| End-to-end | implicated-hazard recall (300 NTSB positives) | ≥ 0.85 | — (0 / 300 covered: archive began 2026-09-11 — [details](evals/briefing/RESULTS.md)) |
-| End-to-end | false-alarm rate (300 matched negatives) | < 0.15 | — (0 / 300 covered) |
+| End-to-end | implicated-hazard recall (300 NTSB positives) | ≥ 0.85 | **0.188** on the weather slice — 117 of 142 weather-implicated events, briefed against the public historical METAR at the time; the 158 NOTAM-implicated events are uncoverable by choice. 74 of the 117 had calm wind in that METAR: the ceiling of a METAR-based weather layer — [details](evals/briefing/RESULTS.md) |
+| End-to-end | false-alarm rate (300 matched negatives) | < 0.15 | **0.103** on the 117 matched weather negatives |
 | Grounding | hybrid verifier (NLI + exact-figure gate): true-claim acceptance · corruption rejection | ≥ 0.97 | **1.000 · 0.972** at 0.5 — [details](evals/grounding/RESULTS.md) |
 | Narrative | unsupported-claim rate of model-written sentences, `qwen3:14b` local | ≤ 0.05 | **0.010** (98 / 99 kept; 1 genuine catch) — [history](evals/narrative/HISTORY.md) |
 | Abstention | recall on constructed data-gap cases · false-abstention rate on clean cases | ≥ 0.90 | **1.000 · 0.000** (26 cases, 20 gaps; 0.55 before this eval named three silent gaps — [details](evals/abstention/README.md)) |
@@ -366,7 +366,7 @@ searched.
 | `pytest -m ml` | loads the real embedding and reranker models |
 | `preflight eval retrieval` | Recall/nDCG/P@10 per config on the 350-query golden set (~30 min) |
 | `preflight eval embedder` | embedder ablation: same queries, a 20k-chunk subset, exact search in memory, one row per model (~50 min for three) |
-| `preflight eval briefing` | replay the briefing on 600 NTSB-derived cases; coverage, hazard recall, false alarms |
+| `preflight eval briefing [--backfill-weather]` | replay the briefing on 600 NTSB-derived cases; `--backfill-weather` first pulls each weather case's historical METARs from Iowa State's public ASOS archive (~20 min, polite rate); coverage, per-category recall and false alarms, the wind-rule sweep |
 | `preflight eval forecast` | Chronos-Bolt vs seasonal-naive vs climatology, rolling-origin backtest (MASE, pinball) |
 | `preflight eval grounding` | NLI verifier on the briefing's own claims and one corrupted copy of each |
 | `preflight eval safety` | injection detector: recall on the red-team set, false positives on benign NOTAMs |
@@ -413,6 +413,8 @@ src/preflight/
     notam.py            rule-based parser: raw NOTAM → NotamRecord
   sources/
     aviationweather.py  METAR/TAF client
+    iem.py              Iowa State ASOS archive: historical METARs (rate-limited, backs off)
+    metar_text.py       raw METAR → the same Metar record, incl. FAA flight category
     notams.py           NotamSource protocol; FileSource, NasaDipSource
     asrs.py             ASRS export download + row parsing (locale→ICAO, phase taxonomy)
     ntsb.py             NTSB avall.mdb via mdbtools: events + narratives + findings + sequence
@@ -471,6 +473,7 @@ All public. Nothing in this repo is scraped.
 |---|---|---|
 | FAA NOTAMs | bundled sample NOTAMs and user-supplied dump files, through a provider interface | live feeds **out of scope by choice** — every one (FAA API, SWIM/SCDS, NASA DIP, commercial) requires an account and approval; this project uses only data that needs neither — [ADR 0002](docs/adr/0002-notam-access-and-the-provider-abstraction.md) |
 | aviationweather.gov | METAR, TAF, PIREP, SIGMET, AIRMET | free, no key |
+| Iowa State ASOS archive (IEM) | historical METARs back to the 1990s, for the time-travel eval | free, no key; one request per 4 s with back-off |
 | NASA ASRS | 47,723 de-identified incident reports with the full ASRS taxonomy, via [`elihoole/asrs-aviation-reports`](https://huggingface.co/datasets/elihoole/asrs-aviation-reports) | HF Hub, Apache-2.0 packaging over public-domain data |
 | NTSB aviation database | 27,986 investigations 2008→ with date, nearest airport, weather, light, phase and cause-flagged findings — the golden-set raw material | free bulk download (`avall.zip`) |
 | BTS On-Time Performance | flight-level delay history, aggregated to airport-hour | free monthly zips, ~3-month lag |

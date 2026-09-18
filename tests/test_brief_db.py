@@ -89,3 +89,19 @@ def test_rejected_notams_in_the_latest_fetch_are_declared(db):
     b = build_briefing(db, FlightRequest(departure=A, destination=B, off_block=T0), now=T0)
     gap = next(a for a in b.abstentions if a.reason == "parse_failure")
     assert gap.topic == "NOTAM decoding" and gap.detail.startswith("2 NOTAMs in the latest fetch")
+
+
+def test_latest_weather_respects_as_of(db):
+    """A time-travel briefing must not see a report issued after its snapshot."""
+    from preflight.sources.aviationweather import Metar
+
+    wdb.upsert_metars(db, [
+        Metar(icao=A, observed_at=T0 - timedelta(hours=3), raw="OLD", flight_category="IFR"),
+        Metar(icao=A, observed_at=T0 + timedelta(hours=2), raw="NEW", flight_category="VFR"),
+    ])
+    assert wdb.latest(db, A, "METAR").raw == "NEW"
+    assert wdb.latest(db, A, "METAR", as_of=T0).raw == "OLD"
+    assert wdb.latest(db, A, "METAR", as_of=T0 - timedelta(hours=4)) is None
+    b = build_briefing(db, FlightRequest(departure=A, destination=B, off_block=T0), now=T0)
+    wx = [f for f in b.findings if f.category == "weather" and A in f.headline]
+    assert not wx and (f"{A} current weather", "stale_source") in _reasons(b)   # OLD is 3 h old

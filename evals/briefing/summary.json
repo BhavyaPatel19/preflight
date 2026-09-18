@@ -1,11 +1,15 @@
 {
   "suite": "briefing",
-  "ran_at": "2026-09-12T19:35:22+00:00",
-  "git_sha": "2f80faf",
+  "ran_at": "2026-09-18T06:22:43+00:00",
+  "git_sha": "43195cd",
   "metrics": {
-    "coverage_positive": 0,
-    "coverage_negative": 0,
-    "hazard_recall": null,
-    "false_alarm_rate": null
+    "coverage_positive": 117,
+    "coverage_negative": 117,
+    "hazard_recall": 0.188,
+    "false_alarm_rate": 0.1026
+  },
+  "cases": {
+    "positive": 300,
+    "negative": 300
   }
 }

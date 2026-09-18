@@ -76,7 +76,25 @@ the habit, visible in every `HISTORY.md`, of writing down what each experiment g
 
 ## What it does today
 
-![The briefing UI: a KSFO→KJFK flight with a runway closure, an ILS outage and a taxiway closure, each with cited NOTAMs and prior-report precedent](docs/briefing-ui.png)
+![The briefing UI: a KSFO→KJFK flight with a runway closure, an ILS outage and a taxiway closure, each with cited NOTAMs, prior-report precedent, model-written sentences marked grounded, and abstentions for what could not be determined](docs/screenshots/03-briefing.png)
+
+Every citation chip opens the record the claim rests on — the raw NOTAM and its validity window,
+the METAR and its decoded reading, or the passage of the NTSB investigation or ASRS report the
+retriever matched:
+
+| A NOTAM citation, opened | A precedent citation, opened |
+|---|---|
+| ![NOTAM citation expanded](docs/screenshots/04-notam-citation.png) | ![NTSB precedent expanded](docs/screenshots/05-precedent.png) |
+
+The same briefing from the terminal, with the graph's stage trace and every model-written sentence
+carrying its verification score — and the evaluation gate CI runs on every pull request:
+
+| `preflight brief … --llm` | `preflight eval gate` |
+|---|---|
+| ![CLI briefing](docs/screenshots/09-cli.png) | ![Eval gate: 16 / 16 pass](docs/screenshots/10-eval-gate.png) |
+
+**[Screen-by-screen walkthrough of the whole interface →](docs/INTERFACE.md)** — web UI, streaming,
+citations, abstentions, API docs, CLI, MCP tools, and what the backend is doing at each step.
 
 `preflight serve` then open http://localhost:8000 — findings stream in as they resolve, every citation
 clicks open to its source passage. For the runway closure at KSFO, the precedent search returned the
@@ -483,6 +501,8 @@ src/preflight/
   cli.py                the `preflight` command
 db/*.sql                schema + migrations (pgvector, full-text, HNSW)
 docs/adr/               architecture decision records
+docs/INTERFACE.md       the interface screen by screen · docs/screenshots/ · docs/WALKTHROUGH.md (demo script)
+docs/model-card-notam-extractor.md
 evals/gates.toml        regression floors per suite metric, with why each is (or is not) gated
 evals/*/summary.json    headline metrics of the latest run + commit + time; committed, diffed, gated
 evals/retrieval/        golden.jsonl (350 queries), RESULTS.md (latest run), HISTORY.md (what each run changed)
@@ -530,6 +550,8 @@ All public. Nothing in this repo is scraped.
 ---
 
 ## Demo
+
+[docs/INTERFACE.md](docs/INTERFACE.md) — the interface screen by screen, with what the backend does at each step.
 
 [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md) — a three-minute demo script, what each measured number
 means and what it does not claim, and the questions you will be asked.

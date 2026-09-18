@@ -1,12 +1,13 @@
 {
   "suite": "retrieval",
-  "ran_at": "2026-09-17T09:26:11+00:00",
-  "git_sha": "74ad409",
+  "ran_at": "2026-09-18T06:03:58+00:00",
+  "git_sha": "ebcc6c2",
   "metrics": {
-    "hybrid_rerank_ndcg_at_10": 0.4069,
+    "hybrid_rerank_recall_at_20_specific": 0.781,
+    "hybrid_rerank_ndcg_at_10": 0.407,
     "hybrid_rerank_recall_at_20": 0.5967,
     "hybrid_rerank_precision_at_10_identifier": 0.774,
-    "hybrid_rerank_latency_ms_p50": 977.5873,
+    "hybrid_rerank_latency_ms_p50": 946.9581,
     "rerank_lift_ndcg_at_10": 0.0556
   },
   "embedding_model": "BAAI/bge-large-en-v1.5",

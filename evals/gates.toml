@@ -51,6 +51,12 @@ note = "measured 0.607; target 0.90 — the embedder is the lever"
 
 [[gate]]
 suite = "retrieval"
+metric = "hybrid_rerank_recall_at_20_specific"
+min = 0.76
+note = "Recall@20 on synopses > 25 words (151 queries); measured 0.781 — the half of the set where the label is unambiguous"
+
+[[gate]]
+suite = "retrieval"
 metric = "hybrid_rerank_precision_at_10_identifier"
 min = 0.75
 note = "measured 0.774; target 0.80"

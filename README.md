@@ -203,7 +203,7 @@ CI gate will enforce.
 | Layer | Metric | Target | Measured |
 |---|---|---:|---:|
 | Extraction | macro entity F1 (RWY/TWY/NAVAID/OBST/AIRSPACE/TIME) | ≥ 0.92 | — |
-| Retrieval | Recall@20 / nDCG@10 — synopsis→narrative, 300 queries | ≥ 0.90 / 0.65 | 0.60 / 0.41 — [details](evals/retrieval/RESULTS.md); `bge-large` lifted the dense channel (+0.04 nDCG) and left the reranked config unchanged — [what the ablation got wrong](evals/retrieval/HISTORY.md) |
+| Retrieval | Recall@20 / nDCG@10 — synopsis→narrative, 300 queries | ≥ 0.90 / 0.65 | 0.60 / 0.41 overall; **0.78** Recall@20 on the 151 specific synopses (> 25 words) — the short half is a labelling ceiling, not a retrieval one — [details](evals/retrieval/RESULTS.md) · [history](evals/retrieval/HISTORY.md) |
 | Retrieval | P@10 on exact-identifier queries (`runway 28R` at an airport) | ≥ 0.80 | 0.77 |
 | Rerank | nDCG@10 lift over dense-only | +0.12 | +0.09 |
 | Forecast | MASE, 24 h arrival delay, rolling-origin backtest | < 0.85 | **0.715** Chronos-Bolt · 0.751 climatology · 1.067 seasonal-naive — [details](evals/forecast/RESULTS.md) |
@@ -226,8 +226,10 @@ corpus, and fixing *that* was checked against the same harness before it was kep
 (`evals/retrieval/HISTORY.md`). The embedder was the next knob: a subset ablation priced
 `bge-large-en-v1.5` at +0.127 Recall@20, the full re-embed delivered +0.04 nDCG@10 on the dense
 channel and nothing measurable after reranking — the ablation had measured ranking quality, not
-recall at depth, and the history says so. Recall@20 at 0.60 is now a chunking or query-side
-question, not an embedder one.
+recall at depth, and the history says so. An LLM query rewrite made every bucket worse (run 8).
+The miss analysis (run 9) then located the ceiling: half the golden queries are short synopses
+with hundreds of equally matching reports, where the single labelled target is one draw from an
+equivalence class; on the specific half, Recall@20 is 0.78.
 
 ---
 

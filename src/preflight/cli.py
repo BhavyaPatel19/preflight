@@ -46,6 +46,11 @@ def main(argv: list[str] | None = None) -> int:
     er.add_argument("--no-rerank", action="store_true", help="skip the reranker config")
     er.add_argument("--candidates", type=int, default=40)
     er.add_argument("--kind", choices=["synopsis", "identifier"], help="run only one query set")
+    er.add_argument("--config", action="append", metavar="NAME",
+                    help="only these configs (repeatable), e.g. --config hybrid+rerank")
+    er.add_argument("--rewrite", action="store_true",
+                    help="add the hybrid+rerank+rewrite config: synopsis queries rewritten by "
+                         "the configured LLM first (cached per model)")
     ee = evsub.add_parser("embedder", help="embedder ablation on a corpus subset, in memory")
     ee.add_argument("--models", nargs="+", help="sentence-transformers ids (first = baseline)")
     ee.add_argument("--size", type=int, default=40_000, help="subset size in chunks")
@@ -569,8 +574,10 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.cmd == "eval":
+        from preflight.config import settings
         from preflight.db import close_pool, get_pool
         from preflight.evals import retrieval as R
+        from preflight.llm import LLMUnavailable
         from preflight.retrieval.embed import STEmbedder, STReranker
 
         try:
@@ -584,8 +591,26 @@ def main(argv: list[str] | None = None) -> int:
                     queries = [q for q in queries if q.kind == args.kind]
                 if args.limit:
                     queries = queries[: args.limit]
+                configs = tuple(cfg for cfg in R.CONFIGS if not args.config
+                                or cfg[0] in args.config) or R.CONFIGS
+                rewrites = None
+                if args.rewrite:
+                    from preflight.llm import load_llm
+
+                    # Cached rewrites need no model; only uncached queries do.
+                    llm = load_llm()
+                    cfg = settings()
+                    slug = (llm.name if llm else f"ollama/{cfg.ollama_model}"
+                            ).replace("/", "-").replace(":", "-")
+                    try:
+                        rewrites = R.synopsis_rewriter(
+                            llm, R.GOLDEN.parent / f"rewrites-{slug}.json")(queries)
+                    except LLMUnavailable as e:
+                        print(f"error: --rewrite: {e} (start ollama)", file=sys.stderr)
+                        return 3
                 res = R.run(conn, STEmbedder(), None if args.no_rerank else STReranker(),
-                            queries, candidates=args.candidates)
+                            queries, candidates=args.candidates, configs=configs,
+                            rewrites=rewrites)
             run_path, md_path = R.save_run(res)
             print(R.to_markdown(res))
             print(f"written: {run_path}  {md_path}")

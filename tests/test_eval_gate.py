@@ -24,7 +24,7 @@ def _toml(tmp_path, text):
 def test_committed_gates_file_is_valid_and_every_gate_has_a_bound():
     gates = G.load_gates()
     assert gates and all((g.min is not None) != (g.max is not None) for g in gates)
-    assert {g.suite for g in gates if g.live} == {"safety", "abstention"}
+    assert {g.suite for g in gates if g.live} == {"safety", "abstention", "extraction"}
 
 
 def test_min_max_and_missing(evals_dir):

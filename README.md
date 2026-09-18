@@ -135,7 +135,7 @@ Built in the open, six sprints over twelve weeks.
 | Sprint | Focus | State |
 |---|---|---|
 | 1 | Foundation — schemas, rule decoder, ingestion, archive, deterministic briefing, scheduler | 🟢 done |
-| 2 | Fine-tuned NOTAM entity extractor → HF Hub | ⬜ re-scoped: trained on synthetic NOTAMs from the Q-code taxonomy, evaluated on the real-format samples in the repo, labelled as such (live NOTAM feeds are out of scope — see below) |
+| 2 | Fine-tuned NOTAM entity extractor | 🟢 done, re-scoped — ModernBERT-base fine-tuned on generated NOTAMs, evaluated on a 124-body hand-labelled gold set: macro-F1 0.898 vs the rule decoder's 0.875, prose false positives 54 → 3 over three data iterations. Weights local (`models/`), card in `docs/`; Hub publish is one command for the owner |
 | 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟢 done — corpus, golden set, measured |
 | 4 | LangGraph orchestration, LLM layer, grounding, abstention | 🟢 done — graph with Postgres checkpointer over gather → precedent → verify → narrate |
 | 5 | Time-travel eval harness + CI regression gate | 🟡 600-case set built; **weather slice scored** (117 cases against public historical METARs: recall 0.19, false alarms 0.10 — and why the ceiling is low); NOTAM slices uncoverable by choice; **CI gate live** — 12 floors over 6 suites; κ awaits the human sheet |
@@ -145,7 +145,9 @@ Built in the open, six sprints over twelve weeks.
 
 - **Decode** — ICAO Q-code taxonomy (145 subjects × 79 conditions), FAA/ICAO contraction dictionary
   (263 terms), rule-based parser for ICAO and US-domestic NOTAMs producing typed records with
-  clause-scoped entities and an honest `decode_confidence` for escalation routing.
+  clause-scoped entities and an honest `decode_confidence` for escalation routing; plus a
+  fine-tuned ModernBERT token classifier (trained on generated NOTAMs, evaluated on a hand-labelled
+  gold set) that tags whole mentions and validity windows the rules do not.
 - **Store** — Postgres 16 + pgvector; an "in force at this instant" query; a low-confidence
   escalation queue; every fetch archived raw before decode.
 - **Ingest** — METAR/TAF from aviationweather.gov; NOTAMs through a provider interface, from text
@@ -202,7 +204,7 @@ CI gate will enforce.
 
 | Layer | Metric | Target | Measured |
 |---|---|---:|---:|
-| Extraction | macro entity F1 (RWY/TWY/NAVAID/OBST/AIRSPACE/TIME) | ≥ 0.92 | — |
+| Extraction | macro entity F1 over 8 types, hand-labelled real-format gold set (124 bodies) | ≥ 0.92 | **0.898** fine-tuned ModernBERT (rules 0.875) · exact-span 0.842 vs 0.172 · TIME F1 0.984 vs 0 · **trained on synthetic NOTAMs** — [details](evals/extraction/RESULTS.md) · [history](evals/extraction/HISTORY.md) · [model card](docs/model-card-notam-extractor.md) |
 | Retrieval | Recall@20 / nDCG@10 — synopsis→narrative, 300 queries | ≥ 0.90 / 0.65 | 0.60 / 0.41 overall; **0.78** Recall@20 on the 151 specific synopses (> 25 words) — the short half is a labelling ceiling, not a retrieval one — [details](evals/retrieval/RESULTS.md) · [history](evals/retrieval/HISTORY.md) |
 | Retrieval | P@10 on exact-identifier queries (`runway 28R` at an airport) | ≥ 0.80 | 0.77 |
 | Rerank | nDCG@10 lift over dense-only | +0.12 | +0.09 |
@@ -371,6 +373,8 @@ searched.
 | `preflight eval grounding` | NLI verifier on the briefing's own claims and one corrupted copy of each |
 | `preflight eval safety` | injection detector: recall on the red-team set, false positives on benign NOTAMs |
 | `preflight eval abstention` | 26 constructed data-gap cases on a synthetic route, rolled back; recall and false-abstention rate |
+| `preflight extract synth` / `gold` / `train` | generate the synthetic NOTAM set; rebuild the hand-labelled gold set; fine-tune the token classifier on MPS (~12 min) |
+| `preflight eval extraction [--model models/notam-extractor]` | entity P/R/F1 of the rule decoder and the model on the gold set (overlap and exact span, TIME, entities tagged in injected prose) |
 | `preflight eval gate [--live]` | every committed `summary.json` against the floors in `evals/gates.toml`; `--live` re-runs safety and abstention first. Non-zero exit on any failing gate |
 | `preflight eval narrative` | unsupported-claim rate of the configured model's prose, with the dropped sentences listed |
 | `preflight eval precedent` | LLM judge over (hazard, prior report) pairs; `--score` reports κ against the human sheet |
@@ -434,6 +438,8 @@ src/preflight/
   evals/precedent.py    judge, human sheet, Cohen's κ, attached-precedent precision
   evals/latency.py      per-stage p50/p95 bench over the graph's node timings
   evals/abstention.py   constructed data-gap cases: expected abstention present, nothing spurious
+  evals/extraction.py   rule decoder vs fine-tuned model on the hand-labelled gold set
+  extract/              synth (generator), gold (labelled real-format bodies), labels, train, model
   evals/summary.py      one committed summary.json per suite — what the gate reads
   evals/gate.py         floors from evals/gates.toml vs summaries; live re-run of the cheap suites
   verify/               NLI verifier (nli.py) and claim-level grounding policy (ground.py)
@@ -458,6 +464,7 @@ evals/safety/           injections.jsonl (60 adversarial NOTAMs, 6 families), RE
 evals/narrative/        RESULTS.md (latest run), HISTORY.md — three runs, what each changed and taught
 evals/latency/          RESULTS.md — before/after per stage, what each change was worth, where the rest is
 evals/abstention/       RESULTS.md (latest run), README.md — case design, the three gaps it exposed
+evals/extraction/       gold.jsonl (124 bodies, hand-labelled), RESULTS.md, HISTORY.md — three data iterations
 evals/precedent/        pairs.jsonl, labels.csv (the human sheet), verdicts.json, RESULTS.md
 tests/                  129 tests; markers: db, live, ml
 data/samples/           bundled sample NOTAMs (real corpora are gitignored under data/raw)

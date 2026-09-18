@@ -377,8 +377,8 @@ def build_briefing(
                        "airport, so NOTAM hazards were not assessed.",
             ))
 
-        metar = wdb.latest(conn, icao, "METAR")
-        taf = wdb.latest(conn, icao, "TAF")
+        metar = wdb.latest(conn, icao, "METAR", as_of=now)
+        taf = wdb.latest(conn, icao, "TAF", as_of=now)
         considered += (metar is not None) + (taf is not None)
         wx, gaps = weather_findings(
             icao, role, metar, taf, now=now, window_start=start, window_end=end

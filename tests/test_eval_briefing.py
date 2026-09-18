@@ -138,3 +138,39 @@ def test_golden_roundtrip(db, tmp_path):
     p = tmp_path / "g.jsonl"
     B.save_cases(cases, p)
     assert B.load_cases(p) == cases
+
+
+@pytest.mark.db
+def test_backfill_weather_targets_the_weather_slice_and_is_idempotent(db):
+    from datetime import UTC, datetime, timedelta
+
+    from preflight.sources.aviationweather import Metar
+
+    snap = "2013-08-12T08:57:00+00:00"
+    cases = [
+        B.Case("p1", "positive", "X1", "KZZY", "destination", "KDEN", snap, snap, "weather",
+               ("weather/phenomena-Wind-Gusts",)),
+        B.Case("n1", "negative", None, "KZZY", "destination", "KDEN", snap, snap, None, (),
+               matched_to="p1"),
+        B.Case("p2", "positive", "X2", "KZZX", "destination", "KDEN", snap, snap, "wildlife",
+               ("Birdstrike",)),
+    ]
+    asked: list[tuple[str, datetime, datetime]] = []
+
+    class Src:
+        def fetch_metars(self, icao, start, end):
+            asked.append((icao, start, end))
+            return [Metar(icao=icao, observed_at=end - timedelta(minutes=10), raw="X 10SM",
+                          flight_category="VFR")]
+
+    # commit=False: the function commits per case by design, and the db fixture is shared.
+    counts = B.backfill_weather(db, cases, source=Src(), commit=False)
+    # p1 fetched; its matched negative shares airport and snapshot, so it is already covered.
+    assert counts["cases"] == 2 and counts["fetched"] == 1 and counts["skipped"] == 1
+    assert asked == [("KZZY", datetime.fromisoformat(snap) - timedelta(hours=3),
+                      datetime.fromisoformat(snap) + timedelta(minutes=5))]
+    # The wildlife case is not weather-coverable; a rerun fetches nothing.
+    again = B.backfill_weather(db, cases, source=Src(), commit=False)
+    assert again["skipped"] == 2 and again["fetched"] == 0
+    assert B.covered(db, cases[0]) and not B.covered(db, cases[2])
+    assert datetime.now(UTC)  # (keeps the import honest for the linter)

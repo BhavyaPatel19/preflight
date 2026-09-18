@@ -20,7 +20,9 @@ ON CONFLICT (icao, kind, issued_at) DO UPDATE SET
 
 _LATEST = """
 SELECT raw, parsed, issued_at, valid_from, valid_to FROM weather_reports
-WHERE icao = %s AND kind = %s ORDER BY issued_at DESC LIMIT 1
+WHERE icao = %(icao)s AND kind = %(kind)s
+  AND (%(as_of)s::timestamptz IS NULL OR issued_at <= %(as_of)s)
+ORDER BY issued_at DESC LIMIT 1
 """
 
 
@@ -47,6 +49,9 @@ def upsert_tafs(conn: Connection[Any], tafs: list[Taf]) -> int:
     return len(tafs)
 
 
-def latest(conn: Connection[Any], icao: str, kind: str) -> WeatherRow | None:
-    row = conn.execute(_LATEST, (icao, kind)).fetchone()
+def latest(conn: Connection[Any], icao: str, kind: str, *,
+           as_of: datetime | None = None) -> WeatherRow | None:
+    """The newest report — or, with ``as_of``, the newest issued at or before that instant,
+    which is what a time-travel briefing must see (a report from later would be an oracle)."""
+    row = conn.execute(_LATEST, {"icao": icao, "kind": kind, "as_of": as_of}).fetchone()
     return WeatherRow(*row) if row else None

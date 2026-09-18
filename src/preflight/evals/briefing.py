@@ -27,7 +27,7 @@ import json
 import random
 import re
 import subprocess
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import asdict, dataclass
 from datetime import UTC, date, datetime, time, timedelta
 from pathlib import Path
@@ -235,6 +235,48 @@ def score_case(c: Case, b: Briefing) -> dict[str, Any]:
             "abstained": any(c.airport in a.topic for a in b.abstentions)}
 
 
+def backfill_weather(
+    conn: Connection[Any], cases: Sequence[Case], *, source: Any, hours_before: float = 3.0,
+    commit: bool = True, log: Callable[[str], None] | None = None,
+) -> dict[str, int]:
+    """Pull the METARs around each case's snapshot from a historical archive into the weather
+    table, so the time-travel briefing has what a briefing at that moment would have had.
+
+    Only cases whose implicated hazard (or whose matched positive's) is weather are fetched —
+    that is the slice public data can cover; the NOTAM-implicated slices stay uncovered and are
+    reported as such. Idempotent: airports already holding a METAR inside the staleness window
+    before the snapshot are skipped, so a rerun costs nothing. Commits per case so a long pull
+    survives interruption — pass ``commit=False`` inside a transaction you own (tests).
+    """
+    from preflight.db import weather as wdb
+
+    stale = timedelta(minutes=settings().metar_stale_after_minutes)
+    weather_ids = {c.id for c in cases if c.label == "positive" and c.implicated == "weather"}
+    todo = [c for c in cases if c.id in weather_ids or c.matched_to in weather_ids]
+    counts = {"cases": len(todo), "fetched": 0, "skipped": 0, "reports": 0, "unavailable": 0}
+    for i, c in enumerate(todo, 1):
+        snap = datetime.fromisoformat(c.snapshot_at)
+        have = wdb.latest(conn, c.airport, "METAR", as_of=snap)
+        if have is not None and have.issued_at >= snap - stale:
+            counts["skipped"] += 1
+            continue
+        try:
+            reports = source.fetch_metars(c.airport, snap - timedelta(hours=hours_before),
+                                          snap + timedelta(minutes=5))
+        except Exception as e:  # noqa: BLE001 — one dead station must not end the backfill
+            counts["unavailable"] += 1
+            if log:
+                log(f"{c.airport} {c.snapshot_at[:16]}: {e}")
+            continue
+        counts["fetched"] += 1
+        counts["reports"] += wdb.upsert_metars(conn, reports)
+        if commit:
+            conn.commit()
+        if log and i % 25 == 0:
+            log(f"{i}/{len(todo)} cases · {counts['reports']} reports")
+    return counts
+
+
 def _git_sha() -> str:
     try:
         return subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True,
@@ -258,13 +300,30 @@ def run(conn: Connection[Any], cases: Sequence[Case]) -> dict[str, Any]:
     neg = [r for r in per if r["label"] == "negative"]
     pos_c = [r for r in pos if r["covered"]]
     neg_c = [r for r in neg if r["covered"]]
-    by_cat: dict[str, dict[str, int]] = {}
+    by_cat: dict[str, dict[str, Any]] = {}
     for r in pos:
         d = by_cat.setdefault(r["implicated"], {"cases": 0, "covered": 0, "found": 0})
         d["cases"] += 1
         d["covered"] += r["covered"]
         d["found"] += bool(r.get("hazard_found"))
+    for d in by_cat.values():
+        d["recall"] = round(d["found"] / d["covered"], 3) if d["covered"] else None
+    # Negatives are matched to a positive; score them beside the category they control for.
+    matched = {c.id: c.matched_to for c in cases if c.label == "negative"}
+    cat_of = {c.id: c.implicated for c in cases if c.label == "positive"}
+    neg_by_cat: dict[str, dict[str, Any]] = {}
+    for r in neg_c:
+        cat = cat_of.get(matched.get(r["id"]) or "") or "unmatched"
+        d = neg_by_cat.setdefault(cat, {"covered": 0, "false_alarms": 0})
+        d["covered"] += 1
+        d["false_alarms"] += bool(r.get("false_alarm"))
+    for d in neg_by_cat.values():
+        d["rate"] = round(d["false_alarms"] / d["covered"], 3) if d["covered"] else None
+    misses = [r for r in pos_c if not r.get("hazard_found")]
     return {
+        "negatives_by_category": neg_by_cat,
+        "misses": [{"id": r["id"], "airport": r["airport"], "abstained": r.get("abstained")}
+                   for r in misses[:400]],
         "ran_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "git_sha": _git_sha(),
         "cases": {"positive": len(pos), "negative": len(neg)},
@@ -294,17 +353,23 @@ def to_markdown(res: dict[str, Any]) -> str:
         f"| covered negatives | {res['coverage']['negative']} / {res['cases']['negative']} |",
         f"| implicated-hazard recall (covered positives) | {pct(res['hazard_recall'])} |",
         f"| false-alarm rate (covered negatives) | {pct(res['false_alarm_rate'])} |",
-        "", "| implicated category | cases | covered | found |", "|---|---:|---:|---:|",
+        "", "| implicated category | cases | covered | found | recall | matched negatives "
+        "covered | false alarms |", "|---|---:|---:|---:|---:|---:|---:|",
     ]
+    negs = res.get("negatives_by_category", {})
     for cat, d in sorted(res["by_category"].items()):
-        lines.append(f"| {cat} | {d['cases']} | {d['covered']} | {d['found']} |")
+        n = negs.get(cat, {})
+        lines.append(
+            f"| {cat} | {d['cases']} | {d['covered']} | {d['found']} | {pct(d.get('recall'))} | "
+            f"{n.get('covered', 0)} | {pct(n.get('rate'))} |")
     lines += [
         "",
-        f"Coverage is the honest number here: the raw NOTAM/weather archive began on "
-        f"{res['archive_started']}, so historical cases are uncovered until their snapshot data "
-        "is reconstructed (NTSB docket exhibits) or new events occur inside the archive. Recall "
-        "and false-alarm rate are computed only over covered cases and are the CI gate's inputs "
-        "once coverage is non-trivial.",
+        "Coverage is the honest number here. The weather slice is covered from the Iowa State "
+        "ASOS archive — public historical METARs pulled for each case's airport at its snapshot "
+        "(`preflight eval briefing --backfill-weather`). The wildlife, runway and lighting slices "
+        "need the NOTAMs in force at the time, and live NOTAM feeds are out of scope by choice "
+        "(ADR 0002), so those cases stay uncovered and are reported, not scored. Recall and "
+        "false-alarm rate are computed only over covered cases.",
     ]
     return "\n".join(lines) + "\n"
 

@@ -11,7 +11,9 @@ for every run is under `runs/` (gitignored — the numbers that matter are here)
 | 4 | 2026-09-12 19:11 | step 11 | pg17 native | **final full run** at the step-11 retrieval code (recorded sha is the step-12 checkout; retrieval code identical) — `RESULTS.md` | 0.315 | 0.294 | 0.379 | **0.405** | 0.746 / 0.772 | 424 ms |
 | 5 | 2026-09-12 20:08 | main | pg17 native | experiment: **100 candidates** per channel instead of 40 (`--candidates 100`) — not adopted | 0.315 | 0.294 | 0.388 | 0.391 | 0.748 / 0.776 | 429 ms |
 | 6 | 2026-09-14 05:47 | step 22 | pg17 native | **index-driven SQL**: per-channel filters instead of a materialised `pool` CTE; dense channel is now an HNSW scan (`ef_search=1000`, iterative) instead of an exact sort | 0.310 | 0.294 | 0.373 | 0.402 | 0.746 / 0.774 | 217 ms |
-| 7 | 2026-09-17 09:26 | step 26 | pg17 native | **embedder → `bge-large-en-v1.5`** (1024-d; migration 007, full re-embed, index rebuilt with `ef_construction=128`) — `RESULTS.md` | **0.351** | 0.294 | **0.393** | **0.407** | 0.748 / 0.774 | 221 ms |
+| 7 | 2026-09-17 09:26 | step 26 | pg17 native | **embedder → `bge-large-en-v1.5`** (1024-d; migration 007, full re-embed, index rebuilt with `ef_construction=128`) | **0.351** | 0.294 | **0.393** | **0.407** | 0.748 / 0.774 | 221 ms |
+| 8 | 2026-09-17 23:55 | step 27 | pg17 native | experiment: **LLM query rewrite** (`qwen3:14b` rewrites each synopsis into the narrative's register before retrieval; `--rewrite`) — not adopted | — | — | — | 0.309 (rewrite) vs 0.407 | — | — |
+| 9 | 2026-09-18 06:05 | step 27 | pg17 native | full run with the **miss analysis**: Recall@20 by synopsis length — `RESULTS.md` | 0.351 | 0.294 | 0.392 | 0.407 | 0.748 / 0.774 | 194 ms |
 
 ## What each run taught
 
@@ -77,8 +79,33 @@ Kept anyway: the dense channel matters on its own when the reranker is off (the
 instead of 1.2), and the deployed numbers did not move the wrong way. Not a win, not a loss —
 a priced decision whose price turned out to be the accurate part.
 
-**Still open.** Recall@20 at 0.60 against a 0.90 target is now clearly not an embedder problem.
-The two remaining hypotheses are the chunking (a synopsis paraphrases the whole report; the
-target may be split across chunks that individually match weakly) and the query side (a synopsis
-is analyst shorthand — a rewrite into narrative register might retrieve better). Both are
-measurable with this harness.
+**Run 8: rewriting the query made it worse, everywhere.** The register hypothesis — a synopsis is
+analyst shorthand, so rewrite it into the crew's own words before searching — was tested with
+`qwen3:14b` on all 300 queries (cached in `rewrites-ollama-qwen3-14b.json`). Hybrid+rerank
+Recall@20 fell 0.597 → 0.467 and nDCG@10 0.407 → 0.309, and the drop held in every
+synopsis-length bucket (0.385 → 0.231, 0.412 → 0.346, 0.781 → 0.596). A fluent paraphrase
+discards the exact phrases that identify one report among tens of thousands of similar ones. Not
+adopted; the config stays available as `--rewrite` for the next candidate model.
+
+**Run 9: the ceiling is the query, and it is a labelling ceiling, not a retrieval one.** The miss
+analysis splits the 300 synopsis queries by length:
+
+| synopsis length | queries | Recall@20 | target not in the 40-candidate pool |
+|---|---:|---:|---:|
+| ≤ 12 words | 13 | 0.385 | 0.538 |
+| 13–25 words | 136 | 0.412 | 0.551 |
+| **> 25 words** | 151 | **0.781** | 0.185 |
+
+Half the set is short synopses — "C172 instructor pilot reported engine malfunctioning and having
+to make a 180 turn back to the airport" — for which the one labelled target is one of hundreds
+of equally matching reports; missing it is not a retrieval error, it is the label being one draw
+from a large equivalence class. On the specific half the system reaches 0.78. The number of
+chunks in the target report barely matters (0.61 / 0.62 / 0.51), which retires the chunking
+hypothesis too. The summary now carries `hybrid_rerank_recall_at_20_specific` (the > 25-word
+slice) beside the overall figure, and the gate floors both.
+
+**Still open.** 0.78 → 0.90 on specific queries is the remaining honest target. The candidates
+are a reranker upgrade (`bge-reranker-v2-m3`, now that the reranker is the largest share of
+latency and the lift has shrunk) and a golden set v2 that labels *all* equivalent reports for a
+synopsis rather than one — which would measure precision of the top-k rather than recall of a
+single draw.

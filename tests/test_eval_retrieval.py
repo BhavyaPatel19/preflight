@@ -196,10 +196,13 @@ def test_markdown_renders_the_miss_analysis():
                                          "precision_at_10_identifier": 0.0}},
            "misses": {"synopsis_queries": 2, "missed": 1, "miss_rate": 0.5,
                       "by_synopsis_length": {"≤12 words": {"queries": 2, "missed": 1,
-                                                           "miss_rate": 0.5}},
+                                                           "miss_rate": 0.5, "recall_at_20": 0.5,
+                                                           "others": {"hybrid+rerank+rewrite": 0.0,
+                                                                      "dense": 0.5}}},
                       "by_target_chunks": {"4+ chunks": {"queries": 2, "missed": 1,
-                                                         "miss_rate": 0.5}},
+                                                         "miss_rate": 0.5, "recall_at_20": 0.5}},
                       "examples": [{"id": "x", "synopsis": "S", "narrative_opens": "N"}]}}
     md = R.to_markdown(res)
-    assert "1 of 2 synopsis queries, 50.0%" in md and "| ≤12 words | 2 | 0.500 |" in md
-    assert "| 4+ chunks | 2 | 0.500 |" in md and "*S* → “N…”" in md
+    assert "1 of 2 synopsis queries, 50.0%" in md
+    assert "| ≤12 words | 2 | 0.500 · hybrid+rerank+rewrite: 0.000 | 0.500 |" in md   # dense hidden
+    assert "| 4+ chunks | 2 | 0.500 | 0.500 |" in md and "*S* → “N…”" in md

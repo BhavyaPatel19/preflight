@@ -354,7 +354,8 @@ def run(
         "first_rank": first_rank,          # per config: query id → rank of first relevant doc
     }
     if "hybrid+rerank" in first_rank and first_rank["hybrid+rerank"]:
-        out["misses"] = analyse_misses(conn, queries, first_rank["hybrid+rerank"])
+        others = {n: r for n, r in first_rank.items() if n != "hybrid+rerank" and r}
+        out["misses"] = analyse_misses(conn, queries, first_rank["hybrid+rerank"], others=others)
     if "dense" in out["configs"] and "hybrid+rerank" in out["configs"]:
         out["rerank_lift_ndcg_at_10"] = round(
             out["configs"]["hybrid+rerank"]["ndcg_at_10"] - out["configs"]["dense"]["ndcg_at_10"], 4
@@ -363,7 +364,8 @@ def run(
 
 
 def analyse_misses(conn: Connection[Any], queries: Sequence[Query],
-                   first_rank: dict[str, int | None], *, examples: int = 5) -> dict[str, Any]:
+                   first_rank: dict[str, int | None], *, examples: int = 5,
+                   others: dict[str, dict[str, int | None]] | None = None) -> dict[str, Any]:
     """Who are the queries whose target never appears in the candidate pool?
 
     Splits synopsis queries by length and by how many narrative chunks the target report
@@ -378,14 +380,22 @@ def analyse_misses(conn: Connection[Any], queries: Sequence[Query],
         "WHERE d.external_id = ANY(%s) AND c.text NOT LIKE %s GROUP BY 1",
         ([r for q in syn for r in q.relevant], SYNOPSIS_MARK)).fetchall())
 
-    def bucket(rows: list[tuple[str, bool]]) -> dict[str, Any]:
+    def bucket(rows: list[tuple[str, Query]]) -> dict[str, Any]:
         out: dict[str, Any] = {}
-        for label, missed in rows:
-            b = out.setdefault(label, {"queries": 0, "missed": 0})
+        for label, q in rows:
+            r = first_rank[q.id]
+            b = out.setdefault(label, {"queries": 0, "missed": 0, "in_top_20": 0,
+                                       "others": dict.fromkeys(others or {}, 0)})
             b["queries"] += 1
-            b["missed"] += int(missed)
+            b["missed"] += int(r is None)
+            b["in_top_20"] += int(r is not None and r <= 20)
+            for name, ranks in (others or {}).items():
+                ro = ranks.get(q.id)
+                b["others"][name] += int(ro is not None and ro <= 20)
         for b in out.values():
             b["miss_rate"] = round(b["missed"] / b["queries"], 3)
+            b["recall_at_20"] = round(b["in_top_20"] / b["queries"], 3)
+            b["others"] = {k: round(v / b["queries"], 3) for k, v in b["others"].items()}
         return out
 
     def length_label(q: Query) -> str:
@@ -408,8 +418,8 @@ def analyse_misses(conn: Connection[Any], queries: Sequence[Query],
     return {
         "synopsis_queries": len(syn), "missed": len(missed),
         "miss_rate": round(len(missed) / len(syn), 3),
-        "by_synopsis_length": bucket([(length_label(q), first_rank[q.id] is None) for q in syn]),
-        "by_target_chunks": bucket([(chunks_label(q), first_rank[q.id] is None) for q in syn]),
+        "by_synopsis_length": bucket([(length_label(q), q) for q in syn]),
+        "by_target_chunks": bucket([(chunks_label(q), q) for q in syn]),
         "examples": sample,
     }
 
@@ -461,17 +471,22 @@ def to_markdown(res: dict[str, Any]) -> str:
             f"**Where hybrid+rerank misses** ({m['missed']} of {m['synopsis_queries']} synopsis "
             f"queries, {m['miss_rate']:.1%}, have no relevant report anywhere in the "
             f"{res['candidates']}-candidate pool):", "",
-            "| synopsis length | queries | miss rate |", "|---|---:|---:|",
+            "| synopsis length | queries | Recall@20 | not in pool |", "|---|---:|---:|---:|",
         ]
         for label in ("≤12 words", "13–25 words", ">25 words"):
             b = m["by_synopsis_length"].get(label)
             if b:
-                lines.append(f"| {label} | {b['queries']} | {b['miss_rate']:.3f} |")
-        lines += ["", "| target narrative | queries | miss rate |", "|---|---:|---:|"]
+                extra = "".join(f" · {k}: {v:.3f}" for k, v in b.get("others", {}).items()
+                                if "rewrite" in k)
+                lines.append(f"| {label} | {b['queries']} | {b['recall_at_20']:.3f}{extra} | "
+                             f"{b['miss_rate']:.3f} |")
+        lines += ["", "| target narrative | queries | Recall@20 | not in pool |",
+                  "|---|---:|---:|---:|"]
         for label in ("1 chunk", "2–3 chunks", "4+ chunks"):
             b = m["by_target_chunks"].get(label)
             if b:
-                lines.append(f"| {label} | {b['queries']} | {b['miss_rate']:.3f} |")
+                lines.append(f"| {label} | {b['queries']} | {b['recall_at_20']:.3f} | "
+                             f"{b['miss_rate']:.3f} |")
         if m.get("examples"):
             lines += ["", "Verbatim misses (synopsis → how the target narrative opens):", ""]
             for ex in m["examples"]:
@@ -488,7 +503,9 @@ def to_markdown(res: dict[str, Any]) -> str:
 def summarise(res: dict[str, Any]) -> dict[str, float | None]:
     """Headline numbers for the gate: the deployed config, plus the rerank lift."""
     best = res["configs"].get("hybrid+rerank") or res["configs"].get("hybrid") or {}
+    specific = (res.get("misses") or {}).get("by_synopsis_length", {}).get(">25 words", {})
     return {
+        "hybrid_rerank_recall_at_20_specific": specific.get("recall_at_20"),
         "hybrid_rerank_ndcg_at_10": best.get("ndcg_at_10"),
         "hybrid_rerank_recall_at_20": best.get("recall_at_20"),
         "hybrid_rerank_precision_at_10_identifier": best.get("precision_at_10_identifier"),

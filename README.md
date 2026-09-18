@@ -15,6 +15,16 @@ $ preflight brief KSFO KJFK --alt KBOS --off-block 2026-09-11T02:30Z --type A320
 > aeronautical data to study a hard information-retrieval problem — not to replace an official
 > preflight briefing.
 
+**In numbers.** 47,723 ASRS + 27,986 NTSB reports indexed as 316k chunks in pgvector; hybrid
+retrieval measured over 9 recorded runs (Recall@20 0.78 on unambiguous queries, 0.60 overall, with
+the ceiling located); an NLI grounding verifier at 1.000 / 0.972 accept / reject; a local-model
+narrative layer at a 1% unsupported-claim rate; 26-case abstention eval at 1.000 / 0.000; a 60-case
+injection red-team at 1.000 / 0.000; a ModernBERT NOTAM extractor at 0.898 macro-F1 on a hand-labelled
+gold set; a Chronos delay forecast at MASE 0.715; a time-travel eval whose first real number (0.19
+recall on 117 weather cases) came with the reason it is low; 25 s per full briefing on a laptop,
+halved from 50; **16 evaluation floors enforced in CI on every pull request.** All on public data,
+zero API spend.
+
 ---
 
 ## The problem
@@ -50,12 +60,17 @@ Pair those positive cases with **matched negative controls** — uneventful flig
 hour and season — and you can measure recall and false-alarm rate on the same footing. Alert fatigue
 is the real failure mode of every safety system ever fielded, so precision is not a secondary metric.
 
-One constraint shapes how that set gets built: nobody hands out historical NOTAMs (see
-[ADR 0002](docs/adr/0002-notam-access-and-the-provider-abstraction.md)). So every fetch is archived
-raw from day one, negatives come from that archive going forward, and positives older than the
-archive come from NTSB docket exhibits, which include the NOTAMs in effect at the time.
+One constraint shapes what that set can score. Every machine-readable NOTAM source requires an
+account and an approval, and this project uses only public data that needs neither
+([ADR 0002](docs/adr/0002-notam-access-and-the-provider-abstraction.md)). So the 158 cases whose
+hazard was a NOTAM — a closed runway, dark lights, wildlife — are reported as uncoverable, and the
+142 weather cases are scored against the public historical METAR at their airport an hour before
+the event. The result (recall 0.19, false alarms 0.10) is low, and the analysis says why: in 74 of
+117 cases the wind the investigation named was not in the observation yet. A ceiling, measured,
+beats a target, assumed.
 
-This eval design is the centre of the project. Everything else is in service of it.
+This eval design is the centre of the project. Everything else is in service of it — including
+the habit, visible in every `HISTORY.md`, of writing down what each experiment got wrong.
 
 ---
 
@@ -138,7 +153,7 @@ Built in the open, six sprints over twelve weeks.
 | 2 | Fine-tuned NOTAM entity extractor | 🟢 done, re-scoped — ModernBERT-base fine-tuned on generated NOTAMs, evaluated on a 124-body hand-labelled gold set: macro-F1 0.898 vs the rule decoder's 0.875, prose false positives 54 → 3 over three data iterations. Weights local (`models/`), card in `docs/`; Hub publish is one command for the owner |
 | 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟢 done — corpus, golden set, measured |
 | 4 | LangGraph orchestration, LLM layer, grounding, abstention | 🟢 done — graph with Postgres checkpointer over gather → precedent → verify → narrate |
-| 5 | Time-travel eval harness + CI regression gate | 🟡 600-case set built; **weather slice scored** (117 cases against public historical METARs: recall 0.19, false alarms 0.10 — and why the ceiling is low); NOTAM slices uncoverable by choice; **CI gate live** — 12 floors over 6 suites; κ awaits the human sheet |
+| 5 | Time-travel eval harness + CI regression gate | 🟡 600-case set built; **weather slice scored** (117 cases against public historical METARs: recall 0.19, false alarms 0.10 — and why the ceiling is low); NOTAM slices uncoverable by choice; **CI gate live** — 16 floors over 7 suites, three re-measured on every PR; κ awaits the human sheet |
 | 6 | Delay forecasting, cost/latency, UI, MCP server | 🟢 done — forecasting, UI, MCP server; latency pass halved the full briefing (49.5 → 25.4 s p50, local model) |
 
 **Working today**
@@ -199,8 +214,9 @@ Built in the open, six sprints over twelve weeks.
 
 ## Evaluation targets
 
-The retrieval rows are measured; the rest wait on their harnesses (Sprint 5). Targets are what the
-CI gate will enforce.
+Every row but one is measured; the CI gate holds 16 of these numbers to floors on every pull
+request (`evals/gates.toml`). Targets were set before building. Where a number is below its target,
+the history file next to it says what was tried and what the ceiling turned out to be.
 
 | Layer | Metric | Target | Measured |
 |---|---|---:|---:|
@@ -220,18 +236,32 @@ CI gate will enforce.
 
 The κ row matters as much as the rest: an LLM judge nobody validated is a number nobody should trust.
 
-The forecast, grounding, narrative and abstention rows are met; latency is within a second of target. The narrative row is measured on a local model at
-zero cost; the same command with `PREFLIGHT_LLM=anthropic` produces the frontier comparison row. The retrieval numbers are below target and that is the point of having them: the first run of the
-harness found the lexical ranking function was both slow and bad, and fixing it moved hybrid from
-*worse* than dense to better; the latency pass then found the SQL was sequentially scanning the
-corpus, and fixing *that* was checked against the same harness before it was kept
-(`evals/retrieval/HISTORY.md`). The embedder was the next knob: a subset ablation priced
-`bge-large-en-v1.5` at +0.127 Recall@20, the full re-embed delivered +0.04 nDCG@10 on the dense
-channel and nothing measurable after reranking — the ablation had measured ranking quality, not
-recall at depth, and the history says so. An LLM query rewrite made every bucket worse (run 8).
-The miss analysis (run 9) then located the ceiling: half the golden queries are short synopses
-with hundreds of equally matching reports, where the single labelled target is one draw from an
-equivalence class; on the specific half, Recall@20 is 0.78.
+**What the evals changed, in one list.** Each of these was a number that moved because a harness
+said so, with the failed attempts kept in the history files:
+
+- *Retrieval* — `ts_rank_cd` on long OR queries was slow and made hybrid worse than dense; `ts_rank`
+  fixed both (run 2). The hybrid SQL's shared CTE forced a sequential scan; per-channel filters made
+  it index-driven at identical quality (run 6). A subset ablation priced `bge-large` at +0.13
+  Recall@20; the full re-embed delivered +0.04 nDCG on the dense channel and nothing after
+  reranking — the ablation measured ranking, not recall at depth (run 7). An LLM query rewrite made
+  every bucket worse (run 8). The miss analysis found the ceiling: half the golden queries are short
+  synopses with hundreds of equally matching reports (run 9).
+- *Grounding* — the NLI verifier accepted a fabricated "44 min" at 0.98; an exact-figure gate took
+  corruption rejection from 0.44 back to 0.97.
+- *Narrative* — unsupported-claim rate 0.50 → 0.22 → 0.01 across three runs by changing the prompt,
+  the evidence and the verifier in turn, not the model.
+- *Abstention* — writing the case set exposed three gaps the briefing was silent about; recall on
+  gap cases 0.55 → 1.00 with the rules that followed.
+- *Extraction* — a model at 1.000 on its synthetic validation set tagged 54 entities inside
+  injected prose on the gold set; two rounds of generator changes took that to 3 and macro-F1 past
+  the rule decoder.
+- *Latency* — 49.5 s → 25.4 s per full briefing, from a materialised CTE, a 128 MB buffer cache and
+  an Ollama flag, not from the code that was suspected.
+- *End-to-end* — the first real number for the time-travel eval (weather slice) came with the
+  reason it is low, and the thresholds were left alone rather than tuned to the test.
+
+The narrative row is measured on a local model at zero cost; the same command with
+`PREFLIGHT_LLM=anthropic` produces the frontier comparison row.
 
 ---
 

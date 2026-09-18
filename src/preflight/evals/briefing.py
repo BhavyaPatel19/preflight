@@ -277,6 +277,49 @@ def backfill_weather(
     return counts
 
 
+def wind_threshold_sweep(
+    conn: Connection[Any], cases: Sequence[Case],
+    thresholds: Sequence[tuple[int, int]] = ((25, 20), (20, 17), (18, 15), (15, 12), (12, 10)),
+) -> dict[str, Any]:
+    """What the covered weather cases' own METARs say about the wind rule.
+
+    For each (gust ≥ g or wind ≥ w) rule, the share of covered positives it would flag and the
+    share of covered negatives it would flag too — recall and false-alarm rate of the wind rule
+    alone, so a threshold is a priced choice. Also reports how many positives had no gust and
+    under 10 kt of wind at the snapshot: cases where the hazard the NTSB named is not in the
+    airport observation an hour before, whatever the threshold.
+    """
+    from preflight.db import weather as wdb
+
+    stale = timedelta(minutes=settings().metar_stale_after_minutes)
+    wx_ids = {c.id for c in cases if c.label == "positive" and c.implicated == "weather"}
+    rows: list[tuple[str, float, float]] = []
+    for c in cases:
+        if not (c.id in wx_ids or c.matched_to in wx_ids):
+            continue
+        snap = datetime.fromisoformat(c.snapshot_at)
+        m = wdb.latest(conn, c.airport, "METAR", as_of=snap)
+        if m is None or m.issued_at < snap - stale:
+            continue
+        rows.append((c.label, float(m.parsed.get("wind_kt") or 0),
+                     float(m.parsed.get("gust_kt") or 0)))
+    pos = [r for r in rows if r[0] == "positive"]
+    neg = [r for r in rows if r[0] == "negative"]
+    if not pos or not neg:
+        return {}
+    table = [{
+        "gust_kt": g, "wind_kt": w,
+        "recall": round(sum(r[2] >= g or r[1] >= w for r in pos) / len(pos), 3),
+        "false_alarm_rate": round(sum(r[2] >= g or r[1] >= w for r in neg) / len(neg), 3),
+    } for g, w in thresholds]
+    return {
+        "positives": len(pos), "negatives": len(neg), "table": table,
+        "positives_calm": sum(1 for r in pos if r[2] == 0 and r[1] < 10),
+        "median_wind_kt": {"positive": sorted(r[1] for r in pos)[len(pos) // 2],
+                           "negative": sorted(r[1] for r in neg)[len(neg) // 2]},
+    }
+
+
 def _git_sha() -> str:
     try:
         return subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True,
@@ -321,6 +364,7 @@ def run(conn: Connection[Any], cases: Sequence[Case]) -> dict[str, Any]:
         d["rate"] = round(d["false_alarms"] / d["covered"], 3) if d["covered"] else None
     misses = [r for r in pos_c if not r.get("hazard_found")]
     return {
+        "wind_sweep": wind_threshold_sweep(conn, cases),
         "negatives_by_category": neg_by_cat,
         "misses": [{"id": r["id"], "airport": r["airport"], "abstained": r.get("abstained")}
                    for r in misses[:400]],
@@ -362,6 +406,26 @@ def to_markdown(res: dict[str, Any]) -> str:
         lines.append(
             f"| {cat} | {d['cases']} | {d['covered']} | {d['found']} | {pct(d.get('recall'))} | "
             f"{n.get('covered', 0)} | {pct(n.get('rate'))} |")
+    sw = res.get("wind_sweep") or {}
+    if sw:
+        lines += [
+            "", f"**The wind rule, priced** ({sw['positives']} covered weather positives, "
+            f"{sw['negatives']} matched negatives; each row flags gust ≥ g or wind ≥ w):", "",
+            "| gust ≥ kt | wind ≥ kt | recall | false-alarm rate |", "|---:|---:|---:|---:|",
+        ]
+        for t in sw["table"]:
+            mark = " ←" if (t["gust_kt"], t["wind_kt"]) == (25, 20) else ""
+            lines.append(f"| {t['gust_kt']} | {t['wind_kt']} | {t['recall']:.3f} | "
+                         f"{t['false_alarm_rate']:.3f} |{mark}")
+        lines += [
+            "",
+            f"{sw['positives_calm']} of {sw['positives']} positives had no gust and under 10 kt "
+            f"of wind in the METAR an hour before the event (median wind: positives "
+            f"{sw['median_wind_kt']['positive']:.0f} kt, negatives "
+            f"{sw['median_wind_kt']['negative']:.0f} kt). For those, the hazard the NTSB named "
+            "was not in the airport observation at briefing time, whatever the threshold — the "
+            "ceiling of a METAR-based weather layer for light-aircraft wind accidents.",
+        ]
     lines += [
         "",
         "Coverage is the honest number here. The weather slice is covered from the Iowa State "

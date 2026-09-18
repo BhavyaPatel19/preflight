@@ -96,12 +96,19 @@ def to_markdown(outcomes: list[Outcome]) -> str:
 
 def run_live(conn_factory: Any) -> list[str]:
     """Re-run the model-free suites and refresh their summaries. Returns what ran."""
-    from preflight.evals import abstention, safety
+    from preflight.evals import abstention, extraction, safety
 
     ran: list[str] = []
     res = safety.run()
     safety.save_run(res)
     ran.append("safety")
+    # Rule-decoder extraction needs no model; the fine-tuned model's numbers are committed.
+    xres = extraction.run({"rules": extraction.predict_rules})
+    prior = summary.read("extraction") or {}
+    keep = {k: v for k, v in prior.get("metrics", {}).items() if k.startswith("model_")}
+    summary.write("extraction", xres, {**extraction.summarise(xres), **keep},
+                  gold_items=xres["gold_items"], model=prior.get("model"))
+    ran.append("extraction (rules)")
     with conn_factory() as conn:
         ab = abstention.run(conn)
     abstention.save_run(ab)

@@ -87,6 +87,12 @@ def main(argv: list[str] | None = None) -> int:
     xs.add_argument("--n", type=int, default=8000)
     xs.add_argument("--seed", type=int, default=20260918)
     exsub.add_parser("gold", help="rebuild evals/extraction/gold.jsonl from the labelled sources")
+    xt = exsub.add_parser("train", help="fine-tune the token classifier on the synthetic set")
+    xt.add_argument("--base", default=None, help="base model id (default: ModernBERT-base)")
+    xt.add_argument("--epochs", type=int, default=3)
+    xt.add_argument("--batch", type=int, default=16)
+    xt.add_argument("--limit", type=int, help="train on the first N examples (smoke test)")
+    xt.add_argument("--out", type=Path)
 
     sc = sub.add_parser("schedule", help="run the ingest scheduler (hourly weather + NOTAMs)")
     sc.add_argument("--no-run-now", action="store_true", help="wait for the first tick")
@@ -507,6 +513,14 @@ def main(argv: list[str] | None = None) -> int:
             from preflight.extract.gold import GOLD, write
 
             print(f"gold set: {write()} bodies → {GOLD}")
+            return 0
+        if args.op == "train":
+            from preflight.extract.train import DEFAULT_MODEL, train
+
+            out = train(base_model=args.base or DEFAULT_MODEL, epochs=args.epochs,
+                        batch_size=args.batch, limit=args.limit, out_dir=args.out,
+                        log=lambda m: print(m, file=sys.stderr, flush=True))
+            print(f"saved → {out}")
             return 0
 
     if args.cmd == "eval" and args.suite == "extraction":

@@ -1,11 +1,14 @@
 {
   "suite": "extraction",
-  "ran_at": "2026-09-18T07:07:00+00:00",
-  "git_sha": "c536f35",
+  "ran_at": "2026-09-18T07:52:22+00:00",
+  "git_sha": "9e08b14",
   "metrics": {
     "rules_gold_macro_f1": 0.8748,
     "rules_gold_prose_fp": 0,
-    "rules_synthetic_macro_f1": 0.77
+    "rules_synthetic_macro_f1": 0.7515,
+    "model_gold_macro_f1": 0.8981,
+    "model_gold_prose_fp": 3,
+    "model_synthetic_macro_f1": 1.0
   },
   "gold_items": 124
 }

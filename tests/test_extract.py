@@ -111,3 +111,52 @@ def test_rules_predictor_returns_typed_spans():
 def test_every_handwritten_item_has_at_least_one_entity(marked):
     _, spans = gold.compile_markup(marked)
     assert spans
+
+
+# ---------------------------------------------------------------- training plumbing
+
+class _Enc(dict):
+    def __init__(self, ids, wids):
+        super().__init__(input_ids=ids, attention_mask=[1] * len(ids))
+        self._wids = wids
+
+    def word_ids(self):
+        return self._wids
+
+
+class FakeTok:
+    """Splits every word into two sub-tokens, with CLS/SEP, like a real WordPiece would."""
+
+    pad_token_id = 0
+
+    def __call__(self, words, *, is_split_into_words, truncation, max_length):
+        ids, wids = [101], [None]
+        for i, _ in enumerate(words):
+            ids += [200 + i, 300 + i]
+            wids += [i, i]
+        ids.append(102)
+        wids.append(None)
+        return _Enc(ids, wids)
+
+
+def test_encode_labels_first_subtoken_only():
+    from preflight.extract.labels import TAG_ID
+    from preflight.extract.train import encode
+
+    rows = [{"tokens": ["RWY", "28R", "CLSD"], "tags": ["B-RWY", "I-RWY", "O"]}]
+    enc = encode(FakeTok(), rows)[0]
+    assert enc["labels"] == [-100, TAG_ID["B-RWY"], -100, TAG_ID["I-RWY"], -100, TAG_ID["O"],
+                             -100, -100]
+    assert len(enc["labels"]) == len(enc["input_ids"]) == len(enc["attention_mask"])
+
+
+def test_batches_pad_to_the_longest_and_mask_padding():
+    pytest.importorskip("torch")
+    from preflight.extract.train import _batches
+
+    rows = [{"input_ids": [1, 2, 3], "attention_mask": [1, 1, 1], "labels": [0, 1, -100]},
+            {"input_ids": [4], "attention_mask": [1], "labels": [2]}]
+    (batch,) = list(_batches(rows, 2, pad_id=0, rng=None))
+    assert batch["input_ids"].tolist() == [[1, 2, 3], [4, 0, 0]]
+    assert batch["attention_mask"].tolist() == [[1, 1, 1], [1, 0, 0]]
+    assert batch["labels"].tolist() == [[0, 1, -100], [2, -100, -100]]

@@ -38,6 +38,32 @@ max = 0.05
 note = "no abstention on clean cases"
 
 [[gate]]
+suite = "extraction"
+live = true
+metric = "rules_gold_macro_f1"
+min = 0.85
+note = "rule decoder on the 124-item hand-labelled gold set; measured 0.875"
+
+[[gate]]
+suite = "extraction"
+live = true
+metric = "rules_gold_prose_fp"
+max = 0
+note = "the rule decoder tags nothing inside injected prose"
+
+[[gate]]
+suite = "extraction"
+metric = "model_gold_macro_f1"
+min = 0.87
+note = "fine-tuned extractor on the same gold set; measured 0.898 (run 3). Committed, not live: needs the weights"
+
+[[gate]]
+suite = "extraction"
+metric = "model_gold_prose_fp"
+max = 6
+note = "entities tagged inside injected prose; measured 3 (was 54 before prose distractors)"
+
+[[gate]]
 suite = "retrieval"
 metric = "hybrid_rerank_ndcg_at_10"
 min = 0.39

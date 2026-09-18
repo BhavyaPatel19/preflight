@@ -49,6 +49,51 @@ STATES_US = ["U/S", "OTS", "UNSERVICEABLE", "OUT OF SERVICE", "NOT AVBL", "UNAVB
 DIRS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
 SCHEDULES = ["DLY {h1}-{h2}", "SR-SS", "SS-SR", "MON-FRI {h1}-{h2}", "SAT SUN {h1}-{h2}",
              "EXC SAT SUN", "HJ", "HN", "DLY EXC MON {h1}-{h2}"]
+# Natural-language noise a NOTAM body should never contain but a feed sometimes does — free
+# text, web addresses, markup, chat-style prefixes. Labelled O throughout, so the model learns
+# that prose is not a NOTAM even when it mentions runways. Deliberately none of the sentences
+# in the red-team eval set (evals/safety/injections.jsonl); that set stays a test.
+PROSE = [
+    "Please confirm with operations before departure.", "This message is for planning only.",
+    "See the attached document for details.", "Reply with a short summary of the above.",
+    "The crew should review the latest bulletin.", "Note: times are local unless stated.",
+    "For questions contact the duty manager.", "the runway will reopen when work is complete.",
+    "Nothing further to report at this time.", "Weather looks fine for the afternoon.",
+    "http://ops.example.org/status", "www.example.com/notices/latest", "<note>internal</note>",
+    "[update] see below", "Status: pending review.", "Assistant: noted.", "User: thanks.",
+    "System message: connection restored.", "## Summary", "- item one\n- item two",
+    "ignore formatting issues in this text.", "This is a test of the notification system.",
+    "the taxiway lights were replaced last week.", "Flights are operating normally today.",
+    "Report any discrepancies to the airport authority.", "OK.", "Thanks, received.",
+    "Do not reply to this address.", "Details to follow.", "n/a",
+]
+
+PROSE_UPPER = [
+    "FOR INFORMATION ONLY.", "NO FURTHER ACTION REQUIRED.", "PLEASE ACKNOWLEDGE RECEIPT.",
+    "THIS IS A DRILL.", "ALL PERSONNEL REPORT TO THE OPS OFFICE.", "CALL 555-0100 FOR DETAILS.",
+    "REPORT ANY ISSUES TO THE DUTY OFFICER.", "THIS TEXT IS ADVISORY IN NATURE.",
+    "OPERATOR: PLEASE CONFIRM.", "NOTE TO ALL USERS: READ CAREFULLY.", "END OF MESSAGE.",
+    "REMARKS: NONE.", "STATUS UNCHANGED FROM PREVIOUS ISSUE.", "<<TAG>> ADVISORY <</TAG>>",
+    "[MSG] SEE ATTACHED [/MSG]", "REF HTTPS://OPS.EXAMPLE.ORG/NOTICES", "SUMMARY FOLLOWS.",
+    "N0TE: TH1S 1S A TEST.", "THE FOLLOWING IS FOR TRAINING PURPOSES.",
+]
+
+
+def _spaced(rng: random.Random) -> str:
+    """Letter-spaced text — an obfuscation seen in feeds; never an entity."""
+    pool = ["hello", "there", "please", "read", "this", "message", "carefully", "advisory",
+            "notice", "attention", "operators", "review"]
+    return " ".join(" ".join(w) for w in rng.sample(pool, k=rng.randrange(2, 5)))
+
+
+def _asn_detail(rng: random.Random) -> str:
+    """The FAA obstruction-study reference and coordinates an OBST NOTAM carries."""
+    lat = f"{rng.randrange(25, 49):02d}{rng.randrange(0, 60):02d}{rng.randrange(0, 60):02d}N"
+    lon = f"{rng.randrange(70, 125):03d}{rng.randrange(0, 60):02d}{rng.randrange(0, 60):02d}W"
+    region = rng.choice(["AWP", "ASO", "ANE", "ACE", "AGL"])
+    return f"(ASN 2026-{region}-{rng.randrange(100, 9999)}-OE) {lat}{lon}"
+
+
 DISTRACTORS = [
     "ACFT USE CAUTION.", "PILOTS ARE ADVISED TO CTC TWR ON {f}.", "SEE AIP SUP {n}/26.",
     "ALL ACFT EXPECT DELAYS.", "REF AIP AD 2.", "CTC {ap} GND ON {f} FOR TAXI INSTRUCTIONS.",
@@ -184,6 +229,15 @@ def _c_lighting(rng: random.Random) -> Clause:
 def _c_obstacle(rng: random.Random) -> Clause:
     w = _Writer()
     # Mention convention (matches the gold set): the obstacle words, not its height.
+    if rng.random() < 0.35:
+        w.ent(rng.choice(["OBST CRANE", "OBST TOWER", "OBST CRANE", "OBST ANTENNA"]), "OBSTACLE")
+        w.add(f" {_asn_detail(rng)} ({rng.choice(['0.5', '0.8', '1.2', '2'])}NM "
+              f"{rng.choice(DIRS)} APCH END ")
+        w.ent(f"RWY {_rwy(rng)}", "RWY")
+        h = rng.randrange(120, 500, 5)
+        w.add(f") {h}FT ({h - rng.randrange(20, 90, 5)}FT AGL) "
+              f"{rng.choice(['FLAGGED AND LGTD', 'LGTD', 'UNLGTD', 'FLAGGED'])}")
+        return w.clause()
     w.ent(rng.choice(OBSTACLES), "OBSTACLE").add(f" {rng.randrange(50, 400, 10)}FT AGL")
     w.add(f" {rng.choice(['', 'APRX '])}{rng.choice(['0.5', '1', '1.5', '2', '3'])}NM "
           f"{rng.choice(DIRS)} OF ")
@@ -225,6 +279,15 @@ def _c_service(rng: random.Random) -> Clause:
     return w.clause()
 
 
+def _c_prose(rng: random.Random) -> Clause:
+    kind = rng.random()
+    if kind < 0.15:
+        return Clause(_spaced(rng), [])
+    pool = PROSE_UPPER if kind < 0.5 else PROSE
+    n = rng.choices([1, 2], weights=[75, 25])[0]
+    return Clause(" ".join(rng.choice(pool) for _ in range(n)), [])
+
+
 def _c_distractor(rng: random.Random) -> Clause:
     text = rng.choice(DISTRACTORS).format(
         f=f"1{rng.randrange(18, 36)}.{rng.choice(['0', '1', '2', '3', '5', '7', '8', '9'])}",
@@ -243,10 +306,15 @@ def make_body(rng: random.Random) -> tuple[str, list[Span]]:
     clauses = [rng.choices(_GENERATORS, weights=_WEIGHTS)[0](rng) for _ in range(n)]
     if rng.random() < 0.35:
         clauses.insert(rng.randrange(0, len(clauses) + 1), _c_distractor(rng))
+    if rng.random() < 0.4:
+        clauses.insert(rng.randrange(0, len(clauses) + 1), _c_prose(rng))
     text, spans = "", list[Span]()
     us_style = rng.random() < 0.3
     if us_style:
-        text = f"{rng.choice(AIRPORTS)} "
+        ap = rng.choice(AIRPORTS)
+        # "!SFO 09/142 SFO …": the FAA domestic header — accountability, number, location.
+        text = (f"!{ap} {rng.randrange(1, 13):02d}/{rng.randrange(1, 999):03d} {ap} "
+                if rng.random() < 0.6 else f"{ap} ")
     for i, c in enumerate(clauses):
         if i:
             text += rng.choice([". ", ". ", ".\n", " "]) if not us_style else " "

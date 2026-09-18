@@ -1,0 +1,11 @@
+{
+  "suite": "extraction",
+  "ran_at": "2026-09-18T07:07:00+00:00",
+  "git_sha": "c536f35",
+  "metrics": {
+    "rules_gold_macro_f1": 0.8748,
+    "rules_gold_prose_fp": 0,
+    "rules_synthetic_macro_f1": 0.77
+  },
+  "gold_items": 124
+}

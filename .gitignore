@@ -39,3 +39,5 @@ evals/*.local.json
 # Logs
 data/logs/
 data/backups/
+data/extract/
+models/

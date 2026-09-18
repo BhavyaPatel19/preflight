@@ -61,6 +61,9 @@ def main(argv: list[str] | None = None) -> int:
     evsub.add_parser("grounding", help="NLI verifier: accept true claims, reject corrupted ones")
     evsub.add_parser("safety", help="injection red-team set: detector recall, false positives")
     evsub.add_parser("abstention", help="constructed data-gap cases: does the briefing abstain?")
+    ex_ev = evsub.add_parser("extraction", help="entity P/R/F1 of the rule decoder (and the model) "
+                                                "on the hand-labelled gold set")
+    ex_ev.add_argument("--model", type=Path, help="fine-tuned extractor directory")
     eg = evsub.add_parser("gate", help="regression gate: committed summaries vs evals/gates.toml")
     eg.add_argument("--live", action="store_true",
                     help="re-run the model-free suites (safety, abstention) first")
@@ -77,6 +80,13 @@ def main(argv: list[str] | None = None) -> int:
     eb.add_argument("--backfill-weather", action="store_true",
                     help="first pull each weather case's historical METARs from the Iowa State "
                          "ASOS archive (public, no account) into the weather table")
+
+    ex = sub.add_parser("extract", help="NOTAM entity extractor: data, training, inference")
+    exsub = ex.add_subparsers(dest="op", required=True)
+    xs = exsub.add_parser("synth", help="write synthetic train/val NOTAM bodies with BIO tags")
+    xs.add_argument("--n", type=int, default=8000)
+    xs.add_argument("--seed", type=int, default=20260918)
+    exsub.add_parser("gold", help="rebuild evals/extraction/gold.jsonl from the labelled sources")
 
     sc = sub.add_parser("schedule", help="run the ingest scheduler (hourly weather + NOTAMs)")
     sc.add_argument("--no-run-now", action="store_true", help="wait for the first tick")
@@ -485,6 +495,34 @@ def main(argv: list[str] | None = None) -> int:
         outcomes = gate.evaluate(gate.load_gates())
         print(gate.to_markdown(outcomes))
         return 0 if gate.passed(outcomes) else 1
+
+    if args.cmd == "extract":
+        if args.op == "synth":
+            from preflight.extract.synth import OUT, write_dataset
+
+            sizes = write_dataset(args.n, seed=args.seed)
+            print(f"synthetic NOTAMs → {OUT}: {sizes}")
+            return 0
+        if args.op == "gold":
+            from preflight.extract.gold import GOLD, write
+
+            print(f"gold set: {write()} bodies → {GOLD}")
+            return 0
+
+    if args.cmd == "eval" and args.suite == "extraction":
+        from preflight.evals import extraction as X
+        from preflight.extract.synth import OUT
+
+        predictors: dict[str, X.Predictor] = {"rules": X.predict_rules}
+        if args.model:
+            from preflight.extract.model import load_predictor
+
+            predictors["model"] = load_predictor(args.model)
+        res = X.run(predictors, synthetic_val=OUT / "val.jsonl")
+        run_path, md_path = X.save_run(res)
+        print(X.to_markdown(res))
+        print(f"written: {run_path}  {md_path}")
+        return 0
 
     if args.cmd == "eval" and args.suite == "abstention":
         from preflight.db import close_pool, get_pool

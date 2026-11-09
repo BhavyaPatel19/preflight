@@ -78,6 +78,15 @@ button:disabled{opacity:.55;cursor:wait}
 .abstain code{font:11px var(--mono);color:var(--ink-3)}
 .empty{color:var(--ink-3);font-size:13.5px}
 .err{border-left:3px solid var(--red);background:var(--red-soft);padding:10px 14px;font:13px var(--mono);color:var(--red)}
+
+/* recorded demo (static hosting: no API behind the page) */
+.demo{display:none;border-left:3px solid var(--blue);background:var(--blue-soft);padding:10px 14px;border-radius:0 4px 4px 0;font-size:13.5px;color:var(--ink-2)}
+.demo b{color:var(--blue);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.demo a{color:var(--blue)}
+.rec{display:none}
+body.is-demo .demo{display:block}
+body.is-demo .rec{display:flex}
+body.is-demo form input:not([type=checkbox]){opacity:.75}
 </style>
 </head>
 <body>
@@ -90,7 +99,14 @@ button:disabled{opacity:.55;cursor:wait}
     <div class="strip-note"><b>NOT FOR OPERATIONAL USE.</b><br>Research system. Not certified, not validated. Do not use for real flight planning.</div>
   </header>
 
+  <div class="demo" id="demo"><b>Recorded demo</b><br>
+    These briefings were captured from a local run of the full system (75K NASA/NTSB reports in
+    pgvector, NLI verifier, local model) and are replayed here exactly as streamed. Pick a flight
+    and press Brief. <a href="https://github.com/BhavyaPatel19/preflight#quickstart">Run it live yourself →</a>
+  </div>
+
   <form id="f">
+    <label class="rec off">Recorded flight <select id="rec"></select></label>
     <label>Departure <input id="dep" value="KSFO" pattern="[A-Za-z]{4}" required></label>
     <label>Destination <input id="dest" value="KJFK" pattern="[A-Za-z]{4}" required></label>
     <label>Alternates <input id="alt" value="KBOS" placeholder="KBOS, KPHL"></label>
@@ -160,9 +176,37 @@ button:disabled{opacity:.55;cursor:wait}
     return el;
   }
 
+  // Static hosting (GitHub Pages, a file on disk, or ?demo): no API behind the page, so replay
+  // briefings recorded from a real local run by scripts/record_demo.py.
+  const DEMO = qs.has("demo") || location.hostname.endsWith("github.io") || location.protocol === "file:";
+  let flights = [], timers = [];
+  const stop = () => { if (es) es.close(); es = null; timers.forEach(clearTimeout); timers = []; };
+
+  function fillFrom(r) {
+    $("dep").value = r.departure; $("dest").value = r.destination;
+    $("alt").value = r.alternates || ""; off.value = r.off_block.slice(0, 16);
+    $("type").value = r.aircraft_type || "";
+  }
+
+  function replay(id, on) {
+    fetch(`demo/briefings/${id}.json`).then(r => {
+      if (!r.ok) throw new Error(r.status);
+      return r.json();
+    }).then(rec => {
+      // Original timing is ~25 s of retrieval and model calls; compress it, keep the order.
+      let t = 700;
+      for (const ev of rec.events) {
+        if (ev.event === "start") continue;
+        const d = JSON.stringify(ev.data);
+        timers.push(setTimeout(() => on[ev.event] && on[ev.event]({data: d}, true), t));
+        t += ev.event === "finding" ? 450 : 150;
+      }
+    }).catch(() => on.error("could not load the recorded briefing"));
+  }
+
   $("f").addEventListener("submit", ev => {
     ev.preventDefault();
-    if (es) es.close();
+    stop();
     const p = new URLSearchParams({
       departure: $("dep").value.toUpperCase(), destination: $("dest").value.toUpperCase(),
       alternates: $("alt").value.toUpperCase().replace(/\s+/g, ""),
@@ -170,29 +214,52 @@ button:disabled{opacity:.55;cursor:wait}
     });
     const findings = $("findings"), abst = $("abstentions"), status = $("status");
     findings.innerHTML = ""; abst.innerHTML = "";
-    status.innerHTML = `<span class="live">building</span>`;
+    status.innerHTML = `<span class="live">${DEMO ? "replaying recorded run" : "building"}</span>`;
     $("go").disabled = true;
-    let n = 0, sevCount = {};
-    es = new EventSource("/brief/stream?" + p.toString());
-    es.addEventListener("finding", e => {
-      const f = JSON.parse(e.data); sevCount[f.severity] = (sevCount[f.severity] || 0) + 1;
-      findings.appendChild(renderFinding(f, n++));
-    });
-    es.addEventListener("abstention", e => abst.appendChild(renderAbstention(JSON.parse(e.data))));
-    es.addEventListener("done", e => {
-      const d = JSON.parse(e.data);
-      status.innerHTML = `<span>${d.findings} finding${d.findings === 1 ? "" : "s"}</span><span>${d.abstentions} abstention${d.abstentions === 1 ? "" : "s"}</span>` +
-        `<span>sources considered ${d.sources_considered}</span><span>${d.latency_ms} ms</span>`;
-      if (!n) findings.innerHTML = `<p class="empty">No findings for this flight in the current data.</p>`;
-      es.close(); $("go").disabled = false;
-    });
-    es.onerror = () => {
-      status.innerHTML = `<div class="err">stream error — is the API running and the database up?</div>`;
-      es.close(); $("go").disabled = false;
+    let n = 0;
+    const on = {
+      finding: e => findings.appendChild(renderFinding(JSON.parse(e.data), n++)),
+      abstention: e => abst.appendChild(renderAbstention(JSON.parse(e.data))),
+      done: (e, replayed) => {
+        const d = JSON.parse(e.data);
+        status.innerHTML = `<span>${d.findings} finding${d.findings === 1 ? "" : "s"}</span><span>${d.abstentions} abstention${d.abstentions === 1 ? "" : "s"}</span>` +
+          `<span>sources considered ${d.sources_considered}</span>` +
+          (replayed ? `<span>original run ${(d.latency_ms / 1000).toFixed(1)} s · replayed</span>` : `<span>${d.latency_ms} ms</span>`);
+        if (!n) findings.innerHTML = `<p class="empty">No findings for this flight in the current data.</p>`;
+        stop(); $("go").disabled = false;
+      },
+      error: msg => {
+        status.innerHTML = `<div class="err">${esc(msg)}</div>`;
+        stop(); $("go").disabled = false;
+      },
     };
+    if (DEMO) {
+      replay($("rec").value, on);
+      history.replaceState(null, "", "?" + new URLSearchParams({flight: $("rec").value}).toString());
+      return;
+    }
+    es = new EventSource("/brief/stream?" + p.toString());
+    for (const name of ["finding", "abstention", "done"]) es.addEventListener(name, e => on[name](e));
+    es.onerror = () => on.error("stream error — is the API running and the database up?");
     history.replaceState(null, "", "?" + p.toString());
   });
-  if (qs.get("departure") && qs.get("destination")) $("f").requestSubmit();
+
+  if (DEMO) {
+    document.body.classList.add("is-demo");
+    for (const id of ["dep", "dest", "alt", "off", "type"]) $(id).readOnly = true;
+    $("rec").addEventListener("change", () => fillFrom(flights.find(f => f.id === $("rec").value).request));
+    fetch("demo/flights.json").then(r => r.json()).then(list => {
+      flights = list;
+      $("rec").innerHTML = list.map(f =>
+        `<option value="${esc(f.id)}">${esc(f.label)} · ${f.findings} findings</option>`).join("");
+      const want = qs.get("flight");
+      if (want && list.some(f => f.id === want)) $("rec").value = want;
+      fillFrom(flights.find(f => f.id === $("rec").value).request);
+      $("f").requestSubmit();
+    }).catch(() => {
+      $("status").innerHTML = `<div class="err">no recorded briefings found (demo/flights.json)</div>`;
+    });
+  } else if (qs.get("departure") && qs.get("destination")) $("f").requestSubmit();
 })();
 </script>
 </body>

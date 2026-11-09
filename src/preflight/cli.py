@@ -113,6 +113,17 @@ def main(argv: list[str] | None = None) -> int:
     cr = cosub.add_parser("reembed", help="re-embed every chunk with the configured model "
                                           "(resumable; drop the index first — migration 007)")
     cr.add_argument("--model", help="sentence-transformers id (default: settings)")
+    cf = cosub.add_parser("finetune", help="fine-tune the embedder on ASRS synopsis→narrative "
+                                           "pairs, eval reports held out (needs the ml extra)")
+    cf.add_argument("--base", default=None, help="model to start from (default: settings)")
+    cf.add_argument("--out", type=Path, default=Path("models/embedder-asrs"))
+    cf.add_argument("--pairs", type=int, default=40_000, help="training pairs to sample")
+    cf.add_argument("--epochs", type=int, default=1)
+    cf.add_argument("--batch-size", type=int, default=128)
+    cf.add_argument("--mini-batch-size", type=int, default=16,
+                    help="lower this if the GPU/MPS runs out of memory")
+    cf.add_argument("--lr", type=float, default=2e-5)
+    cf.add_argument("--dry-run", action="store_true", help="build and count pairs, do not train")
     cr.add_argument("--batch", type=int, default=128)
     cr.add_argument("--source", choices=["asrs", "ntsb", "far_aim", "ops_note"],
                     help="only this document source")
@@ -379,6 +390,22 @@ def main(argv: list[str] | None = None) -> int:
                     n_done = reembed(conn, emb, batch=args.batch, source=args.source,
                                      log=lambda m: print(m, file=sys.stderr, flush=True))
                     print(f"re-embedded {n_done:,} chunks with {emb.name}")
+                elif args.op == "finetune":
+                    from preflight.config import settings
+                    from preflight.retrieval import finetune as FT
+
+                    held = FT.held_out_ids()
+                    ft_pairs = FT.build_pairs(conn, exclude=held, limit=args.pairs)
+                    print(f"{len(ft_pairs):,} pairs from reports outside the {len(held)} the "
+                          "evals read", file=sys.stderr)
+                    if not args.dry_run:
+                        card = FT.train(ft_pairs, base=args.base or settings().embedding_model,
+                                        out=args.out, epochs=args.epochs,
+                                        batch_size=args.batch_size,
+                                        mini_batch_size=args.mini_batch_size, lr=args.lr)
+                        print(f"saved {args.out}: {card}")
+                        print(f"next: preflight eval embedder --models "
+                              f"{card['base']} {args.out}")
                 elif args.op == "reindex":
                     from preflight.retrieval.search import reindex
 

@@ -1,4 +1,4 @@
-.PHONY: help install test lint fmt typecheck up down db db-start db-stop db-status ollama-start ollama-stop demo check
+.PHONY: help install test lint fmt typecheck up down db db-start db-stop db-status ollama-start ollama-stop demo demo-record check
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
@@ -61,3 +61,6 @@ db:  ## apply db/*.sql migrations to $$DATABASE_URL
 
 demo:  ## decode the bundled example NOTAMs
 	.venv/bin/python -m preflight.decode.notam --demo
+
+demo-record:  ## record briefings for the hosted replay demo (needs `preflight serve` running)
+	.venv/bin/python scripts/record_demo.py

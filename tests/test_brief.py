@@ -18,7 +18,9 @@ def _metar(cat, issued, **parsed):
 
 
 def _taf(issued, start, end):
-    return WeatherRow(raw="TAF ...", parsed={}, issued_at=issued, valid_from=start, valid_to=end)
+    # A real, quiet TAF: decodable, and no period in it is a hazard.
+    raw = f"TAF KJFK {issued:%d%H%M}Z {start:%d%H}/{end:%d%H} 27008KT P6SM SKC"
+    return WeatherRow(raw=raw, parsed={}, issued_at=issued, valid_from=start, valid_to=end)
 
 
 # ---------------------------------------------------------------- windows

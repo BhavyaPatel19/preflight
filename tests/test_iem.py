@@ -61,3 +61,51 @@ def test_persistent_failure_is_source_unavailable():
                       min_interval_s=0)
     with pytest.raises(SourceUnavailable):
         src.fetch_metars("KTWF", datetime(2026, 1, 1, tzinfo=UTC), datetime(2026, 1, 2, tzinfo=UTC))
+
+
+# ---------------------------------------------------------------- TAFs (AFOS text archive)
+
+AFOS_TEXT = """\x01
+000
+FTUS45 KBOI 141120
+TAFTWF
+TAF
+KTWF 141120Z 1412/1512 28012KT P6SM SCT080
+     FM141800 30025G38KT 6SM BLDU BKN050=
+\x03\x01
+000
+FTUS45 KBOI 141720 AAA
+TAFTWF
+TAF AMD
+KTWF 141720Z 1418/1512 30028G42KT 3SM BLDU BKN030
+     TEMPO 1418/1422 1SM BLDU=
+\x03"""
+
+
+@respx.mock
+def test_fetch_tafs_returns_raw_bulletins_in_the_window(tmp_path, monkeypatch):
+    from preflight import config
+
+    monkeypatch.setattr(config.settings(), "archive_dir", tmp_path)
+    route = respx.get(iem.AFOS).mock(return_value=httpx.Response(200, text=AFOS_TEXT))
+    src = iem.IemAsos(client=httpx.Client(), sleep=lambda s: None, min_interval_s=0)
+    end = datetime(2026, 5, 14, 18, 0, tzinfo=UTC)
+    got = src.fetch_tafs("KTWF", end - timedelta(hours=30), end)
+    params = route.calls[0].request.url.params
+    assert params["pil"] == "TAFTWF" and params["fmt"] == "text"
+    assert params["sdate"] == "2026-05-13T12:00Z" and params["edate"] == "2026-05-14T18:00Z"
+    assert [t.issued_at.hour for t in got] == [11, 17]
+    amd = got[1]
+    assert amd.raw.startswith("TAF AMD KTWF 141720Z 1418/1512 30028G42KT")   # quotable, one line
+    assert amd.valid_from == datetime(2026, 5, 14, 18, tzinfo=UTC)
+    assert amd.valid_to == datetime(2026, 5, 15, 12, tzinfo=UTC)
+    assert list((tmp_path / "weather").rglob("*iem-taf-KTWF*"))
+
+
+@respx.mock
+def test_fetch_tafs_ignores_other_stations_and_out_of_window_issues():
+    other = AFOS_TEXT.replace("KTWF 141120Z", "KBOI 141120Z")
+    respx.get(iem.AFOS).mock(return_value=httpx.Response(200, text=other))
+    src = iem.IemAsos(client=httpx.Client(), archive=False, sleep=lambda s: None, min_interval_s=0)
+    end = datetime(2026, 5, 14, 17, 0, tzinfo=UTC)            # before the 17:20 amendment
+    assert src.fetch_tafs("KTWF", end - timedelta(hours=30), end) == []

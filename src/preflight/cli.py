@@ -78,8 +78,8 @@ def main(argv: list[str] | None = None) -> int:
     eb.add_argument("--build", action="store_true", help="(re)build evals/briefing/golden.jsonl")
     eb.add_argument("--limit", type=int)
     eb.add_argument("--backfill-weather", action="store_true",
-                    help="first pull each weather case's historical METARs from the Iowa State "
-                         "ASOS archive (public, no account) into the weather table")
+                    help="first pull each weather case's historical METARs and TAFs from the "
+                         "Iowa State archives (public, no account) into the weather table")
 
     ex = sub.add_parser("extract", help="NOTAM entity extractor: data, training, inference")
     exsub = ex.add_subparsers(dest="op", required=True)

@@ -174,3 +174,37 @@ def test_backfill_weather_targets_the_weather_slice_and_is_idempotent(db):
     assert again["skipped"] == 2 and again["fetched"] == 0
     assert B.covered(db, cases[0]) and not B.covered(db, cases[2])
     assert datetime.now(UTC)  # (keeps the import honest for the linter)
+
+
+@pytest.mark.db
+def test_backfill_also_pulls_the_taf_in_force(db):
+    from datetime import timedelta
+
+    from preflight.db import weather as wdb
+    from preflight.sources.aviationweather import Metar, Taf
+
+    snap = "2014-05-14T17:00:00+00:00"
+    s = datetime.fromisoformat(snap)
+    cases = [B.Case("p9", "positive", "X9", "KZZW", "departure", "KDEN", snap, snap, "weather",
+                    ("weather/phenomena-Wind-Gusts",))]
+    asked: list[str] = []
+
+    class Src:
+        def fetch_metars(self, icao, start, end):
+            return [Metar(icao=icao, observed_at=end - timedelta(minutes=10), raw="X 10SM",
+                          flight_category="VFR")]
+
+        def fetch_tafs(self, icao, start, end):
+            asked.append(icao)
+            assert end == s and start == s - timedelta(hours=30)
+            five_before = s - timedelta(hours=5)
+            return [Taf(icao=icao, issued_at=five_before, valid_from=five_before,
+                        valid_to=s + timedelta(hours=19),
+                        raw="TAF KZZW 141200Z 1412/1512 30025G38KT P6SM SKC")]
+
+    counts = B.backfill_weather(db, cases, source=Src(), commit=False)
+    assert counts["taf_fetched"] == 1 and counts["tafs"] == 1
+    assert wdb.latest(db, "KZZW", "TAF", as_of=s) is not None
+    # In force at the snapshot already: a rerun does not ask again.
+    B.backfill_weather(db, cases, source=Src(), commit=False)
+    assert asked == ["KZZW"]

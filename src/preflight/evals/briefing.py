@@ -235,16 +235,39 @@ def score_case(c: Case, b: Briefing) -> dict[str, Any]:
             "abstained": any(c.airport in a.topic for a in b.abstentions)}
 
 
+def _backfill_tafs(
+    conn: Connection[Any], c: Case, snap: datetime, *, source: Any, counts: dict[str, int],
+    log: Callable[[str], None] | None,
+) -> None:
+    """The TAFs a briefing at ``snap`` could have used: issued in the 30 h before it (a TAF
+    runs 24-30 h). Skipped when the table already holds one in force at the snapshot."""
+    from preflight.db import weather as wdb
+
+    have = wdb.latest(conn, c.airport, "TAF", as_of=snap)
+    if have is not None and have.valid_to is not None and have.valid_to >= snap:
+        return
+    try:
+        found = source.fetch_tafs(c.airport, snap - timedelta(hours=30), snap)
+    except Exception as e:  # noqa: BLE001 — one station without TAFs must not end the backfill
+        if log:
+            log(f"{c.airport} {c.snapshot_at[:16]} TAF: {e}")
+        return
+    counts["taf_fetched"] += 1
+    counts["tafs"] += wdb.upsert_tafs(conn, found)
+
+
 def backfill_weather(
     conn: Connection[Any], cases: Sequence[Case], *, source: Any, hours_before: float = 3.0,
-    commit: bool = True, log: Callable[[str], None] | None = None,
+    commit: bool = True, log: Callable[[str], None] | None = None, tafs: bool = True,
 ) -> dict[str, int]:
     """Pull the METARs around each case's snapshot from a historical archive into the weather
     table, so the time-travel briefing has what a briefing at that moment would have had.
 
     Only cases whose implicated hazard (or whose matched positive's) is weather are fetched —
     that is the slice public data can cover; the NOTAM-implicated slices stay uncovered and are
-    reported as such. Idempotent: airports already holding a METAR inside the staleness window
+    reported as such. With ``tafs`` (and a source that has ``fetch_tafs``) the TAFs issued in the
+    30 h before the snapshot come too, so the briefing can read the forecast a pilot had.
+    Idempotent: airports already holding a METAR inside the staleness window (or a TAF in force)
     before the snapshot are skipped, so a rerun costs nothing. Commits per case so a long pull
     survives interruption — pass ``commit=False`` inside a transaction you own (tests).
     """
@@ -253,12 +276,18 @@ def backfill_weather(
     stale = timedelta(minutes=settings().metar_stale_after_minutes)
     weather_ids = {c.id for c in cases if c.label == "positive" and c.implicated == "weather"}
     todo = [c for c in cases if c.id in weather_ids or c.matched_to in weather_ids]
-    counts = {"cases": len(todo), "fetched": 0, "skipped": 0, "reports": 0, "unavailable": 0}
+    counts = {"cases": len(todo), "fetched": 0, "skipped": 0, "reports": 0, "unavailable": 0,
+              "taf_fetched": 0, "tafs": 0}
+    want_tafs = tafs and hasattr(source, "fetch_tafs")
     for i, c in enumerate(todo, 1):
         snap = datetime.fromisoformat(c.snapshot_at)
+        if want_tafs:
+            _backfill_tafs(conn, c, snap, source=source, counts=counts, log=log)
         have = wdb.latest(conn, c.airport, "METAR", as_of=snap)
         if have is not None and have.issued_at >= snap - stale:
             counts["skipped"] += 1
+            if commit:
+                conn.commit()
             continue
         try:
             reports = source.fetch_metars(c.airport, snap - timedelta(hours=hours_before),
@@ -429,7 +458,8 @@ def to_markdown(res: dict[str, Any]) -> str:
     lines += [
         "",
         "Coverage is the honest number here. The weather slice is covered from the Iowa State "
-        "ASOS archive — public historical METARs pulled for each case's airport at its snapshot "
+        "archives — public historical METARs, and the TAFs in force, pulled for each case's "
+        "airport at its snapshot "
         "(`preflight eval briefing --backfill-weather`). The wildlife, runway and lighting slices "
         "need the NOTAMs in force at the time, and live NOTAM feeds are out of scope by choice "
         "(ADR 0002), so those cases stay uncovered and are reported, not scored. Recall and "

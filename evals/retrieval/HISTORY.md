@@ -147,3 +147,29 @@ Reproduce: the weights are not committed (`models/` is ignored). Train them with
 `preflight corpus finetune`, set `EMBEDDING_MODEL=models/bge-large-asrs`, then
 `preflight corpus reembed` and `preflight corpus reindex`. The base model's vectors are kept in
 `chunks_embedding_backup_bge_large` for rollback.
+
+**Run 11: route by query, and the reranker stays where it is a filter.** Run 10 left the stock
+reranker hurting description queries and still needed for identifier queries. `mode="auto"`
+(`search.route`) sends a query that names a runway or taxiway ("runway 28R", "RWY 10L",
+"taxiway B") to hybrid+rerank and every other query to dense alone. The rule depends only on
+query text; 12 of the 300 synopses name a runway or taxiway and take the reranked path. Pass rule
+written before the run: synopsis nDCG@10 ≥ 0.52 and Recall@20 ≥ 0.73, identifier P@10 ≥ 0.77.
+
+| config | Recall@20 | nDCG@10 | identifier P@10 | p50 ms |
+|---|---:|---:|---:|---:|
+| hybrid+rerank | 0.707 | 0.450 | 0.776 | 993 |
+| dense | 0.750 | 0.542 | 0.620 | 169 |
+| **routed** | **0.750** | **0.536** | **0.776** | **39** |
+
+All three met: dense's ranking on descriptions, hybrid+rerank's precision on identifiers, and the
+reranker's cost only where it pays. (Dense p50 here is inflated by other work on the machine
+during this run; run 10 measured 54 ms.)
+
+**Not deployed yet, and why.** The briefing's precedent step uses the reranker as a calibrated
+relevance filter as well as a sorter: a precedent is attached only above
+`precedent_min_score` = 0.5 (`brief/precedent.py`), which is how a briefing abstains when no
+prior report is relevant. Dense hits carry no reranker score, so routing that path would drop
+every precedent. Routing therefore fits the ranking-only surfaces (`preflight search`, the MCP
+search tool); for briefings the fix has to be a reranker that agrees with the fine-tuned
+embedder, which is the next run (`corpus finetune-reranker`, `notebooks/finetune_reranker_colab.ipynb`;
+pass rule: hybrid+rerank nDCG@10 ≥ 0.542 and identifier P@10 ≥ 0.776).

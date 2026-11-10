@@ -1,16 +1,17 @@
 # Retrieval evaluation
 
-Run `f0bb228` at 2026-11-10T12:27:13+00:00 · corpus 75,709 documents / 316,226 chunks · embedder `models/bge-large-asrs` · reranker `BAAI/bge-reranker-base` · 40 candidates per channel, RRF k=60
+Run `fef431a` at 2026-11-10T15:21:39+00:00 · corpus 75,709 documents / 316,226 chunks · embedder `models/bge-large-asrs` · reranker `BAAI/bge-reranker-base` · 40 candidates per channel, RRF k=60
 
 **Synopsis → narrative** (300 ASRS queries; synopsis chunks hidden):
 
 | config | Recall@5 | Recall@10 | Recall@20 | MRR@20 | nDCG@10 | p50 ms | p95 ms |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| dense | 0.607 | 0.690 | 0.750 | 0.500 | 0.542 | 54 | 219 |
-| lexical | 0.363 | 0.407 | 0.483 | 0.264 | 0.295 | 209 | 237 |
-| hybrid | 0.570 | 0.657 | 0.733 | 0.456 | 0.499 | 242 | 274 |
-| dense+rerank | 0.557 | 0.643 | 0.733 | 0.418 | 0.467 | 736 | 821 |
-| hybrid+rerank | 0.517 | 0.613 | 0.707 | 0.406 | 0.450 | 961 | 1197 |
+| dense | 0.607 | 0.690 | 0.750 | 0.500 | 0.542 | 169 | 519 |
+| lexical | 0.363 | 0.407 | 0.483 | 0.264 | 0.294 | 225 | 298 |
+| hybrid | 0.570 | 0.657 | 0.733 | 0.455 | 0.499 | 267 | 333 |
+| dense+rerank | 0.557 | 0.643 | 0.733 | 0.418 | 0.467 | 748 | 853 |
+| hybrid+rerank | 0.517 | 0.613 | 0.707 | 0.406 | 0.450 | 993 | 1267 |
+| routed | 0.597 | 0.687 | 0.750 | 0.493 | 0.536 | 39 | 690 |
 
 **Rerank lift** (nDCG@10, hybrid+rerank − dense): **-0.092**
 
@@ -23,6 +24,7 @@ Run `f0bb228` at 2026-11-10T12:27:13+00:00 · corpus 75,709 documents / 316,226 
 | hybrid | 0.746 |
 | dense+rerank | 0.752 |
 | hybrid+rerank | 0.776 |
+| routed | 0.776 |
 
 **Where hybrid+rerank misses** (65 of 300 synopsis queries, 21.7%, have no relevant report anywhere in the 40-candidate pool):
 

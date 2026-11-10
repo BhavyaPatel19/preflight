@@ -249,7 +249,7 @@ the history file next to it says what was tried and what the ceiling turned out 
 | Narrative | unsupported-claim rate of model-written sentences, `qwen3:14b` local | ≤ 0.05 | **0.010** (98 / 99 kept; 1 genuine catch) — [history](evals/narrative/HISTORY.md) |
 | Abstention | recall on constructed data-gap cases · false-abstention rate on clean cases | ≥ 0.90 | **1.000 · 0.000** (26 cases, 20 gaps; 0.55 before this eval named three silent gaps — [details](evals/abstention/README.md)) |
 | Safety | injection detector on 60 adversarial NOTAMs: recall · false positives on benign | 100% | **1.000 · 0.000** (detector; LLM resistance scored against the same set later) — [details](evals/safety/RESULTS.md) |
-| Judge | LLM-judge vs human agreement (Cohen's κ) on precedent relevance | ≥ 0.70 | — (judge run on 304 pairs; 100-row sheet awaits human labels — [how](evals/precedent/README.md)) |
+| Judge | LLM-judge vs human agreement (Cohen's κ) on precedent relevance | ≥ 0.70 | **0.54** against Claude's blind labels, not yet a human's; by those labels **0.42** of attached precedent is relevant, and the 0.5 reranker threshold does not separate relevant from not — [history](evals/precedent/HISTORY.md) |
 | Cost | p50 $/briefing · p95 latency, full briefing with precedent + narrative | < $0.08 · 25 s | **$0 · 26.2 s** local `qwen3:14b` on an M5 (was 53.2 s) · 4.0 s without the model — [details](evals/latency/RESULTS.md) |
 
 The κ row matters as much as the rest: an LLM judge nobody validated is a number nobody should trust.

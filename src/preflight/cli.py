@@ -130,6 +130,22 @@ def main(argv: list[str] | None = None) -> int:
                     help="train from an exported pairs file; no database needed")
     cf.add_argument("--resume", action="store_true",
                     help="continue from the newest checkpoint under --out")
+    crf = cosub.add_parser("finetune-reranker",
+                           help="fine-tune the cross-encoder on exported pairs with negatives "
+                                "mined by the embedder (needs the ml extra; GPU)")
+    crf.add_argument("--pairs-file", type=Path, metavar="JSONL", required=True,
+                     help="pairs from `corpus finetune --export-pairs` (eval reports held out)")
+    crf.add_argument("--embedder", default=None,
+                     help="embedder that mines the negatives (default: settings)")
+    crf.add_argument("--base", default="BAAI/bge-reranker-base")
+    crf.add_argument("--out", type=Path, default=Path("models/bge-reranker-asrs"))
+    crf.add_argument("--pairs", type=int, default=None, help="use only the first N pairs")
+    crf.add_argument("--negatives", type=int, default=5, help="hard negatives per synopsis")
+    crf.add_argument("--epochs", type=int, default=1)
+    crf.add_argument("--batch-size", type=int, default=32)
+    crf.add_argument("--lr", type=float, default=2e-5)
+    crf.add_argument("--resume", action="store_true",
+                     help="continue from the newest checkpoint under --out")
     cr.add_argument("--batch", type=int, default=128)
     cr.add_argument("--source", choices=["asrs", "ntsb", "far_aim", "ops_note"],
                     help="only this document source")
@@ -146,7 +162,7 @@ def main(argv: list[str] | None = None) -> int:
     se.add_argument("query")
     se.add_argument("-k", type=int, default=5)
     se.add_argument("--icao")
-    se.add_argument("--mode", choices=["hybrid", "dense", "lexical"], default="hybrid")
+    se.add_argument("--mode", choices=["hybrid", "dense", "lexical", "auto"], default="hybrid")
     se.add_argument("--no-rerank", action="store_true")
 
     b = sub.add_parser("brief", help="build a briefing from what is in the database")
@@ -381,6 +397,20 @@ def main(argv: list[str] | None = None) -> int:
                                       ("train", "validation", "test")))
             finally:
                 close_pool()
+            return 0
+        if args.op == "finetune-reranker":
+            from preflight.config import settings
+            from preflight.retrieval import finetune as FT
+            from preflight.retrieval import rerank_finetune as RF
+
+            ft_pairs = FT.load_pairs(args.pairs_file)[: args.pairs]
+            print(f"{len(ft_pairs):,} pairs from {args.pairs_file}", file=sys.stderr)
+            card = RF.train_reranker(
+                ft_pairs, embedder=args.embedder or settings().embedding_model, out=args.out,
+                base=args.base, num_negatives=args.negatives, epochs=args.epochs,
+                batch_size=args.batch_size, lr=args.lr, resume=args.resume)
+            print(f"saved {args.out}: {card}")
+            print(f"next: RERANKER_MODEL={args.out} preflight eval retrieval")
             return 0
         if args.op == "finetune" and args.pairs_file:
             from preflight.config import settings

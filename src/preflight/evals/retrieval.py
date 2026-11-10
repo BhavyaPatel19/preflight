@@ -59,6 +59,8 @@ CONFIGS: tuple[tuple[str, str, bool], ...] = (
     ("hybrid", "hybrid", False),
     ("dense+rerank", "dense", True),
     ("hybrid+rerank", "hybrid", True),
+    # Per query: hybrid+rerank when it names a runway or taxiway, dense otherwise (search.route).
+    ("routed", "auto", True),
 )
 # The deployed config with the query first rewritten by the LLM (see ``synopsis_rewriter``).
 REWRITE_CONFIG: tuple[str, str, bool] = ("hybrid+rerank+rewrite", "hybrid", True)
@@ -439,7 +441,7 @@ def to_markdown(res: dict[str, Any]) -> str:
         "| config | Recall@5 | Recall@10 | Recall@20 | MRR@20 | nDCG@10 | p50 ms | p95 ms |",
         "|---|---:|---:|---:|---:|---:|---:|---:|",
     ]
-    for name in ("dense", "lexical", "hybrid", "dense+rerank", "hybrid+rerank",
+    for name in ("dense", "lexical", "hybrid", "dense+rerank", "hybrid+rerank", "routed",
                  REWRITE_CONFIG[0]):
         if name in c:
             r = c[name]
@@ -457,7 +459,7 @@ def to_markdown(res: dict[str, Any]) -> str:
         " metadata filter; relevant = chunk at that airport mentioning that runway):",
         "", "| config | P@10 |", "|---|---:|",
     ]
-    for name in ("dense", "lexical", "hybrid", "dense+rerank", "hybrid+rerank"):
+    for name in ("dense", "lexical", "hybrid", "dense+rerank", "hybrid+rerank", "routed"):
         if name in c:
             lines.append(f"| {name} | {c[name]['precision_at_10_identifier']:.3f} |")
     if REWRITE_CONFIG[0] in c:
@@ -511,6 +513,9 @@ def summarise(res: dict[str, Any]) -> dict[str, float | None]:
         "hybrid_rerank_precision_at_10_identifier": best.get("precision_at_10_identifier"),
         "hybrid_rerank_latency_ms_p50": best.get("latency_ms_p50"),
         "rerank_lift_ndcg_at_10": res.get("rerank_lift_ndcg_at_10"),
+        **{f"routed_{key}": (res["configs"].get("routed") or {}).get(key)
+           for key in ("ndcg_at_10", "recall_at_20", "precision_at_10_identifier",
+                       "latency_ms_p50")},
     }
 
 def save_run(res: dict[str, Any]) -> tuple[Path, Path]:

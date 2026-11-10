@@ -30,7 +30,7 @@ from preflight.evals.retrieval import GOLDEN as RETRIEVAL_GOLDEN
 from preflight.retrieval.embed import query_prefix
 
 PRECEDENT_PAIRS = Path("evals/precedent/pairs.jsonl")
-_SYNOPSIS = re.compile(r"(?:^|\n)Synopsis:\s*(?P<s>.+)$", re.S)
+_SYNOPSIS = re.compile(r"(?:^|\s)Synopsis:\s*(?P<s>.+)$", re.S)
 
 
 @dataclass(frozen=True)
@@ -101,10 +101,23 @@ def build_pairs(
     return pairs
 
 
+def save_pairs(pairs: Sequence[Pair], path: Path) -> None:
+    """Write pairs as JSONL so training can run on a machine without the corpus database."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w") as f:
+        for p in pairs:
+            row = {"report": p.report, "query": p.query, "positive": p.positive}
+            f.write(json.dumps(row) + "\n")
+
+
+def load_pairs(path: Path) -> list[Pair]:
+    return [Pair(**json.loads(line)) for line in path.read_text().splitlines() if line.strip()]
+
+
 def train(
     pairs: Sequence[Pair], *, base: str, out: Path, epochs: int = 1, batch_size: int = 128,
     mini_batch_size: int = 16, lr: float = 2e-5, max_seq_length: int = 256,
-    device: str | None = None,
+    device: str | None = None, resume: bool = False, save_steps: int = 25,
 ) -> dict[str, Any]:
     """Contrastive fine-tune: each synopsis against its narrative, every other narrative in the
     batch as a negative (MultipleNegativesRankingLoss, cached so a 128-pair batch fits in the
@@ -120,7 +133,10 @@ def train(
 
     from preflight.retrieval.embed import _device
 
-    model = SentenceTransformer(base, device=device or _device())
+    dev = device or _device()
+    # Eager attention on MPS only: torch's SDPA kernel there rejects the dropout training uses.
+    model = SentenceTransformer(base, device=dev, model_kwargs=(
+        {"attn_implementation": "eager"} if dev == "mps" else {}))
     model.max_seq_length = max_seq_length
     prefix = query_prefix(base)
     ds = Dataset.from_dict({
@@ -131,10 +147,16 @@ def train(
     args = SentenceTransformerTrainingArguments(
         output_dir=str(out / "checkpoints"), num_train_epochs=epochs,
         per_device_train_batch_size=batch_size, learning_rate=lr, warmup_ratio=0.1,
-        batch_sampler=BatchSamplers.NO_DUPLICATES, save_strategy="no", logging_steps=25,
-        report_to="none", seed=13,
+        batch_sampler=BatchSamplers.NO_DUPLICATES, logging_steps=25, report_to="none", seed=13,
+        # Checkpoint often so a stopped run (laptop closed, Colab disconnect) loses little.
+        save_strategy="steps", save_steps=save_steps, save_total_limit=2,
+        fp16=dev.startswith("cuda"),
     )
-    SentenceTransformerTrainer(model=model, args=args, train_dataset=ds, loss=loss).train()
+    ckpt = out / "checkpoints"
+    has_ckpt = ckpt.is_dir() and any(ckpt.glob("checkpoint-*"))
+    SentenceTransformerTrainer(model=model, args=args, train_dataset=ds, loss=loss).train(
+        resume_from_checkpoint=resume and has_ckpt,
+    )
     out.mkdir(parents=True, exist_ok=True)
     model.save(str(out))
     card = {"base": base, "pairs": len(pairs), "epochs": epochs, "batch_size": batch_size,

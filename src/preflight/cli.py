@@ -124,6 +124,12 @@ def main(argv: list[str] | None = None) -> int:
                     help="lower this if the GPU/MPS runs out of memory")
     cf.add_argument("--lr", type=float, default=2e-5)
     cf.add_argument("--dry-run", action="store_true", help="build and count pairs, do not train")
+    cf.add_argument("--export-pairs", type=Path, metavar="JSONL",
+                    help="write the pairs to a file and exit (to train elsewhere, e.g. Colab)")
+    cf.add_argument("--pairs-file", type=Path, metavar="JSONL",
+                    help="train from an exported pairs file; no database needed")
+    cf.add_argument("--resume", action="store_true",
+                    help="continue from the newest checkpoint under --out")
     cr.add_argument("--batch", type=int, default=128)
     cr.add_argument("--source", choices=["asrs", "ntsb", "far_aim", "ops_note"],
                     help="only this document source")
@@ -376,6 +382,18 @@ def main(argv: list[str] | None = None) -> int:
             finally:
                 close_pool()
             return 0
+        if args.op == "finetune" and args.pairs_file:
+            from preflight.config import settings
+            from preflight.retrieval import finetune as FT
+
+            ft_pairs = FT.load_pairs(args.pairs_file)[: args.pairs]
+            print(f"{len(ft_pairs):,} pairs from {args.pairs_file}", file=sys.stderr)
+            card = FT.train(ft_pairs, base=args.base or settings().embedding_model, out=args.out,
+                            epochs=args.epochs, batch_size=args.batch_size,
+                            mini_batch_size=args.mini_batch_size, lr=args.lr,
+                            resume=args.resume)
+            print(f"saved {args.out}: {card}")
+            return 0
         try:
             with get_pool().connection() as conn:
                 if args.op == "stats":
@@ -398,11 +416,15 @@ def main(argv: list[str] | None = None) -> int:
                     ft_pairs = FT.build_pairs(conn, exclude=held, limit=args.pairs)
                     print(f"{len(ft_pairs):,} pairs from reports outside the {len(held)} the "
                           "evals read", file=sys.stderr)
-                    if not args.dry_run:
+                    if args.export_pairs:
+                        FT.save_pairs(ft_pairs, args.export_pairs)
+                        print(f"wrote {args.export_pairs}")
+                    elif not args.dry_run:
                         card = FT.train(ft_pairs, base=args.base or settings().embedding_model,
                                         out=args.out, epochs=args.epochs,
                                         batch_size=args.batch_size,
-                                        mini_batch_size=args.mini_batch_size, lr=args.lr)
+                                        mini_batch_size=args.mini_batch_size, lr=args.lr,
+                                        resume=args.resume)
                         print(f"saved {args.out}: {card}")
                         print(f"next: preflight eval embedder --models "
                               f"{card['base']} {args.out}")

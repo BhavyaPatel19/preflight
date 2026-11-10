@@ -66,6 +66,29 @@ def test_build_pairs_never_reads_a_held_out_report(db) -> None:
     add("ft-1", "Narrative one.", "Synopsis: " + SYN)
     add("ft-2", "Narrative two.", "Synopsis: " + SYN)
     add("ft-3", "Narrative three, no synopsis.")
-    got = FT.build_pairs(db, exclude={"ft-2"}, limit=10)
+    # Hold out every pre-existing report too, so real corpus pairs can't fill the limit first.
+    real = {r[0] for r in db.execute(
+        "SELECT external_id FROM documents WHERE source = 'asrs' AND external_id NOT LIKE 'ft-%'"
+    ).fetchall()}
+    got = FT.build_pairs(db, exclude=real | {"ft-2"}, limit=10)
     reports = {p.report for p in got}
     assert "ft-1" in reports and "ft-2" not in reports and "ft-3" not in reports
+
+
+def test_pair_from_chunks_finds_inline_synopsis() -> None:
+    # Real ASRS chunks put the synopsis after the last sentence, not on its own line.
+    chunks = [
+        "On the arrival we were busy on the TCAS with multiple targets nearby.",
+        "We were assigned a heading of 270 to avoid traffic. Synopsis: A BE-40 flight crew "
+        "experienced a TCAS RA when they descended to 5;000 when cleared to 6;000.",
+    ]
+    p = FT.pair_from_chunks("r1", chunks)
+    assert p is not None
+    assert p.query.startswith("A BE-40 flight crew")
+    assert p.positive == chunks[0]
+
+
+def test_pairs_round_trip_through_jsonl(tmp_path: Path) -> None:
+    pairs = [FT.Pair(report="r1", query="A crew \"quoted\"\nsynopsis.", positive="Narrative.")]
+    FT.save_pairs(pairs, tmp_path / "p.jsonl")
+    assert FT.load_pairs(tmp_path / "p.jsonl") == pairs

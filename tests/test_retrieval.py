@@ -250,3 +250,15 @@ def test_reindex_statements_carry_the_build_parameters():
     assert stmts[1] == "SET max_parallel_maintenance_workers = 3"
     assert stmts[2].startswith("DROP INDEX IF EXISTS chunks_embedding_idx")
     assert "hnsw (embedding vector_cosine_ops) WITH (m = 24, ef_construction = 200)" in stmts[3]
+
+
+def test_route_sends_designators_to_hybrid_rerank_and_descriptions_to_dense() -> None:
+    from preflight.retrieval.search import route
+
+    for q in ("runway 28R", "RWY 10L closed", "crossed the hold line on Taxiway E at EVB",
+              "landed on Runway 7 at night"):
+        assert route(q) == ("hybrid", True), q
+    for q in ("C172 instructor reported an engine failure on climb out",
+              "runway incursion by a vehicle", "taxiway lighting out of service",
+              "B737 Captain reported a TCAS RA"):
+        assert route(q) == ("dense", False), q

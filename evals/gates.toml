@@ -66,26 +66,26 @@ note = "entities tagged inside injected prose; measured 3 (was 54 before prose d
 [[gate]]
 suite = "retrieval"
 metric = "hybrid_rerank_ndcg_at_10"
-min = 0.39
-note = "measured 0.402 (run 6); target 0.65"
+min = 0.43
+note = "measured 0.450 (run 10, fine-tuned embedder); target 0.65"
 
 [[gate]]
 suite = "retrieval"
 metric = "hybrid_rerank_recall_at_20"
-min = 0.59
-note = "measured 0.607; target 0.90 — the embedder is the lever"
+min = 0.69
+note = "measured 0.707 (run 10, fine-tuned embedder; 0.597 base); target 0.90"
 
 [[gate]]
 suite = "retrieval"
 metric = "hybrid_rerank_recall_at_20_specific"
-min = 0.76
-note = "Recall@20 on synopses > 25 words (151 queries); measured 0.781 — the half of the set where the label is unambiguous"
+min = 0.82
+note = "Recall@20 on synopses > 25 words (151 queries); measured 0.841 (run 10) — the half of the set where the label is unambiguous"
 
 [[gate]]
 suite = "retrieval"
 metric = "hybrid_rerank_precision_at_10_identifier"
 min = 0.75
-note = "measured 0.774; target 0.80"
+note = "measured 0.776 (run 10); target 0.80"
 
 [[gate]]
 suite = "grounding"
@@ -115,3 +115,22 @@ note = "measured 0.715; must stay below climatology (0.751) to be worth evaluati
 #   precedent — judge-estimated relevance is unvalidated until Cohen's κ exists
 #   briefing  — the weather slice is scored (119 cases with TAFs: recall 0.27, false alarms 0.16) but a
 #               floor on 32 hits would fire on noise; gate it once the count is in the hundreds
+
+# Routed retrieval (run 11): dense for descriptions, hybrid+rerank for runway/taxiway designators.
+[[gate]]
+suite = "retrieval"
+metric = "routed_ndcg_at_10"
+min = 0.52
+note = "measured 0.536 (run 11); the pass rule written before the run"
+
+[[gate]]
+suite = "retrieval"
+metric = "routed_recall_at_20"
+min = 0.73
+note = "measured 0.750 (run 11)"
+
+[[gate]]
+suite = "retrieval"
+metric = "routed_precision_at_10_identifier"
+min = 0.77
+note = "measured 0.776 (run 11)"

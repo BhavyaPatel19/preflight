@@ -40,4 +40,5 @@ evals/*.local.json
 data/logs/
 data/backups/
 data/extract/
+data/finetune/
 models/

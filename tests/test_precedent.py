@@ -98,7 +98,7 @@ def _briefing():
 def test_attaches_only_hits_above_threshold_and_updates_counts():
     r = _Retriever([_hit("a", "good", icao="KSFO", title="Good", score=0.9),
                     _hit("b", "weak", icao="KSFO", title="Weak", score=0.2)])
-    out = with_precedent(None, _briefing(), r, min_score=0.5)
+    out = with_precedent(None, _briefing(), r, min_score=0.5, gate=False)
     f = out.findings[0]
     assert len(f.claims) == 2 and [c.ref for c in f.claims[1].citations] == ["a"]
     assert len(r.calls) == 1 and r.calls[0][1] == "KSFO"
@@ -123,7 +123,7 @@ def test_same_report_not_cited_twice_across_findings():
     b = _briefing()
     two = Briefing(**{**b.model_dump(), "findings": (b.findings[0], b.findings[0])})
     r = _Retriever([_hit("dup", "t", icao="KSFO", title="Dup")])
-    out = with_precedent(None, two, r)
+    out = with_precedent(None, two, r, gate=False)
     assert len(out.findings[0].claims) == 2 and len(out.findings[1].claims) == 1
 
 
@@ -131,6 +131,43 @@ def test_one_report_cited_once_even_when_several_chunks_match():
     r = _Retriever([_hit("same", "chunk 0", icao="KSFO", title="Same report", score=0.9),
                     _hit("same", "chunk 3", icao="KSFO", title="Same report", score=0.8),
                     _hit("other", "t", icao="KSFO", title="Other", score=0.7)])
-    out = with_precedent(None, _briefing(), r)
+    out = with_precedent(None, _briefing(), r, gate=False)
     refs = [c.ref for c in out.findings[0].claims[1].citations]
     assert refs == ["same", "other"]
+
+
+def test_gate_attaches_only_reports_about_the_mechanism_and_ignores_score():
+    r = _Retriever([
+        _hit("off", "landed long and overran in gusty wind", icao="KSFO", title="Overrun",
+             score=0.95),
+        _hit("on", "we landed on the closed runway; the NOTAM was missed", icao="KSFO",
+             title="Closed runway landing", score=0.1),
+    ])
+    out = with_precedent(None, _briefing(), r, gate=True)
+    assert [c.ref for c in out.findings[0].claims[1].citations] == ["on"]
+
+
+def test_gate_with_nothing_on_mechanism_attaches_nothing():
+    r = _Retriever([_hit("off", "engine failure on climb", icao="KSFO", title="Engine",
+                         score=0.99)])
+    out = with_precedent(None, _briefing(), r, gate=True)
+    assert len(out.findings[0].claims) == 1
+
+
+def test_attachment_test_sheet_is_blind_and_scores_per_rule(tmp_path):
+    from preflight.evals import precedent as P
+
+    hit = {"title": None, "passage": "landed on the closed runway", "rerank_score": 0.9}
+    pool = [{"hazard": "KAAA: Runway 1 closed", "arms": {
+        "base": [{**hit, "ref": "ntsb:1"}, {**hit, "ref": "ntsb:2"}],
+        "gate": [{**hit, "ref": "ntsb:1"}],
+    }}]
+    sheet = tmp_path / "labels.csv"
+    assert P.write_test_sheet(pool, sheet) == 2               # one row per unique pair
+    text = sheet.read_text()
+    assert "base" not in text and "gate" not in text          # no rule named on the sheet
+    labels = {P._pair_id("KAAA: Runway 1 closed", "ntsb:1"): True,
+              P._pair_id("KAAA: Runway 1 closed", "ntsb:2"): False}
+    res = P.score_test(pool, labels)
+    assert res["base"]["precision"] == 0.5 and res["gate"]["precision"] == 1.0
+    assert res["gate"]["relevant_per_hazard"] == 1.0

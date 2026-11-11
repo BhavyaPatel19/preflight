@@ -1,0 +1,1484 @@
+[
+ {
+  "source": "test-notam",
+  "hazard": "KDFW: Runway 17C/35C closed (work in progress) until 01 Oct 1400Z",
+  "category": "runway",
+  "airport": "KDFW",
+  "query": "Runway 17C/35C closed work in progress. runway closed, crew used the parallel runway, lined up with the wrong runway or a taxiway, confusion over which runway was in use",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1776315",
+     "title": "Air carrier flight crew reported a runway incursion after landing.",
+     "passage": "We were across the hold short lines when I queried him about holding short; but I was late in warning him to avoid the confusion and mistake of going so far. At same time; an airplane had rotated for takeoff on RW (Runway) XXL just prior to our position making it a more serious event. ATC never said anything to us as the event happened or immediately after; so I asked them if we should continue across RW (Runway) XXL. They replied in the affirmative and to contact Ground Control after exiting on other side. At no time did ATC comment on the event. We continued to the gate without further incident.Contributing factors were the confusion about the intention of the aircraft on Taxiway XY near the [Taxiway] XX exit we were instructed to use; the short distance between the parallel runways; and lack of coordinated and deliberate attention to the immediate situation we were in.",
+     "rerank_score": 0.893
+    },
+    {
+     "ref": "asrs:1283584",
+     "title": "CRJ900 flight crew; holding behind another aircraft on Taxiway EF at DFW; is told to taxi around that aircraft and use Taxiway EG to the runway. The painted taxiway signs are confusing when viewed fac",
+     "passage": "Possibly if there were markings at the beginning of the runway hold short taxiways it could make it easier for aircraft to identify the proper taxiway. Bottom line is this is a rare situation; that not many aircraft will be in; but we did make the mistake; and it could have been prevented with a simple look back at our taxiway diagram; but with such close proximity of our new taxi instructions; and the event unfolding quickly; we still made the mistake. Synopsis: CRJ900 flight crew; holding behind another aircraft on Taxiway EF at DFW; is told to taxi around that aircraft and use Taxiway EG to the runway. The painted taxiway signs are confusing when viewed facing south and the crew ends up on Taxiway EH instead of EG. The airport diagram; displayed via iPad; was not consulted.",
+     "rerank_score": 0.843
+    },
+    {
+     "ref": "asrs:1715622",
+     "title": "Air carrier flight crew reported that during the takeoff roll and initial climb; an aircraft attempted to depart from the opposite end runway. The other aircraft aborted the takeoff.",
+     "passage": "I felt with other aircraft using Runway 17 it would be the least disruptive to the flow of the airport. In addition taking off on Runway 17 there was glare from the sun; and also a group of buildings off the departure end that helped hide Aircraft Y from sight.Departing ZZZ off of Runway 17; we had taxied to the end from the ramp. FO made two radio calls during the taxi; once for the initial taxi and then again when we crossed the intersecting Runway; 31/13. While holding short at the end of the runway I instructed the first officer to call Center via a phone number for clearance delivery out of ZZZ. There was some confusion over our flight number being filed as XXXA instead of XXX; as it wasn't in our remarks section of our paperwork and was only present in the ATC strip. We continued holding short of Runway 17 at the end for around 10-15 minutes while we double checked with dispatch and got our release from center.",
+     "rerank_score": 0.809
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:990347",
+     "title": "CRJ200 flight crew describes the events leading up to a taxiway excursion due to failure to read the latest NOTAMs. Breaking action had gone from good to poor and the crew was attempting to taxi on a ",
+     "passage": "We called Operations and they came out and took the passengers to the terminal and we stayed with the aircraft for another hour until we had made all the necessary phone calls. The event occurred because I; the Captain; did not thoroughly read through the close out paper work because I was on the phone with Dispatch and completely forgot to look it over better once off the phone. If I had I would have noticed that the taxiways and runways had deteriorated. I should have also noticed that Taxiway C was closed even though there were not cones or lights indicating that it was a closed taxiway. We arrived at the aircraft and I performed the preflight. At this time it was raining lightly. I returned to the aircraft and set up for the flight. ACARS was unavailable so the Captain contacted Dispatch for our takeoff data. When he was on the phone we received the closeout. We input the numbers; ran checklists; and started the engines. Then we began the taxi to Runway XX.",
+     "rerank_score": 0.647
+    },
+    {
+     "ref": "asrs:1584394",
+     "title": "A321 flight crew reported difficulty taxiing at an unfamiliar airfield due to a scheduled runway closure and lack of taxiway information.",
+     "passage": "Upon arrival at the Aircraft; the flight crew realized that the Tower had just closed making the airport environment uncontrolled and runway maintenance on the intended departure had just commenced. This caused us to use the smaller runway on the other side of the airport. Coming up with the taxi plan we elected to steer clear of runway maintenance since taxiway C was NOTAM'd closed; but the taxi route we chose would have taken us on taxiways that were too narrow for the A321. We began the taxi to runway XXL via A;D;K but the taxiway widths were poorly marked on the Jepp 10-9 and we didn't realize how narrow the taxiways were until the CA (Captain) was taxiing on A with intention of turning right on D but while passing the taxiway it was so narrow it appeared to be an access road and when the CA turned on to what he thought was taxiway D we were turning onto Runway YY.",
+     "rerank_score": 0.605
+    },
+    {
+     "ref": "asrs:1766564",
+     "title": "Pilot and Controller reported a runway incursion due to the pilot misunderstanding of ATC's clearance.",
+     "passage": "I had been held over for 2 hours and a Supervisor was working LC with Tower in-charge on a single runway; so we were not using LUAW (Line Up And Wait). Additionally Runway XXL was closed as well (which we use to offset small arrivals to allow for more departures on XXR) and all these factors were adding complexity to an already busy session.Aircraft X exited Runway XXR and was given taxi instructions 'Taxiway 2; Taxiway 3; Taxiway 4; cross Runway Y and taxi to park' (Runway Y is a closed runway in my control). The pilot read back the instructions correctly. I had other aircraft taxiing and needed a runway crossing between the steady stream of arrivals and departures. I coordinated for the crossing with LC and after Aircraft Y went through the intersection on takeoff roll; I cleared the aircraft waiting to cross Runway XXR at Taxiway 5 to cross.",
+     "rerank_score": 0.597
+    }
+   ]
+  }
+ },
+ {
+  "source": "test-notam",
+  "hazard": "KCLT: Runway 18C/36C closed until 01 Oct 1000Z",
+  "category": "runway",
+  "airport": "KCLT",
+  "query": "Runway 18C/36C closed. runway closed, crew used the parallel runway, lined up with the wrong runway or a taxiway, confusion over which runway was in use",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1776315",
+     "title": "Air carrier flight crew reported a runway incursion after landing.",
+     "passage": "We were across the hold short lines when I queried him about holding short; but I was late in warning him to avoid the confusion and mistake of going so far. At same time; an airplane had rotated for takeoff on RW (Runway) XXL just prior to our position making it a more serious event. ATC never said anything to us as the event happened or immediately after; so I asked them if we should continue across RW (Runway) XXL. They replied in the affirmative and to contact Ground Control after exiting on other side. At no time did ATC comment on the event. We continued to the gate without further incident.Contributing factors were the confusion about the intention of the aircraft on Taxiway XY near the [Taxiway] XX exit we were instructed to use; the short distance between the parallel runways; and lack of coordinated and deliberate attention to the immediate situation we were in.",
+     "rerank_score": 0.913
+    },
+    {
+     "ref": "asrs:1693388",
+     "title": "Medium Transport flight crew reported fatigue and distraction on final approach resulted in a landing on the wrong parallel runway.",
+     "passage": "We did not get any taxi instructions and proceeded to [FBO]. The Tower never asked about the landing and we were not given a phone number to call anyone.I can only attribute to us both being fatigued a little bit the reason we landed on the wrong runway. We should have gone around when Pilot Flying was confused about the approach to Runway 31. If we had gone around we would've realized the error. The Tower didn't correct us but we should've landed on the right runway. Synopsis: Medium Transport flight crew reported fatigue and distraction on final approach resulted in a landing on the wrong parallel runway.",
+     "rerank_score": 0.634
+    },
+    {
+     "ref": "asrs:1584394",
+     "title": "A321 flight crew reported difficulty taxiing at an unfamiliar airfield due to a scheduled runway closure and lack of taxiway information.",
+     "passage": "Upon arrival at the Aircraft; the flight crew realized that the Tower had just closed making the airport environment uncontrolled and runway maintenance on the intended departure had just commenced. This caused us to use the smaller runway on the other side of the airport. Coming up with the taxi plan we elected to steer clear of runway maintenance since taxiway C was NOTAM'd closed; but the taxi route we chose would have taken us on taxiways that were too narrow for the A321. We began the taxi to runway XXL via A;D;K but the taxiway widths were poorly marked on the Jepp 10-9 and we didn't realize how narrow the taxiways were until the CA (Captain) was taxiing on A with intention of turning right on D but while passing the taxiway it was so narrow it appeared to be an access road and when the CA turned on to what he thought was taxiway D we were turning onto Runway YY.",
+     "rerank_score": 0.619
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1693388",
+     "title": "Medium Transport flight crew reported fatigue and distraction on final approach resulted in a landing on the wrong parallel runway.",
+     "passage": "We did not get any taxi instructions and proceeded to [FBO]. The Tower never asked about the landing and we were not given a phone number to call anyone.I can only attribute to us both being fatigued a little bit the reason we landed on the wrong runway. We should have gone around when Pilot Flying was confused about the approach to Runway 31. If we had gone around we would've realized the error. The Tower didn't correct us but we should've landed on the right runway. Synopsis: Medium Transport flight crew reported fatigue and distraction on final approach resulted in a landing on the wrong parallel runway.",
+     "rerank_score": 0.634
+    },
+    {
+     "ref": "asrs:1584394",
+     "title": "A321 flight crew reported difficulty taxiing at an unfamiliar airfield due to a scheduled runway closure and lack of taxiway information.",
+     "passage": "Upon arrival at the Aircraft; the flight crew realized that the Tower had just closed making the airport environment uncontrolled and runway maintenance on the intended departure had just commenced. This caused us to use the smaller runway on the other side of the airport. Coming up with the taxi plan we elected to steer clear of runway maintenance since taxiway C was NOTAM'd closed; but the taxi route we chose would have taken us on taxiways that were too narrow for the A321. We began the taxi to runway XXL via A;D;K but the taxiway widths were poorly marked on the Jepp 10-9 and we didn't realize how narrow the taxiways were until the CA (Captain) was taxiing on A with intention of turning right on D but while passing the taxiway it was so narrow it appeared to be an access road and when the CA turned on to what he thought was taxiway D we were turning onto Runway YY.",
+     "rerank_score": 0.619
+    },
+    {
+     "ref": "asrs:1602207",
+     "title": "GA pilot reported landing on a closed runway and some confusion relating to if it was a PPR or actually closed.",
+     "passage": "I was somewhat confused; but also very upset as it appeared we landed on a closed runway. Upon exiting the aircraft; I met with the contractor supervisor who had a hand held radio capable of talking/listening on UNICOM. He was not mad; but said he wished we had called ahead so he could have alerted the contractors we were coming in. So; I asked him - So; it is not really closed - more like PPR? He said; yes. I asked him if we would be able to leave and he said 'Yes; no problem as long as we get out before dark.' Maybe this type of closure; is really more of a local airport controlled closure; but very confusing to me. They were working on edge lights and had the whole system turned off. I also spoke with the crews working down at the approach end and they did not feel like we came close to them orwere ignoring their markings. Ends up they had placed a yellow 'X' panel flat on the runway right over the numbers. They probably thought that would be where pilots would look.",
+     "rerank_score": 0.581
+    }
+   ]
+  }
+ },
+ {
+  "source": "test-notam",
+  "hazard": "KMSP: Runway 12R/30L closed (work in progress) until 01 Oct 1200Z",
+  "category": "runway",
+  "airport": "KMSP",
+  "query": "Runway 12R/30L closed work in progress. runway closed, crew used the parallel runway, lined up with the wrong runway or a taxiway, confusion over which runway was in use",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1776315",
+     "title": "Air carrier flight crew reported a runway incursion after landing.",
+     "passage": "We were across the hold short lines when I queried him about holding short; but I was late in warning him to avoid the confusion and mistake of going so far. At same time; an airplane had rotated for takeoff on RW (Runway) XXL just prior to our position making it a more serious event. ATC never said anything to us as the event happened or immediately after; so I asked them if we should continue across RW (Runway) XXL. They replied in the affirmative and to contact Ground Control after exiting on other side. At no time did ATC comment on the event. We continued to the gate without further incident.Contributing factors were the confusion about the intention of the aircraft on Taxiway XY near the [Taxiway] XX exit we were instructed to use; the short distance between the parallel runways; and lack of coordinated and deliberate attention to the immediate situation we were in.",
+     "rerank_score": 0.939
+    },
+    {
+     "ref": "asrs:1277725",
+     "title": "An EMB-145 flight crew incurred a runway while rushing for a time constrained takeoff with complex taxi instructions because of a closed taxiway.",
+     "passage": "The construction on Taxiway C; as well as the close intersection of D and A on the way to Runway XX must cause some confusion with pilots. The only other thing that I can think to prevent this is to tell the aircraft RIGHT turn on D to RWY XX; or to say A instead to prevent confusion. I don't believe that what was issued for taxi instructions was wrong; but maybe further clarification may have helped. Pavement markings and I believe wigwags were already in place for XY and D; and an airport diagram would clearly define a right turn on D for XX either way. Synopsis: An EMB-145 flight crew incurred a runway while rushing for a time constrained takeoff with complex taxi instructions because of a closed taxiway.",
+     "rerank_score": 0.638
+    },
+    {
+     "ref": "asrs:1602207",
+     "title": "GA pilot reported landing on a closed runway and some confusion relating to if it was a PPR or actually closed.",
+     "passage": "I was somewhat confused; but also very upset as it appeared we landed on a closed runway. Upon exiting the aircraft; I met with the contractor supervisor who had a hand held radio capable of talking/listening on UNICOM. He was not mad; but said he wished we had called ahead so he could have alerted the contractors we were coming in. So; I asked him - So; it is not really closed - more like PPR? He said; yes. I asked him if we would be able to leave and he said 'Yes; no problem as long as we get out before dark.' Maybe this type of closure; is really more of a local airport controlled closure; but very confusing to me. They were working on edge lights and had the whole system turned off. I also spoke with the crews working down at the approach end and they did not feel like we came close to them orwere ignoring their markings. Ends up they had placed a yellow 'X' panel flat on the runway right over the numbers. They probably thought that would be where pilots would look.",
+     "rerank_score": 0.628
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1277725",
+     "title": "An EMB-145 flight crew incurred a runway while rushing for a time constrained takeoff with complex taxi instructions because of a closed taxiway.",
+     "passage": "The construction on Taxiway C; as well as the close intersection of D and A on the way to Runway XX must cause some confusion with pilots. The only other thing that I can think to prevent this is to tell the aircraft RIGHT turn on D to RWY XX; or to say A instead to prevent confusion. I don't believe that what was issued for taxi instructions was wrong; but maybe further clarification may have helped. Pavement markings and I believe wigwags were already in place for XY and D; and an airport diagram would clearly define a right turn on D for XX either way. Synopsis: An EMB-145 flight crew incurred a runway while rushing for a time constrained takeoff with complex taxi instructions because of a closed taxiway.",
+     "rerank_score": 0.638
+    },
+    {
+     "ref": "asrs:1602207",
+     "title": "GA pilot reported landing on a closed runway and some confusion relating to if it was a PPR or actually closed.",
+     "passage": "I was somewhat confused; but also very upset as it appeared we landed on a closed runway. Upon exiting the aircraft; I met with the contractor supervisor who had a hand held radio capable of talking/listening on UNICOM. He was not mad; but said he wished we had called ahead so he could have alerted the contractors we were coming in. So; I asked him - So; it is not really closed - more like PPR? He said; yes. I asked him if we would be able to leave and he said 'Yes; no problem as long as we get out before dark.' Maybe this type of closure; is really more of a local airport controlled closure; but very confusing to me. They were working on edge lights and had the whole system turned off. I also spoke with the crews working down at the approach end and they did not feel like we came close to them orwere ignoring their markings. Ends up they had placed a yellow 'X' panel flat on the runway right over the numbers. They probably thought that would be where pilots would look.",
+     "rerank_score": 0.628
+    },
+    {
+     "ref": "asrs:990347",
+     "title": "CRJ200 flight crew describes the events leading up to a taxiway excursion due to failure to read the latest NOTAMs. Breaking action had gone from good to poor and the crew was attempting to taxi on a ",
+     "passage": "We called Operations and they came out and took the passengers to the terminal and we stayed with the aircraft for another hour until we had made all the necessary phone calls. The event occurred because I; the Captain; did not thoroughly read through the close out paper work because I was on the phone with Dispatch and completely forgot to look it over better once off the phone. If I had I would have noticed that the taxiways and runways had deteriorated. I should have also noticed that Taxiway C was closed even though there were not cones or lights indicating that it was a closed taxiway. We arrived at the aircraft and I performed the preflight. At this time it was raining lightly. I returned to the aircraft and set up for the flight. ACARS was unavailable so the Captain contacted Dispatch for our takeoff data. When he was on the phone we received the closeout. We input the numbers; ran checklists; and started the engines. Then we began the taxi to Runway XX.",
+     "rerank_score": 0.624
+    }
+   ]
+  }
+ },
+ {
+  "source": "test-notam",
+  "hazard": "KPHL: Taxiway E closed between K and S until 01 Oct 1500Z",
+  "category": "taxiway",
+  "airport": "KPHL",
+  "query": "Taxiway E closed between K and S. taxiway closed, ground reroute, wrong taxiway taken or hold short missed during taxi",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1747359",
+     "title": "Air carrier First Officer reported a taxiway incursion due to distraction from dealing with Engine 1 indications being higher than Engine 2.",
+     "passage": "As we were taxiing out to the runway for departure the FO was getting the data ready and starting the takeoff data brief. He noticed that the engine N1 indications for engine one was quite a bit higher than the engine indications for engine 2. He immediately tried to diagnose why this was happening and we noticed that there was no air going through the packs. In the meantime I was taxiing and waiting for the aircraft in front of us to proceed. As they started to proceed forward; we followed and during which time I was trying to decide our next plan of attack and getting ready to see if we could go somewhere to take a look at the situation. During this time the Ramp Controller told us to hold short at the next spot and contact ground. As we continued toward the spot unknowingly missed the spot we were supposed to hold at and crossed onto the taxiway slightly. I noticed it immediately and put on the brakes and called ground who gave us taxi instructions to the runway.",
+     "rerank_score": 0.96
+    },
+    {
+     "ref": "asrs:1673716",
+     "title": "A319 First Officer reported a malfunctioning evacuation alarm sounding in excess of 100dB; causing them to miss a turn during taxi to gate.",
+     "passage": "I coordinated with the Flight Attendant to ensure nothing was wrong in the back and confirmed that they had not activated the alarm. We determined that the PA (Public Address) system or the crew intercom system was not operational at this point. After some troubleshooting in coordination with Maintenance; the Captain and I decided to taxi the aircraft to the gate and to turn the aircraft over to Maintenance to troubleshoot the system there. We received standard taxi instructions to SS then hold short of T6. I attempted to reduce the noise by covering the evacuation speaker. I was distracted by the noise of the alarm; attempted to cover the speaker with my hand; as well as attempting to coordinate with Maintenance when I realized we had missed the turn onto taxiway SS. The Captain immediately stopped the aircraft and we coordinated with Ground for a new taxi assignment. We then proceeded to the gate with the new taxi route assignment.",
+     "rerank_score": 0.958
+    },
+    {
+     "ref": "asrs:1427684",
+     "title": "Corporate Captain reported being cleared to taxi eastbound on Taxiway K and hold short of Taxiway E after landing on Runway 27R. The crew did not see any E signs and held short of Runway 35 after cros",
+     "passage": "After landing on Runway 27R at PHL; we were given instructions to turn right; taxi on K hold short of Taxiway E. There were three airliners lined up on Taxiway E holding short of Taxiway K. Upon approaching Taxiway E; neither myself nor the pilot taxiing the aircraft saw any signs indicating Taxiway E and assumed that the aircraft were on Taxiway F. Once we saw the Runway 35 hold short markings and lighting; we realized we had gone too far. The ground controller questioned our location and we immediately responded we had passed E and were holding short of Runway 35. We were then cleared to cross the runway and continued taxiing to the ramp with no further issues. There seems to be a lack of signage marking Taxiways F and E when approaching from the west on Taxiway K. Synopsis: Corporate Captain reported being cleared to taxi eastbound on Taxiway K and hold short of Taxiway E after landing on Runway 27R.",
+     "rerank_score": 0.952
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1747359",
+     "title": "Air carrier First Officer reported a taxiway incursion due to distraction from dealing with Engine 1 indications being higher than Engine 2.",
+     "passage": "As we were taxiing out to the runway for departure the FO was getting the data ready and starting the takeoff data brief. He noticed that the engine N1 indications for engine one was quite a bit higher than the engine indications for engine 2. He immediately tried to diagnose why this was happening and we noticed that there was no air going through the packs. In the meantime I was taxiing and waiting for the aircraft in front of us to proceed. As they started to proceed forward; we followed and during which time I was trying to decide our next plan of attack and getting ready to see if we could go somewhere to take a look at the situation. During this time the Ramp Controller told us to hold short at the next spot and contact ground. As we continued toward the spot unknowingly missed the spot we were supposed to hold at and crossed onto the taxiway slightly. I noticed it immediately and put on the brakes and called ground who gave us taxi instructions to the runway.",
+     "rerank_score": 0.96
+    },
+    {
+     "ref": "asrs:1673716",
+     "title": "A319 First Officer reported a malfunctioning evacuation alarm sounding in excess of 100dB; causing them to miss a turn during taxi to gate.",
+     "passage": "I coordinated with the Flight Attendant to ensure nothing was wrong in the back and confirmed that they had not activated the alarm. We determined that the PA (Public Address) system or the crew intercom system was not operational at this point. After some troubleshooting in coordination with Maintenance; the Captain and I decided to taxi the aircraft to the gate and to turn the aircraft over to Maintenance to troubleshoot the system there. We received standard taxi instructions to SS then hold short of T6. I attempted to reduce the noise by covering the evacuation speaker. I was distracted by the noise of the alarm; attempted to cover the speaker with my hand; as well as attempting to coordinate with Maintenance when I realized we had missed the turn onto taxiway SS. The Captain immediately stopped the aircraft and we coordinated with Ground for a new taxi assignment. We then proceeded to the gate with the new taxi route assignment.",
+     "rerank_score": 0.958
+    },
+    {
+     "ref": "asrs:1427684",
+     "title": "Corporate Captain reported being cleared to taxi eastbound on Taxiway K and hold short of Taxiway E after landing on Runway 27R. The crew did not see any E signs and held short of Runway 35 after cros",
+     "passage": "After landing on Runway 27R at PHL; we were given instructions to turn right; taxi on K hold short of Taxiway E. There were three airliners lined up on Taxiway E holding short of Taxiway K. Upon approaching Taxiway E; neither myself nor the pilot taxiing the aircraft saw any signs indicating Taxiway E and assumed that the aircraft were on Taxiway F. Once we saw the Runway 35 hold short markings and lighting; we realized we had gone too far. The ground controller questioned our location and we immediately responded we had passed E and were holding short of Runway 35. We were then cleared to cross the runway and continued taxiing to the ramp with no further issues. There seems to be a lack of signage marking Taxiways F and E when approaching from the west on Taxiway K. Synopsis: Corporate Captain reported being cleared to taxi eastbound on Taxiway K and hold short of Taxiway E after landing on Runway 27R.",
+     "rerank_score": 0.952
+    }
+   ]
+  }
+ },
+ {
+  "source": "test-notam",
+  "hazard": "KBWI: Taxiway P closed (construction) until 01 Oct 1300Z",
+  "category": "taxiway",
+  "airport": "KBWI",
+  "query": "Taxiway P closed construction. taxiway closed, ground reroute, wrong taxiway taken or hold short missed during taxi",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1343682",
+     "title": "While taxiing to LAX 25R; the First Officer reported that they were cleared for takeoff on a taxiway behind them after missing the hold short of taxiway note. Ground had cleared them to taxi full leng",
+     "passage": "Ground controller cleared us to taxi full length Runway 25R. Just prior to reaching intersection F we switched to tower frequency 120.95. After passing F we were cleared for takeoff at F intersection so the Tower controller asked why we didn't stop. Our clearance limit was the end of 25R not a random intersection. The ground controller should have specified taxi to 25R and hold short at intersection F for possible intersection departure. The fact that there is a note on the chart to monitor tower for possible takeoff at that intersection does not require you to hold short. Synopsis: While taxiing to LAX 25R; the First Officer reported that they were cleared for takeoff on a taxiway behind them after missing the hold short of taxiway note. Ground had cleared them to taxi full length.",
+     "rerank_score": 0.988
+    },
+    {
+     "ref": "asrs:1645542",
+     "title": "A319 flight crew reported a runway incursion due to unclear ATC instructions.",
+     "passage": "Nothing more was said from ATC.The Ground controller may have misspoke and meant XXL; said XXR and didn't listen to our read back; and Tower controllers did not listen to our read back of the clearance we had received from Ground when he cleared us to hold short and didn't specify holding short of which runway.I will never cross a runway again without multiple confirmations that it is clear to cross; even if it's closed. I will also question what runway to hold short if a controller doesn't respond with the clearance I get while taxiing from Ground when switched to Tower. Taxiing for departure; we were given instructions to taxi to Runway XXR. I repeated those instructions for XXR to both Ground controllers. The [second] controller instructed us to hold short of Taxiway XX on Taxiway XY; while a ground crew cleared debris from Taxiway XY ahead of us. Once they cleared the taxiway; Ground had us switch to Tower. The Tower controller instructed us to continue on XY and hold short.",
+     "rerank_score": 0.978
+    },
+    {
+     "ref": "asrs:1756839",
+     "title": "Air carrier flight crew reported inadvertently crossing the runway hold short line while attempting to turn onto a taxiway.",
+     "passage": "During taxi out we were given instructions to taxi XXL via Mike; hold short of Echo Delta. Upon stopping short of Echo Delta; ground then instructed us to 'make the right turn on Echo Delta; hold short of XXR approach.' While the Captain was turning I noted the hold short line was immediately in front of us. By the time he realized what I said the aircraft nose stopped just past the hold short line. We immediately notified Ground who then instructed us to continue taxi to XXL.The wording the Ground Controller used to 'make the right turn onto echo delta' is somewhat misleading. The hold short line is so close to the taxiway intersection there is no way the aircraft can even turn 90 degrees and still hold short.I would say the controllers should stay with our original taxi clearance of 'hold short of Echo Delta on Mike' until cleared through the XXR approach path. During taxi out to XXL we were told to taxi on Mike; hold short [taxiways] ED (Echo and Delta).",
+     "rerank_score": 0.978
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1343682",
+     "title": "While taxiing to LAX 25R; the First Officer reported that they were cleared for takeoff on a taxiway behind them after missing the hold short of taxiway note. Ground had cleared them to taxi full leng",
+     "passage": "Ground controller cleared us to taxi full length Runway 25R. Just prior to reaching intersection F we switched to tower frequency 120.95. After passing F we were cleared for takeoff at F intersection so the Tower controller asked why we didn't stop. Our clearance limit was the end of 25R not a random intersection. The ground controller should have specified taxi to 25R and hold short at intersection F for possible intersection departure. The fact that there is a note on the chart to monitor tower for possible takeoff at that intersection does not require you to hold short. Synopsis: While taxiing to LAX 25R; the First Officer reported that they were cleared for takeoff on a taxiway behind them after missing the hold short of taxiway note. Ground had cleared them to taxi full length.",
+     "rerank_score": 0.988
+    },
+    {
+     "ref": "asrs:1645542",
+     "title": "A319 flight crew reported a runway incursion due to unclear ATC instructions.",
+     "passage": "Nothing more was said from ATC.The Ground controller may have misspoke and meant XXL; said XXR and didn't listen to our read back; and Tower controllers did not listen to our read back of the clearance we had received from Ground when he cleared us to hold short and didn't specify holding short of which runway.I will never cross a runway again without multiple confirmations that it is clear to cross; even if it's closed. I will also question what runway to hold short if a controller doesn't respond with the clearance I get while taxiing from Ground when switched to Tower. Taxiing for departure; we were given instructions to taxi to Runway XXR. I repeated those instructions for XXR to both Ground controllers. The [second] controller instructed us to hold short of Taxiway XX on Taxiway XY; while a ground crew cleared debris from Taxiway XY ahead of us. Once they cleared the taxiway; Ground had us switch to Tower. The Tower controller instructed us to continue on XY and hold short.",
+     "rerank_score": 0.978
+    },
+    {
+     "ref": "asrs:1756839",
+     "title": "Air carrier flight crew reported inadvertently crossing the runway hold short line while attempting to turn onto a taxiway.",
+     "passage": "During taxi out we were given instructions to taxi XXL via Mike; hold short of Echo Delta. Upon stopping short of Echo Delta; ground then instructed us to 'make the right turn on Echo Delta; hold short of XXR approach.' While the Captain was turning I noted the hold short line was immediately in front of us. By the time he realized what I said the aircraft nose stopped just past the hold short line. We immediately notified Ground who then instructed us to continue taxi to XXL.The wording the Ground Controller used to 'make the right turn onto echo delta' is somewhat misleading. The hold short line is so close to the taxiway intersection there is no way the aircraft can even turn 90 degrees and still hold short.I would say the controllers should stay with our original taxi clearance of 'hold short of Echo Delta on Mike' until cleared through the XXR approach path. During taxi out to XXL we were told to taxi on Mike; hold short [taxiways] ED (Echo and Delta).",
+     "rerank_score": 0.978
+    }
+   ]
+  }
+ },
+ {
+  "source": "test-notam",
+  "hazard": "KMDW: Taxiway Y closed (snow removal) until 01 Oct 1800Z",
+  "category": "taxiway",
+  "airport": "KMDW",
+  "query": "Taxiway Y closed snow removal. taxiway closed, ground reroute, wrong taxiway taken or hold short missed during taxi",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1645542",
+     "title": "A319 flight crew reported a runway incursion due to unclear ATC instructions.",
+     "passage": "Nothing more was said from ATC.The Ground controller may have misspoke and meant XXL; said XXR and didn't listen to our read back; and Tower controllers did not listen to our read back of the clearance we had received from Ground when he cleared us to hold short and didn't specify holding short of which runway.I will never cross a runway again without multiple confirmations that it is clear to cross; even if it's closed. I will also question what runway to hold short if a controller doesn't respond with the clearance I get while taxiing from Ground when switched to Tower. Taxiing for departure; we were given instructions to taxi to Runway XXR. I repeated those instructions for XXR to both Ground controllers. The [second] controller instructed us to hold short of Taxiway XX on Taxiway XY; while a ground crew cleared debris from Taxiway XY ahead of us. Once they cleared the taxiway; Ground had us switch to Tower. The Tower controller instructed us to continue on XY and hold short.",
+     "rerank_score": 0.978
+    },
+    {
+     "ref": "asrs:1343682",
+     "title": "While taxiing to LAX 25R; the First Officer reported that they were cleared for takeoff on a taxiway behind them after missing the hold short of taxiway note. Ground had cleared them to taxi full leng",
+     "passage": "Ground controller cleared us to taxi full length Runway 25R. Just prior to reaching intersection F we switched to tower frequency 120.95. After passing F we were cleared for takeoff at F intersection so the Tower controller asked why we didn't stop. Our clearance limit was the end of 25R not a random intersection. The ground controller should have specified taxi to 25R and hold short at intersection F for possible intersection departure. The fact that there is a note on the chart to monitor tower for possible takeoff at that intersection does not require you to hold short. Synopsis: While taxiing to LAX 25R; the First Officer reported that they were cleared for takeoff on a taxiway behind them after missing the hold short of taxiway note. Ground had cleared them to taxi full length.",
+     "rerank_score": 0.975
+    },
+    {
+     "ref": "asrs:1423490",
+     "title": "PVD Tower Controller and the flight crew involved reported the crew was approved to use a closed taxiway that was not listed as closed on the ATIS.",
+     "passage": "Ground cleared us to taxi; and apparently cleared us to taxi on a closed runway. I don't specifically remember the taxi directions; but with the amount of snowfall that day; there weren't many options; and so I didn't question ground control's directions and thought they had the best situational awareness of the airport. We also took off about 5 minutes before the tower closed; so I'm not sure if this was a factor in the route they gave us or not; but given the field conditions; the route seemed logical. Most of the taxiways were closed due to deep snow. I was notified by the safety review committee that we taxied on a closed runway.With the constantly changing airport conditions; and the operations crew working to clear up the airport; the fact that runway had not been opened was missed. I assumed that ground control had the most up to date picture of the airfield; and didn't question their taxi instructions. We followed the directions we were given.",
+     "rerank_score": 0.974
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1645542",
+     "title": "A319 flight crew reported a runway incursion due to unclear ATC instructions.",
+     "passage": "Nothing more was said from ATC.The Ground controller may have misspoke and meant XXL; said XXR and didn't listen to our read back; and Tower controllers did not listen to our read back of the clearance we had received from Ground when he cleared us to hold short and didn't specify holding short of which runway.I will never cross a runway again without multiple confirmations that it is clear to cross; even if it's closed. I will also question what runway to hold short if a controller doesn't respond with the clearance I get while taxiing from Ground when switched to Tower. Taxiing for departure; we were given instructions to taxi to Runway XXR. I repeated those instructions for XXR to both Ground controllers. The [second] controller instructed us to hold short of Taxiway XX on Taxiway XY; while a ground crew cleared debris from Taxiway XY ahead of us. Once they cleared the taxiway; Ground had us switch to Tower. The Tower controller instructed us to continue on XY and hold short.",
+     "rerank_score": 0.978
+    },
+    {
+     "ref": "asrs:1343682",
+     "title": "While taxiing to LAX 25R; the First Officer reported that they were cleared for takeoff on a taxiway behind them after missing the hold short of taxiway note. Ground had cleared them to taxi full leng",
+     "passage": "Ground controller cleared us to taxi full length Runway 25R. Just prior to reaching intersection F we switched to tower frequency 120.95. After passing F we were cleared for takeoff at F intersection so the Tower controller asked why we didn't stop. Our clearance limit was the end of 25R not a random intersection. The ground controller should have specified taxi to 25R and hold short at intersection F for possible intersection departure. The fact that there is a note on the chart to monitor tower for possible takeoff at that intersection does not require you to hold short. Synopsis: While taxiing to LAX 25R; the First Officer reported that they were cleared for takeoff on a taxiway behind them after missing the hold short of taxiway note. Ground had cleared them to taxi full length.",
+     "rerank_score": 0.975
+    },
+    {
+     "ref": "asrs:1423490",
+     "title": "PVD Tower Controller and the flight crew involved reported the crew was approved to use a closed taxiway that was not listed as closed on the ATIS.",
+     "passage": "Ground cleared us to taxi; and apparently cleared us to taxi on a closed runway. I don't specifically remember the taxi directions; but with the amount of snowfall that day; there weren't many options; and so I didn't question ground control's directions and thought they had the best situational awareness of the airport. We also took off about 5 minutes before the tower closed; so I'm not sure if this was a factor in the route they gave us or not; but given the field conditions; the route seemed logical. Most of the taxiways were closed due to deep snow. I was notified by the safety review committee that we taxied on a closed runway.With the constantly changing airport conditions; and the operations crew working to clear up the airport; the fact that runway had not been opened was missed. I assumed that ground control had the most up to date picture of the airfield; and didn't question their taxi instructions. We followed the directions we were given.",
+     "rerank_score": 0.974
+    }
+   ]
+  }
+ },
+ {
+  "source": "test-notam",
+  "hazard": "KPDX: ILS 10R unserviceable (maintenance) until 02 Oct 0100Z",
+  "category": "approach aids",
+  "airport": "KPDX",
+  "query": "ILS 10R unserviceable maintenance. ILS out of service, flew an RNAV or visual approach instead, late change of approach, glidepath or minimums confusion",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1681694",
+     "title": "EMB-145 Captain reported initiating a go-around due to an unstable approach.",
+     "passage": "Aircraft was unstable during night visual backed up with RNAV; go-around was initiated with a left pattern to a landing.Pilot monitoring detected the unstable approach near the final approach fix due to speed; configuration and altitude above the glidepath as out of reasonable parameters to complete a stable approach and landing.Pilot flying was too high; fast and configured too late for a stabilized approach. Guidance was full scale and PAPI was all white outside and just inside the final approach fix. Vertical speed was 1;000 FPM with no apparent capture of the glidepath. The pilot flying increased descent rate to 1;500 FPM and we were at 1;200 feet. I (pilot monitoring) immediately called for a go-around. The pilot flying did not respond; I called for it again and it was finally initiated. We climbed to 2;000 feet MSL and flew a left pattern for another approach.",
+     "rerank_score": 0.769
+    },
+    {
+     "ref": "asrs:1192323",
+     "title": "An important and illuminating report that addresses the effect of inappropriate and/or improper modifications programmed into the autoflight system by a fatigued flight crew cleared to fly a visual ap",
+     "passage": "We departed late due to a late inbound aircraft. We flew an RNAV STAR arrival and received vectors abeam the airport. Due to the late arrival into the normally busy airport the traffic pattern was clear. The ILS to [Runway] XXL was out of service and visual approaches were in use. We loaded the RNAV (GPS) Y Runway XXL into the FMS for backup guidance for the visual. While on vectors I extended the centerline off the FAF; however; when I executed the modification; the centerline extended off [Runway] XXL and the FAF was deleted from the route; along with its 2;400 FT crossing restriction. We were on a southerly heading at 3;000 MSL; outbound abeam the FAF when the Controller turned us to a 080 heading for a base leg. I reentered the FAF into the FMS and extended it; but did not enter the hard altitude of 2;400 FT. The Controller asked if we had the field in sight; we said yes and he cleared us the visual approach to [Runway] XXL.",
+     "rerank_score": 0.706
+    },
+    {
+     "ref": "asrs:1317627",
+     "title": "Glideslope failed during ILS approach. Flight crew converted to LOC only approach procedures; but missed a crossing altitude restriction. Tower received a low altitude alert.",
+     "passage": "We were on vectors for an ILS approach. When given turn to intercept LOC; ATC informed us that the GS was now Out of Service (OTS) and we were now cleared for the LOC approach instead. In hind sight; at this point I should have discontinued the approach and gone around. This would have allowed my crew to properly brief the LOC approach. I did not do this. Instead; we continued the approach thinking we would be able to easily identify all the step down altitudes. We crossed the first fix at 2;300 feet and then descended all the way to 1;000 feet MDA. By doing this; we missed the 1;640 feet mandatory level-off at the second fix. We broke out of the clouds at 1;200 feet just as we received a low altitude alert from Tower. We were then able to see that we were too low and climbed back up to 1;500 feet; which was now clear of clouds; until we were back on a more appropriate visual glide path. Synopsis: Glideslope failed during ILS approach.",
+     "rerank_score": 0.596
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1681694",
+     "title": "EMB-145 Captain reported initiating a go-around due to an unstable approach.",
+     "passage": "Aircraft was unstable during night visual backed up with RNAV; go-around was initiated with a left pattern to a landing.Pilot monitoring detected the unstable approach near the final approach fix due to speed; configuration and altitude above the glidepath as out of reasonable parameters to complete a stable approach and landing.Pilot flying was too high; fast and configured too late for a stabilized approach. Guidance was full scale and PAPI was all white outside and just inside the final approach fix. Vertical speed was 1;000 FPM with no apparent capture of the glidepath. The pilot flying increased descent rate to 1;500 FPM and we were at 1;200 feet. I (pilot monitoring) immediately called for a go-around. The pilot flying did not respond; I called for it again and it was finally initiated. We climbed to 2;000 feet MSL and flew a left pattern for another approach.",
+     "rerank_score": 0.769
+    },
+    {
+     "ref": "asrs:1192323",
+     "title": "An important and illuminating report that addresses the effect of inappropriate and/or improper modifications programmed into the autoflight system by a fatigued flight crew cleared to fly a visual ap",
+     "passage": "We departed late due to a late inbound aircraft. We flew an RNAV STAR arrival and received vectors abeam the airport. Due to the late arrival into the normally busy airport the traffic pattern was clear. The ILS to [Runway] XXL was out of service and visual approaches were in use. We loaded the RNAV (GPS) Y Runway XXL into the FMS for backup guidance for the visual. While on vectors I extended the centerline off the FAF; however; when I executed the modification; the centerline extended off [Runway] XXL and the FAF was deleted from the route; along with its 2;400 FT crossing restriction. We were on a southerly heading at 3;000 MSL; outbound abeam the FAF when the Controller turned us to a 080 heading for a base leg. I reentered the FAF into the FMS and extended it; but did not enter the hard altitude of 2;400 FT. The Controller asked if we had the field in sight; we said yes and he cleared us the visual approach to [Runway] XXL.",
+     "rerank_score": 0.706
+    },
+    {
+     "ref": "asrs:1317627",
+     "title": "Glideslope failed during ILS approach. Flight crew converted to LOC only approach procedures; but missed a crossing altitude restriction. Tower received a low altitude alert.",
+     "passage": "We were on vectors for an ILS approach. When given turn to intercept LOC; ATC informed us that the GS was now Out of Service (OTS) and we were now cleared for the LOC approach instead. In hind sight; at this point I should have discontinued the approach and gone around. This would have allowed my crew to properly brief the LOC approach. I did not do this. Instead; we continued the approach thinking we would be able to easily identify all the step down altitudes. We crossed the first fix at 2;300 feet and then descended all the way to 1;000 feet MDA. By doing this; we missed the 1;640 feet mandatory level-off at the second fix. We broke out of the clouds at 1;200 feet just as we received a low altitude alert from Tower. We were then able to see that we were too low and climbed back up to 1;500 feet; which was now clear of clouds; until we were back on a more appropriate visual glide path. Synopsis: Glideslope failed during ILS approach.",
+     "rerank_score": 0.596
+    }
+   ]
+  }
+ },
+ {
+  "source": "test-notam",
+  "hazard": "KSTL: LOC 30R unserviceable until 01 Oct 1600Z",
+  "category": "approach aids",
+  "airport": "KSTL",
+  "query": "LOC 30R unserviceable. ILS out of service, flew an RNAV or visual approach instead, late change of approach, glidepath or minimums confusion",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1681694",
+     "title": "EMB-145 Captain reported initiating a go-around due to an unstable approach.",
+     "passage": "Aircraft was unstable during night visual backed up with RNAV; go-around was initiated with a left pattern to a landing.Pilot monitoring detected the unstable approach near the final approach fix due to speed; configuration and altitude above the glidepath as out of reasonable parameters to complete a stable approach and landing.Pilot flying was too high; fast and configured too late for a stabilized approach. Guidance was full scale and PAPI was all white outside and just inside the final approach fix. Vertical speed was 1;000 FPM with no apparent capture of the glidepath. The pilot flying increased descent rate to 1;500 FPM and we were at 1;200 feet. I (pilot monitoring) immediately called for a go-around. The pilot flying did not respond; I called for it again and it was finally initiated. We climbed to 2;000 feet MSL and flew a left pattern for another approach.",
+     "rerank_score": 0.62
+    },
+    {
+     "ref": "asrs:1192323",
+     "title": "An important and illuminating report that addresses the effect of inappropriate and/or improper modifications programmed into the autoflight system by a fatigued flight crew cleared to fly a visual ap",
+     "passage": "We departed late due to a late inbound aircraft. We flew an RNAV STAR arrival and received vectors abeam the airport. Due to the late arrival into the normally busy airport the traffic pattern was clear. The ILS to [Runway] XXL was out of service and visual approaches were in use. We loaded the RNAV (GPS) Y Runway XXL into the FMS for backup guidance for the visual. While on vectors I extended the centerline off the FAF; however; when I executed the modification; the centerline extended off [Runway] XXL and the FAF was deleted from the route; along with its 2;400 FT crossing restriction. We were on a southerly heading at 3;000 MSL; outbound abeam the FAF when the Controller turned us to a 080 heading for a base leg. I reentered the FAF into the FMS and extended it; but did not enter the hard altitude of 2;400 FT. The Controller asked if we had the field in sight; we said yes and he cleared us the visual approach to [Runway] XXL.",
+     "rerank_score": 0.62
+    },
+    {
+     "ref": "asrs:1317627",
+     "title": "Glideslope failed during ILS approach. Flight crew converted to LOC only approach procedures; but missed a crossing altitude restriction. Tower received a low altitude alert.",
+     "passage": "We were on vectors for an ILS approach. When given turn to intercept LOC; ATC informed us that the GS was now Out of Service (OTS) and we were now cleared for the LOC approach instead. In hind sight; at this point I should have discontinued the approach and gone around. This would have allowed my crew to properly brief the LOC approach. I did not do this. Instead; we continued the approach thinking we would be able to easily identify all the step down altitudes. We crossed the first fix at 2;300 feet and then descended all the way to 1;000 feet MDA. By doing this; we missed the 1;640 feet mandatory level-off at the second fix. We broke out of the clouds at 1;200 feet just as we received a low altitude alert from Tower. We were then able to see that we were too low and climbed back up to 1;500 feet; which was now clear of clouds; until we were back on a more appropriate visual glide path. Synopsis: Glideslope failed during ILS approach.",
+     "rerank_score": 0.562
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1681694",
+     "title": "EMB-145 Captain reported initiating a go-around due to an unstable approach.",
+     "passage": "Aircraft was unstable during night visual backed up with RNAV; go-around was initiated with a left pattern to a landing.Pilot monitoring detected the unstable approach near the final approach fix due to speed; configuration and altitude above the glidepath as out of reasonable parameters to complete a stable approach and landing.Pilot flying was too high; fast and configured too late for a stabilized approach. Guidance was full scale and PAPI was all white outside and just inside the final approach fix. Vertical speed was 1;000 FPM with no apparent capture of the glidepath. The pilot flying increased descent rate to 1;500 FPM and we were at 1;200 feet. I (pilot monitoring) immediately called for a go-around. The pilot flying did not respond; I called for it again and it was finally initiated. We climbed to 2;000 feet MSL and flew a left pattern for another approach.",
+     "rerank_score": 0.62
+    },
+    {
+     "ref": "asrs:1192323",
+     "title": "An important and illuminating report that addresses the effect of inappropriate and/or improper modifications programmed into the autoflight system by a fatigued flight crew cleared to fly a visual ap",
+     "passage": "We departed late due to a late inbound aircraft. We flew an RNAV STAR arrival and received vectors abeam the airport. Due to the late arrival into the normally busy airport the traffic pattern was clear. The ILS to [Runway] XXL was out of service and visual approaches were in use. We loaded the RNAV (GPS) Y Runway XXL into the FMS for backup guidance for the visual. While on vectors I extended the centerline off the FAF; however; when I executed the modification; the centerline extended off [Runway] XXL and the FAF was deleted from the route; along with its 2;400 FT crossing restriction. We were on a southerly heading at 3;000 MSL; outbound abeam the FAF when the Controller turned us to a 080 heading for a base leg. I reentered the FAF into the FMS and extended it; but did not enter the hard altitude of 2;400 FT. The Controller asked if we had the field in sight; we said yes and he cleared us the visual approach to [Runway] XXL.",
+     "rerank_score": 0.62
+    },
+    {
+     "ref": "asrs:1317627",
+     "title": "Glideslope failed during ILS approach. Flight crew converted to LOC only approach procedures; but missed a crossing altitude restriction. Tower received a low altitude alert.",
+     "passage": "We were on vectors for an ILS approach. When given turn to intercept LOC; ATC informed us that the GS was now Out of Service (OTS) and we were now cleared for the LOC approach instead. In hind sight; at this point I should have discontinued the approach and gone around. This would have allowed my crew to properly brief the LOC approach. I did not do this. Instead; we continued the approach thinking we would be able to easily identify all the step down altitudes. We crossed the first fix at 2;300 feet and then descended all the way to 1;000 feet MDA. By doing this; we missed the 1;640 feet mandatory level-off at the second fix. We broke out of the clouds at 1;200 feet just as we received a low altitude alert from Tower. We were then able to see that we were too low and climbed back up to 1;500 feet; which was now clear of clouds; until we were back on a more appropriate visual glide path. Synopsis: Glideslope failed during ILS approach.",
+     "rerank_score": 0.562
+    }
+   ]
+  }
+ },
+ {
+  "source": "test-notam",
+  "hazard": "KMSY: ILS 11 unserviceable until 01 Oct 1700Z",
+  "category": "approach aids",
+  "airport": "KMSY",
+  "query": "ILS 11 unserviceable. ILS out of service, flew an RNAV or visual approach instead, late change of approach, glidepath or minimums confusion",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1681694",
+     "title": "EMB-145 Captain reported initiating a go-around due to an unstable approach.",
+     "passage": "Aircraft was unstable during night visual backed up with RNAV; go-around was initiated with a left pattern to a landing.Pilot monitoring detected the unstable approach near the final approach fix due to speed; configuration and altitude above the glidepath as out of reasonable parameters to complete a stable approach and landing.Pilot flying was too high; fast and configured too late for a stabilized approach. Guidance was full scale and PAPI was all white outside and just inside the final approach fix. Vertical speed was 1;000 FPM with no apparent capture of the glidepath. The pilot flying increased descent rate to 1;500 FPM and we were at 1;200 feet. I (pilot monitoring) immediately called for a go-around. The pilot flying did not respond; I called for it again and it was finally initiated. We climbed to 2;000 feet MSL and flew a left pattern for another approach.",
+     "rerank_score": 0.716
+    },
+    {
+     "ref": "asrs:1571608",
+     "title": "Learjet 45 pilot reported flying a RNAV/GPS approach when it was not authorized.",
+     "passage": "I was the PM (Pilot Monitoring) and was responsible for the radio communication. The PIC was the PF (Pilot Flying) on this leg. We had discussed the problem with the FMS en route; and had agreed on the fact that there would be no guidance on an RNAV/GPS approach after the FAF; and that we would plan on the ILS approach.ATIS reported the winds as calm; overcast at around 6;000/6;500 feet; and FEW clouds at 600 feet. It also reported that the Runway 9 was in use; and to expect the RNAV/GPS or visual approach to Runway 9.Upon handoff to Approach Control; I informed them that we were unable any RNAV approaches; and he responded that he assumed that meant that we were looking for the ILS; which I confirmed. He came back at some point saying that the ILS was out of order and asked what we wanted to do. I had already given the PIC the ATIS report; and he instructed me to tell them that we could accept the RNAV/GPS to Runway 9.",
+     "rerank_score": 0.65
+    },
+    {
+     "ref": "asrs:1332291",
+     "title": "Air carrier flight crew reported being cleared for an RNP approach that they could not legally fly due to a RNP Availability Forecast (RAF) .11 outage. Other crews were not aware of the NOTAM and this",
+     "passage": "The RNAV (RNP) requires a RAF of .11 to use the 5;000 feet RVR or 1 minimums. ATIS was not reporting any RVR; but Approach claimed Tower was calling the RVR better than 6;000 feet. Okay; not bad; but the RAF report was calling for a .11 outage; right in the middle of our landing. Therefore; my FO and I decided it would not be legal to fly the approach since the next higher minimums (RAF .18) needed 1 1/4 miles. No mention of RVR. We needed the ILS since it offered minimums with both RVR and SM and the 6;000 feet RVR reported by Tower.It required many radio calls to Approach to help them understand the situation. It appeared they didn't understand what we were trying to get across to them. They continued to give the RNAV Approach clearance to other crews coming in. Some; like us; responded they were unable and requested the ILS. Shouldn't they be smarter about this stuff?",
+     "rerank_score": 0.612
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1681694",
+     "title": "EMB-145 Captain reported initiating a go-around due to an unstable approach.",
+     "passage": "Aircraft was unstable during night visual backed up with RNAV; go-around was initiated with a left pattern to a landing.Pilot monitoring detected the unstable approach near the final approach fix due to speed; configuration and altitude above the glidepath as out of reasonable parameters to complete a stable approach and landing.Pilot flying was too high; fast and configured too late for a stabilized approach. Guidance was full scale and PAPI was all white outside and just inside the final approach fix. Vertical speed was 1;000 FPM with no apparent capture of the glidepath. The pilot flying increased descent rate to 1;500 FPM and we were at 1;200 feet. I (pilot monitoring) immediately called for a go-around. The pilot flying did not respond; I called for it again and it was finally initiated. We climbed to 2;000 feet MSL and flew a left pattern for another approach.",
+     "rerank_score": 0.716
+    },
+    {
+     "ref": "asrs:1571608",
+     "title": "Learjet 45 pilot reported flying a RNAV/GPS approach when it was not authorized.",
+     "passage": "I was the PM (Pilot Monitoring) and was responsible for the radio communication. The PIC was the PF (Pilot Flying) on this leg. We had discussed the problem with the FMS en route; and had agreed on the fact that there would be no guidance on an RNAV/GPS approach after the FAF; and that we would plan on the ILS approach.ATIS reported the winds as calm; overcast at around 6;000/6;500 feet; and FEW clouds at 600 feet. It also reported that the Runway 9 was in use; and to expect the RNAV/GPS or visual approach to Runway 9.Upon handoff to Approach Control; I informed them that we were unable any RNAV approaches; and he responded that he assumed that meant that we were looking for the ILS; which I confirmed. He came back at some point saying that the ILS was out of order and asked what we wanted to do. I had already given the PIC the ATIS report; and he instructed me to tell them that we could accept the RNAV/GPS to Runway 9.",
+     "rerank_score": 0.65
+    },
+    {
+     "ref": "asrs:1332291",
+     "title": "Air carrier flight crew reported being cleared for an RNP approach that they could not legally fly due to a RNP Availability Forecast (RAF) .11 outage. Other crews were not aware of the NOTAM and this",
+     "passage": "The RNAV (RNP) requires a RAF of .11 to use the 5;000 feet RVR or 1 minimums. ATIS was not reporting any RVR; but Approach claimed Tower was calling the RVR better than 6;000 feet. Okay; not bad; but the RAF report was calling for a .11 outage; right in the middle of our landing. Therefore; my FO and I decided it would not be legal to fly the approach since the next higher minimums (RAF .18) needed 1 1/4 miles. No mention of RVR. We needed the ILS since it offered minimums with both RVR and SM and the 6;000 feet RVR reported by Tower.It required many radio calls to Approach to help them understand the situation. It appeared they didn't understand what we were trying to get across to them. They continued to give the RNAV Approach clearance to other crews coming in. Some; like us; responded they were unable and requested the ILS. Shouldn't they be smarter about this stuff?",
+     "rerank_score": 0.612
+    }
+   ]
+  }
+ },
+ {
+  "source": "test-notam",
+  "hazard": "KAUS: PAPI 18L unserviceable until 01 Oct 0900Z",
+  "category": "lighting",
+  "airport": "KAUS",
+  "query": "PAPI 18L unserviceable. approach lights or PAPI out of service, night visual approach, glidepath judgment, unstable approach",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1681694",
+     "title": "EMB-145 Captain reported initiating a go-around due to an unstable approach.",
+     "passage": "Aircraft was unstable during night visual backed up with RNAV; go-around was initiated with a left pattern to a landing.Pilot monitoring detected the unstable approach near the final approach fix due to speed; configuration and altitude above the glidepath as out of reasonable parameters to complete a stable approach and landing.Pilot flying was too high; fast and configured too late for a stabilized approach. Guidance was full scale and PAPI was all white outside and just inside the final approach fix. Vertical speed was 1;000 FPM with no apparent capture of the glidepath. The pilot flying increased descent rate to 1;500 FPM and we were at 1;200 feet. I (pilot monitoring) immediately called for a go-around. The pilot flying did not respond; I called for it again and it was finally initiated. We climbed to 2;000 feet MSL and flew a left pattern for another approach.",
+     "rerank_score": 0.977
+    },
+    {
+     "ref": "asrs:1751049",
+     "title": "EMB-145 First Officer reported an uneventful Missed Approach and landing due to an unstable approach during previous approach.",
+     "passage": "Inbound into ZZZ; at 300 ft. prior to touchdown; the aircraft was unstable by being below glide path. I called for the go around and executed the proper steps. Afterwards; tower gave us instructions for vectors to come back into ZZZ. Over correction on pitch was the cause of the go around. PAPI indicates 4 red lights.Over [correction] downward pitch was the cause of the go around. We were 4 red lights on the PAPI. Since it was a visual approach; when I saw the 4 red lights on the PAPI; went for the go around and reconfigured for climb out. Kick the autopilot off earlier to trim the aircraft to be pitched properly for landing. Synopsis: EMB-145 First Officer reported an uneventful Missed Approach and landing due to an unstable approach during previous approach.",
+     "rerank_score": 0.964
+    },
+    {
+     "ref": "ntsb:20201123102325",
+     "title": "ERA21LA050 — Cynthiana, KY — 2020-11-19",
+     "passage": "The pilot was approaching the destination airport for landing at night. On short final approach to the runway, he observed he was slightly low via the precision approach path indicator (PAPI) lights. Due to a 20-knot crosswind, the pilot was attempting to maintain runway centerline and entered an inadvertent slip, subsequently losing 20ft of altitude. As he looked up, he saw all red on the PAPI lights and reached to the throttle to reacquire the glideslope. He then observed the treetops in front of the propeller and the airplane contacted the trees. The airplane subsequently the ground and came to a stop. The airplane’s fuselage, both wings, and empennage were substantially damaged. The pilot reported that there were no mechanical malfunctions or failures of the airplane that would have precluded normal operation. Probable cause: The pilot’s failure to maintain proper glide path during a visual approach that was conducted at night, resulting in a collision with trees and terrain.",
+     "rerank_score": 0.846
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1681694",
+     "title": "EMB-145 Captain reported initiating a go-around due to an unstable approach.",
+     "passage": "Aircraft was unstable during night visual backed up with RNAV; go-around was initiated with a left pattern to a landing.Pilot monitoring detected the unstable approach near the final approach fix due to speed; configuration and altitude above the glidepath as out of reasonable parameters to complete a stable approach and landing.Pilot flying was too high; fast and configured too late for a stabilized approach. Guidance was full scale and PAPI was all white outside and just inside the final approach fix. Vertical speed was 1;000 FPM with no apparent capture of the glidepath. The pilot flying increased descent rate to 1;500 FPM and we were at 1;200 feet. I (pilot monitoring) immediately called for a go-around. The pilot flying did not respond; I called for it again and it was finally initiated. We climbed to 2;000 feet MSL and flew a left pattern for another approach.",
+     "rerank_score": 0.977
+    },
+    {
+     "ref": "asrs:1751049",
+     "title": "EMB-145 First Officer reported an uneventful Missed Approach and landing due to an unstable approach during previous approach.",
+     "passage": "Inbound into ZZZ; at 300 ft. prior to touchdown; the aircraft was unstable by being below glide path. I called for the go around and executed the proper steps. Afterwards; tower gave us instructions for vectors to come back into ZZZ. Over correction on pitch was the cause of the go around. PAPI indicates 4 red lights.Over [correction] downward pitch was the cause of the go around. We were 4 red lights on the PAPI. Since it was a visual approach; when I saw the 4 red lights on the PAPI; went for the go around and reconfigured for climb out. Kick the autopilot off earlier to trim the aircraft to be pitched properly for landing. Synopsis: EMB-145 First Officer reported an uneventful Missed Approach and landing due to an unstable approach during previous approach.",
+     "rerank_score": 0.964
+    },
+    {
+     "ref": "ntsb:20201123102325",
+     "title": "ERA21LA050 — Cynthiana, KY — 2020-11-19",
+     "passage": "The pilot was approaching the destination airport for landing at night. On short final approach to the runway, he observed he was slightly low via the precision approach path indicator (PAPI) lights. Due to a 20-knot crosswind, the pilot was attempting to maintain runway centerline and entered an inadvertent slip, subsequently losing 20ft of altitude. As he looked up, he saw all red on the PAPI lights and reached to the throttle to reacquire the glideslope. He then observed the treetops in front of the propeller and the airplane contacted the trees. The airplane subsequently the ground and came to a stop. The airplane’s fuselage, both wings, and empennage were substantially damaged. The pilot reported that there were no mechanical malfunctions or failures of the airplane that would have precluded normal operation. Probable cause: The pilot’s failure to maintain proper glide path during a visual approach that was conducted at night, resulting in a collision with trees and terrain.",
+     "rerank_score": 0.846
+    }
+   ]
+  }
+ },
+ {
+  "source": "test-notam",
+  "hazard": "KBNA: ALS 2L unserviceable until 01 Oct 1100Z",
+  "category": "lighting",
+  "airport": "KBNA",
+  "query": "ALS 2L unserviceable. approach lights or PAPI out of service, night visual approach, glidepath judgment, unstable approach",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1681694",
+     "title": "EMB-145 Captain reported initiating a go-around due to an unstable approach.",
+     "passage": "Aircraft was unstable during night visual backed up with RNAV; go-around was initiated with a left pattern to a landing.Pilot monitoring detected the unstable approach near the final approach fix due to speed; configuration and altitude above the glidepath as out of reasonable parameters to complete a stable approach and landing.Pilot flying was too high; fast and configured too late for a stabilized approach. Guidance was full scale and PAPI was all white outside and just inside the final approach fix. Vertical speed was 1;000 FPM with no apparent capture of the glidepath. The pilot flying increased descent rate to 1;500 FPM and we were at 1;200 feet. I (pilot monitoring) immediately called for a go-around. The pilot flying did not respond; I called for it again and it was finally initiated. We climbed to 2;000 feet MSL and flew a left pattern for another approach.",
+     "rerank_score": 0.969
+    },
+    {
+     "ref": "asrs:1751049",
+     "title": "EMB-145 First Officer reported an uneventful Missed Approach and landing due to an unstable approach during previous approach.",
+     "passage": "Inbound into ZZZ; at 300 ft. prior to touchdown; the aircraft was unstable by being below glide path. I called for the go around and executed the proper steps. Afterwards; tower gave us instructions for vectors to come back into ZZZ. Over correction on pitch was the cause of the go around. PAPI indicates 4 red lights.Over [correction] downward pitch was the cause of the go around. We were 4 red lights on the PAPI. Since it was a visual approach; when I saw the 4 red lights on the PAPI; went for the go around and reconfigured for climb out. Kick the autopilot off earlier to trim the aircraft to be pitched properly for landing. Synopsis: EMB-145 First Officer reported an uneventful Missed Approach and landing due to an unstable approach during previous approach.",
+     "rerank_score": 0.959
+    },
+    {
+     "ref": "ntsb:20201123102325",
+     "title": "ERA21LA050 — Cynthiana, KY — 2020-11-19",
+     "passage": "The pilot was approaching the destination airport for landing at night. On short final approach to the runway, he observed he was slightly low via the precision approach path indicator (PAPI) lights. Due to a 20-knot crosswind, the pilot was attempting to maintain runway centerline and entered an inadvertent slip, subsequently losing 20ft of altitude. As he looked up, he saw all red on the PAPI lights and reached to the throttle to reacquire the glideslope. He then observed the treetops in front of the propeller and the airplane contacted the trees. The airplane subsequently the ground and came to a stop. The airplane’s fuselage, both wings, and empennage were substantially damaged. The pilot reported that there were no mechanical malfunctions or failures of the airplane that would have precluded normal operation. Probable cause: The pilot’s failure to maintain proper glide path during a visual approach that was conducted at night, resulting in a collision with trees and terrain.",
+     "rerank_score": 0.868
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1681694",
+     "title": "EMB-145 Captain reported initiating a go-around due to an unstable approach.",
+     "passage": "Aircraft was unstable during night visual backed up with RNAV; go-around was initiated with a left pattern to a landing.Pilot monitoring detected the unstable approach near the final approach fix due to speed; configuration and altitude above the glidepath as out of reasonable parameters to complete a stable approach and landing.Pilot flying was too high; fast and configured too late for a stabilized approach. Guidance was full scale and PAPI was all white outside and just inside the final approach fix. Vertical speed was 1;000 FPM with no apparent capture of the glidepath. The pilot flying increased descent rate to 1;500 FPM and we were at 1;200 feet. I (pilot monitoring) immediately called for a go-around. The pilot flying did not respond; I called for it again and it was finally initiated. We climbed to 2;000 feet MSL and flew a left pattern for another approach.",
+     "rerank_score": 0.969
+    },
+    {
+     "ref": "asrs:1751049",
+     "title": "EMB-145 First Officer reported an uneventful Missed Approach and landing due to an unstable approach during previous approach.",
+     "passage": "Inbound into ZZZ; at 300 ft. prior to touchdown; the aircraft was unstable by being below glide path. I called for the go around and executed the proper steps. Afterwards; tower gave us instructions for vectors to come back into ZZZ. Over correction on pitch was the cause of the go around. PAPI indicates 4 red lights.Over [correction] downward pitch was the cause of the go around. We were 4 red lights on the PAPI. Since it was a visual approach; when I saw the 4 red lights on the PAPI; went for the go around and reconfigured for climb out. Kick the autopilot off earlier to trim the aircraft to be pitched properly for landing. Synopsis: EMB-145 First Officer reported an uneventful Missed Approach and landing due to an unstable approach during previous approach.",
+     "rerank_score": 0.959
+    },
+    {
+     "ref": "ntsb:20201123102325",
+     "title": "ERA21LA050 — Cynthiana, KY — 2020-11-19",
+     "passage": "The pilot was approaching the destination airport for landing at night. On short final approach to the runway, he observed he was slightly low via the precision approach path indicator (PAPI) lights. Due to a 20-knot crosswind, the pilot was attempting to maintain runway centerline and entered an inadvertent slip, subsequently losing 20ft of altitude. As he looked up, he saw all red on the PAPI lights and reached to the throttle to reacquire the glideslope. He then observed the treetops in front of the propeller and the airplane contacted the trees. The airplane subsequently the ground and came to a stop. The airplane’s fuselage, both wings, and empennage were substantially damaged. The pilot reported that there were no mechanical malfunctions or failures of the airplane that would have precluded normal operation. Probable cause: The pilot’s failure to maintain proper glide path during a visual approach that was conducted at night, resulting in a collision with trees and terrain.",
+     "rerank_score": 0.868
+    }
+   ]
+  }
+ },
+ {
+  "source": "test-notam",
+  "hazard": "KOAK: HIRL 12/30 unserviceable until 01 Oct 1000Z",
+  "category": "lighting",
+  "airport": "KOAK",
+  "query": "HIRL 12/30 unserviceable. approach lights or PAPI out of service, night visual approach, glidepath judgment, unstable approach",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1681694",
+     "title": "EMB-145 Captain reported initiating a go-around due to an unstable approach.",
+     "passage": "Aircraft was unstable during night visual backed up with RNAV; go-around was initiated with a left pattern to a landing.Pilot monitoring detected the unstable approach near the final approach fix due to speed; configuration and altitude above the glidepath as out of reasonable parameters to complete a stable approach and landing.Pilot flying was too high; fast and configured too late for a stabilized approach. Guidance was full scale and PAPI was all white outside and just inside the final approach fix. Vertical speed was 1;000 FPM with no apparent capture of the glidepath. The pilot flying increased descent rate to 1;500 FPM and we were at 1;200 feet. I (pilot monitoring) immediately called for a go-around. The pilot flying did not respond; I called for it again and it was finally initiated. We climbed to 2;000 feet MSL and flew a left pattern for another approach.",
+     "rerank_score": 0.975
+    },
+    {
+     "ref": "asrs:1751049",
+     "title": "EMB-145 First Officer reported an uneventful Missed Approach and landing due to an unstable approach during previous approach.",
+     "passage": "Inbound into ZZZ; at 300 ft. prior to touchdown; the aircraft was unstable by being below glide path. I called for the go around and executed the proper steps. Afterwards; tower gave us instructions for vectors to come back into ZZZ. Over correction on pitch was the cause of the go around. PAPI indicates 4 red lights.Over [correction] downward pitch was the cause of the go around. We were 4 red lights on the PAPI. Since it was a visual approach; when I saw the 4 red lights on the PAPI; went for the go around and reconfigured for climb out. Kick the autopilot off earlier to trim the aircraft to be pitched properly for landing. Synopsis: EMB-145 First Officer reported an uneventful Missed Approach and landing due to an unstable approach during previous approach.",
+     "rerank_score": 0.961
+    },
+    {
+     "ref": "ntsb:20201123102325",
+     "title": "ERA21LA050 — Cynthiana, KY — 2020-11-19",
+     "passage": "The pilot was approaching the destination airport for landing at night. On short final approach to the runway, he observed he was slightly low via the precision approach path indicator (PAPI) lights. Due to a 20-knot crosswind, the pilot was attempting to maintain runway centerline and entered an inadvertent slip, subsequently losing 20ft of altitude. As he looked up, he saw all red on the PAPI lights and reached to the throttle to reacquire the glideslope. He then observed the treetops in front of the propeller and the airplane contacted the trees. The airplane subsequently the ground and came to a stop. The airplane’s fuselage, both wings, and empennage were substantially damaged. The pilot reported that there were no mechanical malfunctions or failures of the airplane that would have precluded normal operation. Probable cause: The pilot’s failure to maintain proper glide path during a visual approach that was conducted at night, resulting in a collision with trees and terrain.",
+     "rerank_score": 0.905
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1681694",
+     "title": "EMB-145 Captain reported initiating a go-around due to an unstable approach.",
+     "passage": "Aircraft was unstable during night visual backed up with RNAV; go-around was initiated with a left pattern to a landing.Pilot monitoring detected the unstable approach near the final approach fix due to speed; configuration and altitude above the glidepath as out of reasonable parameters to complete a stable approach and landing.Pilot flying was too high; fast and configured too late for a stabilized approach. Guidance was full scale and PAPI was all white outside and just inside the final approach fix. Vertical speed was 1;000 FPM with no apparent capture of the glidepath. The pilot flying increased descent rate to 1;500 FPM and we were at 1;200 feet. I (pilot monitoring) immediately called for a go-around. The pilot flying did not respond; I called for it again and it was finally initiated. We climbed to 2;000 feet MSL and flew a left pattern for another approach.",
+     "rerank_score": 0.975
+    },
+    {
+     "ref": "asrs:1751049",
+     "title": "EMB-145 First Officer reported an uneventful Missed Approach and landing due to an unstable approach during previous approach.",
+     "passage": "Inbound into ZZZ; at 300 ft. prior to touchdown; the aircraft was unstable by being below glide path. I called for the go around and executed the proper steps. Afterwards; tower gave us instructions for vectors to come back into ZZZ. Over correction on pitch was the cause of the go around. PAPI indicates 4 red lights.Over [correction] downward pitch was the cause of the go around. We were 4 red lights on the PAPI. Since it was a visual approach; when I saw the 4 red lights on the PAPI; went for the go around and reconfigured for climb out. Kick the autopilot off earlier to trim the aircraft to be pitched properly for landing. Synopsis: EMB-145 First Officer reported an uneventful Missed Approach and landing due to an unstable approach during previous approach.",
+     "rerank_score": 0.961
+    },
+    {
+     "ref": "ntsb:20201123102325",
+     "title": "ERA21LA050 — Cynthiana, KY — 2020-11-19",
+     "passage": "The pilot was approaching the destination airport for landing at night. On short final approach to the runway, he observed he was slightly low via the precision approach path indicator (PAPI) lights. Due to a 20-knot crosswind, the pilot was attempting to maintain runway centerline and entered an inadvertent slip, subsequently losing 20ft of altitude. As he looked up, he saw all red on the PAPI lights and reached to the throttle to reacquire the glideslope. He then observed the treetops in front of the propeller and the airplane contacted the trees. The airplane subsequently the ground and came to a stop. The airplane’s fuselage, both wings, and empennage were substantially damaged. The pilot reported that there were no mechanical malfunctions or failures of the airplane that would have precluded normal operation. Probable cause: The pilot’s failure to maintain proper glide path during a visual approach that was conducted at night, resulting in a collision with trees and terrain.",
+     "rerank_score": 0.905
+    }
+   ]
+  }
+ },
+ {
+  "source": "test-notam",
+  "hazard": "KSJC: VOR unserviceable until 03 Oct 0000Z",
+  "category": "navaid",
+  "airport": "KSJC",
+  "query": "VOR unserviceable. navigation aid out of service, navigation error, wrong fix or course",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1119879",
+     "title": "C177 pilot reports JXN VOR to be out of service but not NOTAMed.",
+     "passage": "[I] filed an IFR flight plan for a training flight including SUM to JXN to LFD VORs along V221. DUATS briefing did not indicate an issue with JXN VOR; but it could not be received. Fortunately; LFD VOR was functioning and ATC approved a direct to LFD alternative. If not already fixed; please fix the JXN VOR.Also; LAN and PSI VORs along route were non-operational; as indicated in briefing. Please fix. Lesson learned: VOR infrastructure deteriorating; so consider other navigational options. Synopsis: C177 pilot reports JXN VOR to be out of service but not NOTAMed.",
+     "rerank_score": 0.586
+    },
+    {
+     "ref": "asrs:1075055",
+     "title": "Enroute Controller described a loss of terrain separation event when traffic cleared via conventional navigation failed to navigate properly and was off course causing the terrain issue.",
+     "passage": "No response. I issued a low altitude alert on regular frequency and on Guard. No response. I realized that he may be on an adjacent sector frequency still so I enlisted another aircraft to relay a change to the correct frequency. He came up 30 seconds later. I issued a climb and heading to lower terrain and re established his intentions and assigned an ILS approach via PT and the VOR. I was in error in forgetting to switch the aircraft to the correct control frequency. That would have speed up communications when I discovered the navigational error. However; the main issue was poor navigation by the pilot who was in deviation to his clearance and flying the approach incorrectly. Synopsis: Enroute Controller described a loss of terrain separation event when traffic cleared via conventional navigation failed to navigate properly and was off course causing the terrain issue.",
+     "rerank_score": 0.526
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1119879",
+     "title": "C177 pilot reports JXN VOR to be out of service but not NOTAMed.",
+     "passage": "[I] filed an IFR flight plan for a training flight including SUM to JXN to LFD VORs along V221. DUATS briefing did not indicate an issue with JXN VOR; but it could not be received. Fortunately; LFD VOR was functioning and ATC approved a direct to LFD alternative. If not already fixed; please fix the JXN VOR.Also; LAN and PSI VORs along route were non-operational; as indicated in briefing. Please fix. Lesson learned: VOR infrastructure deteriorating; so consider other navigational options. Synopsis: C177 pilot reports JXN VOR to be out of service but not NOTAMed.",
+     "rerank_score": 0.586
+    },
+    {
+     "ref": "asrs:1075055",
+     "title": "Enroute Controller described a loss of terrain separation event when traffic cleared via conventional navigation failed to navigate properly and was off course causing the terrain issue.",
+     "passage": "No response. I issued a low altitude alert on regular frequency and on Guard. No response. I realized that he may be on an adjacent sector frequency still so I enlisted another aircraft to relay a change to the correct frequency. He came up 30 seconds later. I issued a climb and heading to lower terrain and re established his intentions and assigned an ILS approach via PT and the VOR. I was in error in forgetting to switch the aircraft to the correct control frequency. That would have speed up communications when I discovered the navigational error. However; the main issue was poor navigation by the pilot who was in deviation to his clearance and flying the approach incorrectly. Synopsis: Enroute Controller described a loss of terrain separation event when traffic cleared via conventional navigation failed to navigate properly and was off course causing the terrain issue.",
+     "rerank_score": 0.526
+    },
+    {
+     "ref": "asrs:1824108",
+     "title": "An air carrier Captain reported GPS interference caused a course deviation.",
+     "passage": "The First Officer and I put our range scales to 5 miles and noted that the left side showed us approximately 3 to 5 miles left of course; First Officer side showed the same distance to the right of course.We checked the FMC position reference pages and saw that GPS position was blank and substantial errors on the other positions - FMC; IRS and Radio. We advised ATC of the GPS failure and could not determine which source was accurate. ATC said we were showing right of course. I selected GPS off then on; selected HDG (heading) select to manually steer to course. Reselected LNAV. Nothing seemed to be working. I asked for direct to a fix further down the airway. No VORs were on this airway to use for navigation. I repeated switching heading to LNAV but the aircraft symbol did not move closer to the course line as if it was frozen. We were continually advising ATC and monitoring position reference as GPS was now intermittent and RNP-ANP errors were constantly changing.",
+     "rerank_score": 0.437
+    }
+   ]
+  }
+ },
+ {
+  "source": "test-notam",
+  "hazard": "KHOU: Apron APRON closed until 01 Oct 1600Z",
+  "category": "surface",
+  "airport": "KHOU",
+  "query": "Apron APRON closed. apron or ramp closure, ground congestion, ground collision",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1463515",
+     "title": "CSA reported that passengers were deplaned from aircraft at gates while the ramp was closed due to lightning reports in the area.",
+     "passage": "Due to thunderstorms with severe lightning; a ground stop occurred. While the ramp was still closed and the radar showed lightning within 2 miles; the decision was made to have a ramp supervisor go around to our 'critical flights' to crack doors so that flights showed arrived; due to the long tarmac delays. Instead of just cracking the door the ramp supervisor actually opened the aircraft doors and allowed passengers to deplane all while the ramp was closed due to lightning. I called immediately on the radio to verify that the ramp was still closed and we were told yes by the Ops Manager. Then another CSA called the Ops Manager on the phone to verify that the supervisor was deplaning pax and that the ramp was still closed. The Ops Manager confirmed again ramp was closed but that 'Upper Management' made the decision to deplane. The ramp supervisor continued to open other aircraft doors and deplane pax.",
+     "rerank_score": 0.676
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1463515",
+     "title": "CSA reported that passengers were deplaned from aircraft at gates while the ramp was closed due to lightning reports in the area.",
+     "passage": "Due to thunderstorms with severe lightning; a ground stop occurred. While the ramp was still closed and the radar showed lightning within 2 miles; the decision was made to have a ramp supervisor go around to our 'critical flights' to crack doors so that flights showed arrived; due to the long tarmac delays. Instead of just cracking the door the ramp supervisor actually opened the aircraft doors and allowed passengers to deplane all while the ramp was closed due to lightning. I called immediately on the radio to verify that the ramp was still closed and we were told yes by the Ops Manager. Then another CSA called the Ops Manager on the phone to verify that the supervisor was deplaning pax and that the ramp was still closed. The Ops Manager confirmed again ramp was closed but that 'Upper Management' made the decision to deplane. The ramp supervisor continued to open other aircraft doors and deplane pax.",
+     "rerank_score": 0.676
+    },
+    {
+     "ref": "asrs:1009872",
+     "title": "A B737-700 flight crew allowed themselves to be pushed back and depart without following SOP while the airport was being struck by thunderstorms; which were causing the ramp to be closed to ground per",
+     "passage": "I saw lightning overhead and I feared for the ground crew's safety. Later; the Captain told me he felt the same; but there was no way he could communicate with the ground crew to stop the push. We continued the push until the tug driver thought we were far enough away from the gate to taxi off on our own.There was a lot of lightning in the area even before the ramp was closed. I thought some cloud to ground strikes we saw from the cockpit windows were well within two to three miles of the field; but the Agent said Operations was not even close to closing the ramp for the weather. Throughout this event; I thought there were too many people outside working before and during the ramp closure while lighting was well within two to three miles of our position. I sense that our Company Operations and employees are not giving lightning hazard enough respect during a thunderstorm.",
+     "rerank_score": 0.346
+    },
+    {
+     "ref": "asrs:1201451",
+     "title": "An EMB-145 crew lost control of the aircraft at FL370 in an embedded thunderstorm. They descended 2;000 FT below assigned altitude before recovering and returning to the assigned aircraft and track.",
+     "passage": "Encountered severe turbulence en-route. Corrected aircraft upset and flight proceeded normally. Aircraft ahead said the ride ahead through the weather was smooth. We got to ZZZ early enough to load pax and bags to be ready to go early. Plane was boarded and loaded 25 early. Called three times to get fuel. Station Ops called but dismissed it by saying 'you still have 25 minutes to go'. Crew replied that indeed that was the case; there was a cell moving towards the airport that would shut down ramp. Fuel showed up 10 to go; as soon as he was done; we had a chance to close and drop the break to push right before lightning struck and the ramp closed. That's the reason for the on time departure. Ramp was closed for about 25 minutes. During that time our destination airport went in to and out of a ground stop. At the end of our push; Ground came on frequency to inform us that there was another ground stop going to destination.",
+     "rerank_score": 0.308
+    }
+   ]
+  }
+ },
+ {
+  "source": "ntsb-case",
+  "hazard": "KMAC: wildlife — Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on equipment",
+  "category": "wildlife",
+  "airport": "KMAC",
+  "query": "wildlife — Environmental issues-Physical environment-Object/animal/substance-Animals/birds-Ability to respond/compensate; Environmental issues-Physical environment-Object/animal/substance-Animals/birds-Effect on equipment",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "ntsb:20221028106218",
+     "title": "ERA23LA044 — Sarasota, FL — 2022-10-27",
+     "passage": "Probable cause: An in-flight collision with a bird, which resulted in damage to a tail rotor blade, a subsequent vibration, and the pilot’s decision to conduct a precautionary landing to unsuitable terrain. Findings: Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on equipment Sequence: Enroute Birdstrike",
+     "rerank_score": 0.975
+    },
+    {
+     "ref": "ntsb:20171119X32831",
+     "title": "CEN18FA033 — Stuttgart, AR — 2017-11-20",
+     "passage": "Probable cause: An in-flight loss of control due to bird strikes. Findings: Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Awareness of condition - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on equipment - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on personnel - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on operation - C Sequence: Enroute-cruise Birdstrike",
+     "rerank_score": 0.972
+    },
+    {
+     "ref": "ntsb:20100414X12342",
+     "title": "CEN10CA202 — Middlefield, OH — 2010-04-11",
+     "passage": "Probable cause: The inadvertent in-flight collision with a bird. Findings: Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on equipment - C Sequence: Enroute-descent Birdstrike",
+     "rerank_score": 0.967
+    }
+   ],
+   "gate": [
+    {
+     "ref": "ntsb:20221028106218",
+     "title": "ERA23LA044 — Sarasota, FL — 2022-10-27",
+     "passage": "Probable cause: An in-flight collision with a bird, which resulted in damage to a tail rotor blade, a subsequent vibration, and the pilot’s decision to conduct a precautionary landing to unsuitable terrain. Findings: Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on equipment Sequence: Enroute Birdstrike",
+     "rerank_score": 0.975
+    },
+    {
+     "ref": "ntsb:20171119X32831",
+     "title": "CEN18FA033 — Stuttgart, AR — 2017-11-20",
+     "passage": "Probable cause: An in-flight loss of control due to bird strikes. Findings: Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Awareness of condition - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on equipment - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on personnel - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on operation - C Sequence: Enroute-cruise Birdstrike",
+     "rerank_score": 0.972
+    },
+    {
+     "ref": "ntsb:20100414X12342",
+     "title": "CEN10CA202 — Middlefield, OH — 2010-04-11",
+     "passage": "Probable cause: The inadvertent in-flight collision with a bird. Findings: Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on equipment - C Sequence: Enroute-descent Birdstrike",
+     "rerank_score": 0.967
+    }
+   ]
+  }
+ },
+ {
+  "source": "ntsb-case",
+  "hazard": "KBNA: runway — Takeoff-rejected takeoff Runway incursion veh/AC/person",
+  "category": "runway",
+  "airport": "KBNA",
+  "query": "runway — Takeoff-rejected takeoff Runway incursion veh/AC/person. runway closed, crew used the parallel runway, lined up with the wrong runway or a taxiway, confusion over which runway was in use",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1564355",
+     "title": "Embraer 175 flight crew reported a rejected takeoff due to a runway incursion down field.",
+     "passage": "It could have been a case of two aircraft receiving different clearances for the same runway at the same time. This incident highlights the importance of remaining vigilante at all times when near a runway; as well as monitoring the radio for other aircraft who may conflict with our own instructions. Synopsis: Embraer 175 flight crew reported a rejected takeoff due to a runway incursion down field.",
+     "rerank_score": 0.966
+    },
+    {
+     "ref": "asrs:1776315",
+     "title": "Air carrier flight crew reported a runway incursion after landing.",
+     "passage": "We were across the hold short lines when I queried him about holding short; but I was late in warning him to avoid the confusion and mistake of going so far. At same time; an airplane had rotated for takeoff on RW (Runway) XXL just prior to our position making it a more serious event. ATC never said anything to us as the event happened or immediately after; so I asked them if we should continue across RW (Runway) XXL. They replied in the affirmative and to contact Ground Control after exiting on other side. At no time did ATC comment on the event. We continued to the gate without further incident.Contributing factors were the confusion about the intention of the aircraft on Taxiway XY near the [Taxiway] XX exit we were instructed to use; the short distance between the parallel runways; and lack of coordinated and deliberate attention to the immediate situation we were in.",
+     "rerank_score": 0.96
+    },
+    {
+     "ref": "asrs:1615382",
+     "title": "Air carrier flight crew reported a low speed rejected takeoff due to improper flap setting.",
+     "passage": "We rejected takeoff due to CONFIG EICAS warning (flaps not set to takeoff range). Upon being cleared for takeoff on Runway XXR the Captain called for 'Set takeoff thrust.' As the throttles were advanced; we received a CONFIG EICAS and aural warning; and throttles were immediately closed to initiate the rejected takeoff without reverse thrust or braking prior to approximately 40 knots ground speed. The aircraft was taxied clear of the runway. The crew reviewed the takeoff performance data; re-entered the takeoff performance data using the Runway or Performance Change Checklist from the QRH; then re-accomplished the Before Takeoff Checklist; properly configuring the flaps to 10. Brake temperatures were noted by the crew to be '0'. The flight was subsequently cleared for takeoff again and departed uneventfully.",
+     "rerank_score": 0.923
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1564355",
+     "title": "Embraer 175 flight crew reported a rejected takeoff due to a runway incursion down field.",
+     "passage": "It could have been a case of two aircraft receiving different clearances for the same runway at the same time. This incident highlights the importance of remaining vigilante at all times when near a runway; as well as monitoring the radio for other aircraft who may conflict with our own instructions. Synopsis: Embraer 175 flight crew reported a rejected takeoff due to a runway incursion down field.",
+     "rerank_score": 0.966
+    },
+    {
+     "ref": "asrs:1776315",
+     "title": "Air carrier flight crew reported a runway incursion after landing.",
+     "passage": "We were across the hold short lines when I queried him about holding short; but I was late in warning him to avoid the confusion and mistake of going so far. At same time; an airplane had rotated for takeoff on RW (Runway) XXL just prior to our position making it a more serious event. ATC never said anything to us as the event happened or immediately after; so I asked them if we should continue across RW (Runway) XXL. They replied in the affirmative and to contact Ground Control after exiting on other side. At no time did ATC comment on the event. We continued to the gate without further incident.Contributing factors were the confusion about the intention of the aircraft on Taxiway XY near the [Taxiway] XX exit we were instructed to use; the short distance between the parallel runways; and lack of coordinated and deliberate attention to the immediate situation we were in.",
+     "rerank_score": 0.96
+    },
+    {
+     "ref": "asrs:1696638",
+     "title": "Flight crew reported they performed a rejected takeoff in response to a Master Caution light. The brakes locked up; requiring that the aircraft be towed from the runway.",
+     "passage": "The aircraft came to a complete stop abeam Taxiway X with more than 4000 ft. of runway remaining. Unfortunately; the takeoff rejection resulted in the aircraft being disabled on Runway XX unable to move and ZZZ Runway XX being closed for an extended period of time while emergency crews cooled the hot brakes with water and subsequent maintenance efforts to tow/remove the aircraft from the runway.We were given clearance for takeoff on ZZZ Runway XX after a brief line up and wait; runway verified and heading checked; the takeoff clearance acknowledged; the Captain advanced thrust normally; the TOGA button pressed; and the thrust set verified. The plane accelerated normally and 80 kts. was called and cross-checked. Shortly after the 80 kts. but well before V1 a Master Caution -> FLT Control light illuminated. Shortly after; the Captain called for reject and executed the reject procedure. I got ready to key up the mike to announce the reject to ATC.",
+     "rerank_score": 0.918
+    }
+   ]
+  }
+ },
+ {
+  "source": "ntsb-case",
+  "hazard": "KLGA: runway — Landing-landing roll Runway incursion veh/AC/person",
+  "category": "runway",
+  "airport": "KLGA",
+  "query": "runway — Landing-landing roll Runway incursion veh/AC/person. runway closed, crew used the parallel runway, lined up with the wrong runway or a taxiway, confusion over which runway was in use",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1834306",
+     "title": "GA pilot reported that while taxiing across the runway at a non-towered airport; an aircraft that did not communicate their intentions it was taking off using a different runway at the same time.",
+     "passage": "ZZZ was preparing for multiple taxiways being closed and aircraft back-taxiing to [Runway] X despite NOTAM prohibiting. Runway X was in use. It was the preferred calm wind runway and all aircraft were departing and landing 04. Taxi to X from the hangars requires crossing the approach end of [Runway] YY. I stopped at the hold-short line for YY; announced my intention to cross the runway; [and] turned on my strobes and checked for landing traffic in both directions. Not seeing any; I started to cross the runway and looked to my right; there was an aircraft on a takeoff roll on [Runway] Z. He did not announce he was taking off and did not have strobes or a landing light on. There was never any real chance of collision unless he aborted the takeoff and was going to run off the end of the runway; as the approach end of YY is at the very end of the runway.Several factors contributed to this chain of events.",
+     "rerank_score": 0.978
+    },
+    {
+     "ref": "asrs:1496013",
+     "title": "B737-700 Captain reported missing a taxi clearance that was issued during a critical phase of flight during reverse thrust application on landing roll.",
+     "passage": "During the landing rollout; the Tower Controller was asking what turnoff we could make. As the PF; I was zoned in on trying to get the aircraft stopped and wasn't hearing most of the Controller's communications with my F/O. With other aircraft inbound on the same runway; I chose to turn right at [a particular] Taxiway. After we cleared the runway; the Controller told us that Taxiway was closed there and that we were supposed to have turned left on [another taxiway] instead. With the aircraft in full reverse thrust and in critical phase of flight; confusion with Controller's communications took place. We taxied on into the gate. While rolling out on landing; the runway was reported 5; 5; 5. We were still in reverse trust and anti-skid cycling while Tower was telling us to exit [assigned] taxiway while we were still very busy in a critical phase of flight. I was responding back unable.",
+     "rerank_score": 0.96
+    },
+    {
+     "ref": "asrs:1612409",
+     "title": "EMB-145 flight crew reported the aircraft unable to taxi to the gate under its own power due to taxiway conditions.",
+     "passage": "As we were getting ready to depart ZZZ1; I was going over the release with my FO and placed good emphasis on the NOTAMS that were given to us for ZZZ1 and ZZZ. We noticed some taxiway closures in ZZZ and briefed it. With this information we determined that the runway was in good condition for landing and that taxiway Juliet was probably going to be the one that we were going to use since there was no NOTAM associated with this taxiway. This is also in my experience the taxiway we normally use to roll out when we land on this runway given the Embraer 145 landing performance. Weather was VMC.We departed with no issues. Approached and landed with the Control Tower closed at our time of arrival. FO was pilot monitoring and he was making the required position reports on CTAF before landing.",
+     "rerank_score": 0.933
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1834306",
+     "title": "GA pilot reported that while taxiing across the runway at a non-towered airport; an aircraft that did not communicate their intentions it was taking off using a different runway at the same time.",
+     "passage": "ZZZ was preparing for multiple taxiways being closed and aircraft back-taxiing to [Runway] X despite NOTAM prohibiting. Runway X was in use. It was the preferred calm wind runway and all aircraft were departing and landing 04. Taxi to X from the hangars requires crossing the approach end of [Runway] YY. I stopped at the hold-short line for YY; announced my intention to cross the runway; [and] turned on my strobes and checked for landing traffic in both directions. Not seeing any; I started to cross the runway and looked to my right; there was an aircraft on a takeoff roll on [Runway] Z. He did not announce he was taking off and did not have strobes or a landing light on. There was never any real chance of collision unless he aborted the takeoff and was going to run off the end of the runway; as the approach end of YY is at the very end of the runway.Several factors contributed to this chain of events.",
+     "rerank_score": 0.978
+    },
+    {
+     "ref": "asrs:1645542",
+     "title": "A319 flight crew reported a runway incursion due to unclear ATC instructions.",
+     "passage": "I read back to hold short of XXR. Since this is the runway we were expecting; and the Tower controller did not correct me; we had no reason to question the runway in use. There were also no departures or arrivals during the time we held at XX or switched to the Tower that would have indicated use of Runway XXL.Verify all runway crossings; especially if the instruction is unclear. Synopsis: A319 flight crew reported a runway incursion due to unclear ATC instructions.",
+     "rerank_score": 0.929
+    },
+    {
+     "ref": "ntsb:20251229202216",
+     "title": "CEN26LA068 — Hudson, CO — 2025-12-27",
+     "passage": "The pilot stated that taxiway that crossed the runway was raised relative to the runway surface; however, he did not feel that the difference was the reason for the nose over. The airport facility directory noted that the turf surface was in fair condition, the runway was not maintained in winter, and that a taxiway intersected the turf runway at midfield. Probable cause: The pilot’s failure to maintain control of the airplane during the landing roll. Findings: Personnel issues-Task performance-Use of equip/info-Aircraft control-Pilot; Aircraft-Aircraft oper/perf/capability-Performance/control parameters-Directional control-Not attained/maintained; Environmental issues-Physical environment-Runway/land/takeoff/taxi surface-(general)-Effect on operation Sequence: Landing-landing roll Loss of control on ground; Landing-landing roll Nose over/nose down",
+     "rerank_score": 0.832
+    }
+   ]
+  }
+ },
+ {
+  "source": "ntsb-case",
+  "hazard": "KFLL: runway — Takeoff-rejected takeoff Runway incursion veh/AC/person",
+  "category": "runway",
+  "airport": "KFLL",
+  "query": "runway — Takeoff-rejected takeoff Runway incursion veh/AC/person. runway closed, crew used the parallel runway, lined up with the wrong runway or a taxiway, confusion over which runway was in use",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1564355",
+     "title": "Embraer 175 flight crew reported a rejected takeoff due to a runway incursion down field.",
+     "passage": "It could have been a case of two aircraft receiving different clearances for the same runway at the same time. This incident highlights the importance of remaining vigilante at all times when near a runway; as well as monitoring the radio for other aircraft who may conflict with our own instructions. Synopsis: Embraer 175 flight crew reported a rejected takeoff due to a runway incursion down field.",
+     "rerank_score": 0.966
+    },
+    {
+     "ref": "asrs:1776315",
+     "title": "Air carrier flight crew reported a runway incursion after landing.",
+     "passage": "We were across the hold short lines when I queried him about holding short; but I was late in warning him to avoid the confusion and mistake of going so far. At same time; an airplane had rotated for takeoff on RW (Runway) XXL just prior to our position making it a more serious event. ATC never said anything to us as the event happened or immediately after; so I asked them if we should continue across RW (Runway) XXL. They replied in the affirmative and to contact Ground Control after exiting on other side. At no time did ATC comment on the event. We continued to the gate without further incident.Contributing factors were the confusion about the intention of the aircraft on Taxiway XY near the [Taxiway] XX exit we were instructed to use; the short distance between the parallel runways; and lack of coordinated and deliberate attention to the immediate situation we were in.",
+     "rerank_score": 0.96
+    },
+    {
+     "ref": "asrs:1615382",
+     "title": "Air carrier flight crew reported a low speed rejected takeoff due to improper flap setting.",
+     "passage": "We rejected takeoff due to CONFIG EICAS warning (flaps not set to takeoff range). Upon being cleared for takeoff on Runway XXR the Captain called for 'Set takeoff thrust.' As the throttles were advanced; we received a CONFIG EICAS and aural warning; and throttles were immediately closed to initiate the rejected takeoff without reverse thrust or braking prior to approximately 40 knots ground speed. The aircraft was taxied clear of the runway. The crew reviewed the takeoff performance data; re-entered the takeoff performance data using the Runway or Performance Change Checklist from the QRH; then re-accomplished the Before Takeoff Checklist; properly configuring the flaps to 10. Brake temperatures were noted by the crew to be '0'. The flight was subsequently cleared for takeoff again and departed uneventfully.",
+     "rerank_score": 0.923
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1564355",
+     "title": "Embraer 175 flight crew reported a rejected takeoff due to a runway incursion down field.",
+     "passage": "It could have been a case of two aircraft receiving different clearances for the same runway at the same time. This incident highlights the importance of remaining vigilante at all times when near a runway; as well as monitoring the radio for other aircraft who may conflict with our own instructions. Synopsis: Embraer 175 flight crew reported a rejected takeoff due to a runway incursion down field.",
+     "rerank_score": 0.966
+    },
+    {
+     "ref": "asrs:1776315",
+     "title": "Air carrier flight crew reported a runway incursion after landing.",
+     "passage": "We were across the hold short lines when I queried him about holding short; but I was late in warning him to avoid the confusion and mistake of going so far. At same time; an airplane had rotated for takeoff on RW (Runway) XXL just prior to our position making it a more serious event. ATC never said anything to us as the event happened or immediately after; so I asked them if we should continue across RW (Runway) XXL. They replied in the affirmative and to contact Ground Control after exiting on other side. At no time did ATC comment on the event. We continued to the gate without further incident.Contributing factors were the confusion about the intention of the aircraft on Taxiway XY near the [Taxiway] XX exit we were instructed to use; the short distance between the parallel runways; and lack of coordinated and deliberate attention to the immediate situation we were in.",
+     "rerank_score": 0.96
+    },
+    {
+     "ref": "asrs:1696638",
+     "title": "Flight crew reported they performed a rejected takeoff in response to a Master Caution light. The brakes locked up; requiring that the aircraft be towed from the runway.",
+     "passage": "The aircraft came to a complete stop abeam Taxiway X with more than 4000 ft. of runway remaining. Unfortunately; the takeoff rejection resulted in the aircraft being disabled on Runway XX unable to move and ZZZ Runway XX being closed for an extended period of time while emergency crews cooled the hot brakes with water and subsequent maintenance efforts to tow/remove the aircraft from the runway.We were given clearance for takeoff on ZZZ Runway XX after a brief line up and wait; runway verified and heading checked; the takeoff clearance acknowledged; the Captain advanced thrust normally; the TOGA button pressed; and the thrust set verified. The plane accelerated normally and 80 kts. was called and cross-checked. Shortly after the 80 kts. but well before V1 a Master Caution -> FLT Control light illuminated. Shortly after; the Captain called for reject and executed the reject procedure. I got ready to key up the mike to announce the reject to ATC.",
+     "rerank_score": 0.918
+    }
+   ]
+  }
+ },
+ {
+  "source": "ntsb-case",
+  "hazard": "KHYA: runway — Environmental issues-Operating environment-Airport facilities/design-Runway/landing area condition-Decision related to condition",
+  "category": "runway",
+  "airport": "KHYA",
+  "query": "runway — Environmental issues-Operating environment-Airport facilities/design-Runway/landing area condition-Decision related to condition. runway closed, crew used the parallel runway, lined up with the wrong runway or a taxiway, confusion over which runway was in use",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1749024",
+     "title": "Air taxi flight crew reported landing at an airport and being advised that the runway was closed.",
+     "passage": "If we received a clear transmission of Runway XL being closed a slight turn to Runway YY would have been made with no problems. Synopsis: Air taxi flight crew reported landing at an airport and being advised that the runway was closed.",
+     "rerank_score": 0.946
+    },
+    {
+     "ref": "asrs:1277725",
+     "title": "An EMB-145 flight crew incurred a runway while rushing for a time constrained takeoff with complex taxi instructions because of a closed taxiway.",
+     "passage": "The construction on Taxiway C; as well as the close intersection of D and A on the way to Runway XX must cause some confusion with pilots. The only other thing that I can think to prevent this is to tell the aircraft RIGHT turn on D to RWY XX; or to say A instead to prevent confusion. I don't believe that what was issued for taxi instructions was wrong; but maybe further clarification may have helped. Pavement markings and I believe wigwags were already in place for XY and D; and an airport diagram would clearly define a right turn on D for XX either way. Synopsis: An EMB-145 flight crew incurred a runway while rushing for a time constrained takeoff with complex taxi instructions because of a closed taxiway.",
+     "rerank_score": 0.901
+    },
+    {
+     "ref": "asrs:1612409",
+     "title": "EMB-145 flight crew reported the aircraft unable to taxi to the gate under its own power due to taxiway conditions.",
+     "passage": "That taxiway was not in good condition and it should have been closed at some point during the day. It was a VFR evening so I believe there was plenty of time to determine this taxiway was supposed to be closed.The second main cause was the fact that no one decided to create a NOTAM showing the type of contamination and depth on Taxiway Juliet between Runway XX and Taxiway A for crews to at least be aware of the condition of that taxiway before landing. For some reason they created a NOTAM specifying there was 1/8 Inch of Dry Snow over Ice on Juliet between Taxiway Alpha and Foxtrot; but nothing between Runway XX and Alpha.Third cause was that the Control Tower just closed 11 minutes before we landed. Meaning that the controller was probably directing all aircraft that landed prior to us to taxi to the end of the runway and exit there instead of rolling out on Juliet.",
+     "rerank_score": 0.874
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1749024",
+     "title": "Air taxi flight crew reported landing at an airport and being advised that the runway was closed.",
+     "passage": "If we received a clear transmission of Runway XL being closed a slight turn to Runway YY would have been made with no problems. Synopsis: Air taxi flight crew reported landing at an airport and being advised that the runway was closed.",
+     "rerank_score": 0.946
+    },
+    {
+     "ref": "asrs:1277725",
+     "title": "An EMB-145 flight crew incurred a runway while rushing for a time constrained takeoff with complex taxi instructions because of a closed taxiway.",
+     "passage": "The construction on Taxiway C; as well as the close intersection of D and A on the way to Runway XX must cause some confusion with pilots. The only other thing that I can think to prevent this is to tell the aircraft RIGHT turn on D to RWY XX; or to say A instead to prevent confusion. I don't believe that what was issued for taxi instructions was wrong; but maybe further clarification may have helped. Pavement markings and I believe wigwags were already in place for XY and D; and an airport diagram would clearly define a right turn on D for XX either way. Synopsis: An EMB-145 flight crew incurred a runway while rushing for a time constrained takeoff with complex taxi instructions because of a closed taxiway.",
+     "rerank_score": 0.901
+    },
+    {
+     "ref": "asrs:1612409",
+     "title": "EMB-145 flight crew reported the aircraft unable to taxi to the gate under its own power due to taxiway conditions.",
+     "passage": "That taxiway was not in good condition and it should have been closed at some point during the day. It was a VFR evening so I believe there was plenty of time to determine this taxiway was supposed to be closed.The second main cause was the fact that no one decided to create a NOTAM showing the type of contamination and depth on Taxiway Juliet between Runway XX and Taxiway A for crews to at least be aware of the condition of that taxiway before landing. For some reason they created a NOTAM specifying there was 1/8 Inch of Dry Snow over Ice on Juliet between Taxiway Alpha and Foxtrot; but nothing between Runway XX and Alpha.Third cause was that the Control Tower just closed 11 minutes before we landed. Meaning that the controller was probably directing all aircraft that landed prior to us to taxi to the end of the runway and exit there instead of rolling out on Juliet.",
+     "rerank_score": 0.874
+    }
+   ]
+  }
+ },
+ {
+  "source": "ntsb-case",
+  "hazard": "KRTS: wildlife — Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on operation - C; Approach Birdstrike",
+  "category": "wildlife",
+  "airport": "KRTS",
+  "query": "wildlife — Environmental issues-Physical environment-Object/animal/substance-Animals/birds-Effect on operation - C; Approach Birdstrike",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "ntsb:20171019X70539",
+     "title": "WPR18FA011 — Bowie, AZ — 2017-10-19",
+     "passage": "Probable cause: An in-flight loss of control due to a bird strike. Findings: Personnel issues-Task performance-Use of equip/info-Aircraft control-Pilot - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on operation - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate - C Sequence: Enroute-cruise Birdstrike; Enroute-cruise Loss of control in flight; Uncontrolled descent Collision with terr/obj (non-CFIT)",
+     "rerank_score": 0.973
+    },
+    {
+     "ref": "ntsb:20190703X54910",
+     "title": "GAA19CA400 — Navasota, TX — 2019-06-29",
+     "passage": "Probable cause: The airplane’s impact with a bird. Findings: Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on operation - C Sequence: Enroute Birdstrike",
+     "rerank_score": 0.908
+    },
+    {
+     "ref": "ntsb:20220928106012",
+     "title": "WPR22LA358 — South Jordan, UT — 2022-09-23",
+     "passage": "The pilot reported that, while on final approach for the night landing, a bird struck and broke the right-side windshield, which resulted in substantial damage. The pilot continued with the approach and landed without further incident. The pilot reported that there were no preaccident mechanical malfunctions or failures with the airplane that would have precluded normal operation. Probable cause: The pilot’s inability to see and avoid a bird while landing in dark night conditions. Findings: Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate; Environmental issues-Conditions/weather/phenomena-Light condition-Dark-Contributed to outcome; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on operation Sequence: Approach Birdstrike",
+     "rerank_score": 0.878
+    }
+   ],
+   "gate": [
+    {
+     "ref": "ntsb:20171019X70539",
+     "title": "WPR18FA011 — Bowie, AZ — 2017-10-19",
+     "passage": "Probable cause: An in-flight loss of control due to a bird strike. Findings: Personnel issues-Task performance-Use of equip/info-Aircraft control-Pilot - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on operation - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate - C Sequence: Enroute-cruise Birdstrike; Enroute-cruise Loss of control in flight; Uncontrolled descent Collision with terr/obj (non-CFIT)",
+     "rerank_score": 0.973
+    },
+    {
+     "ref": "ntsb:20190703X54910",
+     "title": "GAA19CA400 — Navasota, TX — 2019-06-29",
+     "passage": "Probable cause: The airplane’s impact with a bird. Findings: Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on operation - C Sequence: Enroute Birdstrike",
+     "rerank_score": 0.908
+    },
+    {
+     "ref": "ntsb:20220928106012",
+     "title": "WPR22LA358 — South Jordan, UT — 2022-09-23",
+     "passage": "The pilot reported that, while on final approach for the night landing, a bird struck and broke the right-side windshield, which resulted in substantial damage. The pilot continued with the approach and landed without further incident. The pilot reported that there were no preaccident mechanical malfunctions or failures with the airplane that would have precluded normal operation. Probable cause: The pilot’s inability to see and avoid a bird while landing in dark night conditions. Findings: Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate; Environmental issues-Conditions/weather/phenomena-Light condition-Dark-Contributed to outcome; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on operation Sequence: Approach Birdstrike",
+     "rerank_score": 0.878
+    }
+   ]
+  }
+ },
+ {
+  "source": "ntsb-case",
+  "hazard": "KPUW: lighting — Environmental issues-Operating environment-Airport facilities/design-Airport lighting-Contributed to outcome - F",
+  "category": "lighting",
+  "airport": "KPUW",
+  "query": "lighting — Environmental issues-Operating environment-Airport facilities/design-Airport lighting-Contributed to outcome - F. approach lights or PAPI out of service, night visual approach, glidepath judgment, unstable approach",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1750882",
+     "title": "Air carrier Captain reported non functional PAPI lights at airport for a specific runway and the safety hazards it could pose in weather conditions; especially when crews are not flying as often due t",
+     "passage": "Just reporting the PAPI lights for Runway X are out of service in ZZZZ. Due to the low visibility in rain showers; at night; we chose to land on Runway YY with a slight tailwind; with operable PAPI lights; only because we were in an empty type X Aircraft. If we were in a heavy type Y Aircraft we would be forced to use Runway X with no PAPI lights at night in the weather. Especially due to COVID; pilots are not as proficient flying; we should have all resources available to conduct a safe operation. And just because ZZZZ airport has so few flights (we were the first flight in 2 months); does not mean they can allow those items to slide. Synopsis: Air carrier Captain reported non functional PAPI lights at airport for a specific runway and the safety hazards it could pose in weather conditions; especially when crews are not flying as often due to the COVID-19 pandemic.",
+     "rerank_score": 0.981
+    },
+    {
+     "ref": "asrs:1779962",
+     "title": "Air carrier Captain reported a problem with the alignment of the PAPI lights at LEX airport.",
+     "passage": "The conditions were visual and easily fixed once we referenced the electronic glide slope fully.The Airport Operations Staff and the FAA need to conduct an alignment of the PAPI equipment. There could be a situation in low visibility or very dark conditions where an aircraft arrives at the minimum decision altitude; has the runway environment or approach lights in sight and relies on the PAPI to help keep the pilot's eyes outside to land; which could lead to an issue where they either see themselves as too high according to the PAPI (if it's aligned too low) or; if it only indicates two white two red at any altitude; may follow the PAPI to an unsafe landing either outside of the touchdown zone or short of the runway. Synopsis: Air carrier Captain reported a problem with the alignment of the PAPI lights at LEX airport.",
+     "rerank_score": 0.978
+    },
+    {
+     "ref": "ntsb:20180116X12236",
+     "title": "DCA18IA081 — Pullman, WA — 2017-12-30",
+     "passage": "He further stated he thought he was on the PAPI, but could not remember the last time he observed the PAPI prior to the landing. According to the AIM, page 2-1-4, a PAPI used lights similar to the VASI but were installed in a single row of either two or four lights. These lights were visible from about 5 miles during the day and up to 20 miles at night. The visual glide path of the PAPI typically provided safe obstruction clearance within plus or minus 10 degrees of the extended centerline and to 4 statute miles from the runway threshold. Descent, using the PAPI, should not be initiated until the aircraft is visually aligned with the runway. Lateral guidance is provided by the runway or runway lights. Figure 3: Precision Approach Path Indicator (PAPI). Source: AIM, Figure 2-1-5.",
+     "rerank_score": 0.973
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1750882",
+     "title": "Air carrier Captain reported non functional PAPI lights at airport for a specific runway and the safety hazards it could pose in weather conditions; especially when crews are not flying as often due t",
+     "passage": "Just reporting the PAPI lights for Runway X are out of service in ZZZZ. Due to the low visibility in rain showers; at night; we chose to land on Runway YY with a slight tailwind; with operable PAPI lights; only because we were in an empty type X Aircraft. If we were in a heavy type Y Aircraft we would be forced to use Runway X with no PAPI lights at night in the weather. Especially due to COVID; pilots are not as proficient flying; we should have all resources available to conduct a safe operation. And just because ZZZZ airport has so few flights (we were the first flight in 2 months); does not mean they can allow those items to slide. Synopsis: Air carrier Captain reported non functional PAPI lights at airport for a specific runway and the safety hazards it could pose in weather conditions; especially when crews are not flying as often due to the COVID-19 pandemic.",
+     "rerank_score": 0.981
+    },
+    {
+     "ref": "asrs:1779962",
+     "title": "Air carrier Captain reported a problem with the alignment of the PAPI lights at LEX airport.",
+     "passage": "The conditions were visual and easily fixed once we referenced the electronic glide slope fully.The Airport Operations Staff and the FAA need to conduct an alignment of the PAPI equipment. There could be a situation in low visibility or very dark conditions where an aircraft arrives at the minimum decision altitude; has the runway environment or approach lights in sight and relies on the PAPI to help keep the pilot's eyes outside to land; which could lead to an issue where they either see themselves as too high according to the PAPI (if it's aligned too low) or; if it only indicates two white two red at any altitude; may follow the PAPI to an unsafe landing either outside of the touchdown zone or short of the runway. Synopsis: Air carrier Captain reported a problem with the alignment of the PAPI lights at LEX airport.",
+     "rerank_score": 0.978
+    },
+    {
+     "ref": "ntsb:20180116X12236",
+     "title": "DCA18IA081 — Pullman, WA — 2017-12-30",
+     "passage": "He further stated he thought he was on the PAPI, but could not remember the last time he observed the PAPI prior to the landing. According to the AIM, page 2-1-4, a PAPI used lights similar to the VASI but were installed in a single row of either two or four lights. These lights were visible from about 5 miles during the day and up to 20 miles at night. The visual glide path of the PAPI typically provided safe obstruction clearance within plus or minus 10 degrees of the extended centerline and to 4 statute miles from the runway threshold. Descent, using the PAPI, should not be initiated until the aircraft is visually aligned with the runway. Lateral guidance is provided by the runway or runway lights. Figure 3: Precision Approach Path Indicator (PAPI). Source: AIM, Figure 2-1-5.",
+     "rerank_score": 0.973
+    }
+   ]
+  }
+ },
+ {
+  "source": "ntsb-case",
+  "hazard": "KLAX: wildlife — Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on equipment - C; Enroute-descent Birdstrike",
+  "category": "wildlife",
+  "airport": "KLAX",
+  "query": "wildlife — Environmental issues-Physical environment-Object/animal/substance-Animals/birds-Effect on equipment - C; Enroute-descent Birdstrike",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "ntsb:20171019X70539",
+     "title": "WPR18FA011 — Bowie, AZ — 2017-10-19",
+     "passage": "Probable cause: An in-flight loss of control due to a bird strike. Findings: Personnel issues-Task performance-Use of equip/info-Aircraft control-Pilot - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on operation - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate - C Sequence: Enroute-cruise Birdstrike; Enroute-cruise Loss of control in flight; Uncontrolled descent Collision with terr/obj (non-CFIT)",
+     "rerank_score": 0.983
+    },
+    {
+     "ref": "ntsb:20221028106218",
+     "title": "ERA23LA044 — Sarasota, FL — 2022-10-27",
+     "passage": "Probable cause: An in-flight collision with a bird, which resulted in damage to a tail rotor blade, a subsequent vibration, and the pilot’s decision to conduct a precautionary landing to unsuitable terrain. Findings: Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on equipment Sequence: Enroute Birdstrike",
+     "rerank_score": 0.96
+    },
+    {
+     "ref": "ntsb:20221121106329",
+     "title": "DCA23LA067 — Red Oak, IA — 2022-11-20",
+     "passage": "Probable cause: Multiple bird strikes during descent. Findings: Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on equipment; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Availability of related info; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate Sequence: Enroute-descent Birdstrike",
+     "rerank_score": 0.938
+    }
+   ],
+   "gate": [
+    {
+     "ref": "ntsb:20171019X70539",
+     "title": "WPR18FA011 — Bowie, AZ — 2017-10-19",
+     "passage": "Probable cause: An in-flight loss of control due to a bird strike. Findings: Personnel issues-Task performance-Use of equip/info-Aircraft control-Pilot - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on operation - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate - C Sequence: Enroute-cruise Birdstrike; Enroute-cruise Loss of control in flight; Uncontrolled descent Collision with terr/obj (non-CFIT)",
+     "rerank_score": 0.983
+    },
+    {
+     "ref": "ntsb:20221028106218",
+     "title": "ERA23LA044 — Sarasota, FL — 2022-10-27",
+     "passage": "Probable cause: An in-flight collision with a bird, which resulted in damage to a tail rotor blade, a subsequent vibration, and the pilot’s decision to conduct a precautionary landing to unsuitable terrain. Findings: Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on equipment Sequence: Enroute Birdstrike",
+     "rerank_score": 0.96
+    },
+    {
+     "ref": "ntsb:20221121106329",
+     "title": "DCA23LA067 — Red Oak, IA — 2022-11-20",
+     "passage": "Probable cause: Multiple bird strikes during descent. Findings: Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on equipment; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Availability of related info; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate Sequence: Enroute-descent Birdstrike",
+     "rerank_score": 0.938
+    }
+   ]
+  }
+ },
+ {
+  "source": "ntsb-case",
+  "hazard": "KCXP: runway — Landing-landing roll Runway incursion veh/AC/person",
+  "category": "runway",
+  "airport": "KCXP",
+  "query": "runway — Landing-landing roll Runway incursion veh/AC/person. runway closed, crew used the parallel runway, lined up with the wrong runway or a taxiway, confusion over which runway was in use",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1834306",
+     "title": "GA pilot reported that while taxiing across the runway at a non-towered airport; an aircraft that did not communicate their intentions it was taking off using a different runway at the same time.",
+     "passage": "ZZZ was preparing for multiple taxiways being closed and aircraft back-taxiing to [Runway] X despite NOTAM prohibiting. Runway X was in use. It was the preferred calm wind runway and all aircraft were departing and landing 04. Taxi to X from the hangars requires crossing the approach end of [Runway] YY. I stopped at the hold-short line for YY; announced my intention to cross the runway; [and] turned on my strobes and checked for landing traffic in both directions. Not seeing any; I started to cross the runway and looked to my right; there was an aircraft on a takeoff roll on [Runway] Z. He did not announce he was taking off and did not have strobes or a landing light on. There was never any real chance of collision unless he aborted the takeoff and was going to run off the end of the runway; as the approach end of YY is at the very end of the runway.Several factors contributed to this chain of events.",
+     "rerank_score": 0.978
+    },
+    {
+     "ref": "asrs:1496013",
+     "title": "B737-700 Captain reported missing a taxi clearance that was issued during a critical phase of flight during reverse thrust application on landing roll.",
+     "passage": "During the landing rollout; the Tower Controller was asking what turnoff we could make. As the PF; I was zoned in on trying to get the aircraft stopped and wasn't hearing most of the Controller's communications with my F/O. With other aircraft inbound on the same runway; I chose to turn right at [a particular] Taxiway. After we cleared the runway; the Controller told us that Taxiway was closed there and that we were supposed to have turned left on [another taxiway] instead. With the aircraft in full reverse thrust and in critical phase of flight; confusion with Controller's communications took place. We taxied on into the gate. While rolling out on landing; the runway was reported 5; 5; 5. We were still in reverse trust and anti-skid cycling while Tower was telling us to exit [assigned] taxiway while we were still very busy in a critical phase of flight. I was responding back unable.",
+     "rerank_score": 0.96
+    },
+    {
+     "ref": "asrs:1612409",
+     "title": "EMB-145 flight crew reported the aircraft unable to taxi to the gate under its own power due to taxiway conditions.",
+     "passage": "As we were getting ready to depart ZZZ1; I was going over the release with my FO and placed good emphasis on the NOTAMS that were given to us for ZZZ1 and ZZZ. We noticed some taxiway closures in ZZZ and briefed it. With this information we determined that the runway was in good condition for landing and that taxiway Juliet was probably going to be the one that we were going to use since there was no NOTAM associated with this taxiway. This is also in my experience the taxiway we normally use to roll out when we land on this runway given the Embraer 145 landing performance. Weather was VMC.We departed with no issues. Approached and landed with the Control Tower closed at our time of arrival. FO was pilot monitoring and he was making the required position reports on CTAF before landing.",
+     "rerank_score": 0.933
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1834306",
+     "title": "GA pilot reported that while taxiing across the runway at a non-towered airport; an aircraft that did not communicate their intentions it was taking off using a different runway at the same time.",
+     "passage": "ZZZ was preparing for multiple taxiways being closed and aircraft back-taxiing to [Runway] X despite NOTAM prohibiting. Runway X was in use. It was the preferred calm wind runway and all aircraft were departing and landing 04. Taxi to X from the hangars requires crossing the approach end of [Runway] YY. I stopped at the hold-short line for YY; announced my intention to cross the runway; [and] turned on my strobes and checked for landing traffic in both directions. Not seeing any; I started to cross the runway and looked to my right; there was an aircraft on a takeoff roll on [Runway] Z. He did not announce he was taking off and did not have strobes or a landing light on. There was never any real chance of collision unless he aborted the takeoff and was going to run off the end of the runway; as the approach end of YY is at the very end of the runway.Several factors contributed to this chain of events.",
+     "rerank_score": 0.978
+    },
+    {
+     "ref": "asrs:1645542",
+     "title": "A319 flight crew reported a runway incursion due to unclear ATC instructions.",
+     "passage": "I read back to hold short of XXR. Since this is the runway we were expecting; and the Tower controller did not correct me; we had no reason to question the runway in use. There were also no departures or arrivals during the time we held at XX or switched to the Tower that would have indicated use of Runway XXL.Verify all runway crossings; especially if the instruction is unclear. Synopsis: A319 flight crew reported a runway incursion due to unclear ATC instructions.",
+     "rerank_score": 0.929
+    },
+    {
+     "ref": "ntsb:20251229202216",
+     "title": "CEN26LA068 — Hudson, CO — 2025-12-27",
+     "passage": "The pilot stated that taxiway that crossed the runway was raised relative to the runway surface; however, he did not feel that the difference was the reason for the nose over. The airport facility directory noted that the turf surface was in fair condition, the runway was not maintained in winter, and that a taxiway intersected the turf runway at midfield. Probable cause: The pilot’s failure to maintain control of the airplane during the landing roll. Findings: Personnel issues-Task performance-Use of equip/info-Aircraft control-Pilot; Aircraft-Aircraft oper/perf/capability-Performance/control parameters-Directional control-Not attained/maintained; Environmental issues-Physical environment-Runway/land/takeoff/taxi surface-(general)-Effect on operation Sequence: Landing-landing roll Loss of control on ground; Landing-landing roll Nose over/nose down",
+     "rerank_score": 0.832
+    }
+   ]
+  }
+ },
+ {
+  "source": "ntsb-case",
+  "hazard": "KATL: lighting — Environmental issues-Operating environment-Approach aid coverage/avail-Approach lighting-Availability of related info; Environmental issues-Operating environment-Airport facilities/design-Taxiway lighting-Contributed to outcome",
+  "category": "lighting",
+  "airport": "KATL",
+  "query": "lighting — Environmental issues-Operating environment-Approach aid coverage/avail-Approach lighting-Availability of related info; Environmental issues-Operating environment-Airport facilities/design-Taxiway lighting-Contributed to outcome. approach lights or PAPI out of service, night visual approach, glidepath judgment, unstable approach",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1779962",
+     "title": "Air carrier Captain reported a problem with the alignment of the PAPI lights at LEX airport.",
+     "passage": "The conditions were visual and easily fixed once we referenced the electronic glide slope fully.The Airport Operations Staff and the FAA need to conduct an alignment of the PAPI equipment. There could be a situation in low visibility or very dark conditions where an aircraft arrives at the minimum decision altitude; has the runway environment or approach lights in sight and relies on the PAPI to help keep the pilot's eyes outside to land; which could lead to an issue where they either see themselves as too high according to the PAPI (if it's aligned too low) or; if it only indicates two white two red at any altitude; may follow the PAPI to an unsafe landing either outside of the touchdown zone or short of the runway. Synopsis: Air carrier Captain reported a problem with the alignment of the PAPI lights at LEX airport.",
+     "rerank_score": 0.922
+    },
+    {
+     "ref": "asrs:1640805",
+     "title": "B767 Captain reported challenging night approach due to numerous environmental and equipment factors.",
+     "passage": "This would have been safer. Between terrain; elevation; shortened runways; night; lack of vertical guidance; fuel pump deferrals; and administrative considerations from the FOM we worked very hard.Don't go to ZZZ at night until they get a PAPI or something set up to the displaced threshold to rwy XX. Rewrite night; visual approach requirements to change 'Runway alignment complete by 5nm' to 'On briefed course' or something to that effect. Synopsis: B767 Captain reported challenging night approach due to numerous environmental and equipment factors.",
+     "rerank_score": 0.915
+    },
+    {
+     "ref": "asrs:1181543",
+     "title": "CRJ-900 flight crew is informed during a night visual approach that the runway lights will not come on. The Captain elects to continue; the First Officer is not so sure; but agrees and a normal landin",
+     "passage": "Thus I assumed I would have been overruled. We were on final approach; we had declared the airport in sight and had been cleared for a visual approach. After transferring to Tower frequency (same Controller as approach frequency) and being cleared to land; the Controller stated that the runway lights would not illuminate. We had the PAPI lights in sight as well as taxiway lighting; we were on the ILS glide path. The Controller asked us to state our intentions for this arrival. I told the First Officer that I was comfortable landing on the runway. I also stated 'If you in any way feel uncomfortable with this approach at any time; we will go around and make an alternate decision. Are you okay with continuing?' He said he was okay to continue. I had him tell the Controller that we were okay to continue. The controller stated that he had contacted the county; but wasn't sure how long it would take them to fix the lighting.",
+     "rerank_score": 0.872
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1779962",
+     "title": "Air carrier Captain reported a problem with the alignment of the PAPI lights at LEX airport.",
+     "passage": "The conditions were visual and easily fixed once we referenced the electronic glide slope fully.The Airport Operations Staff and the FAA need to conduct an alignment of the PAPI equipment. There could be a situation in low visibility or very dark conditions where an aircraft arrives at the minimum decision altitude; has the runway environment or approach lights in sight and relies on the PAPI to help keep the pilot's eyes outside to land; which could lead to an issue where they either see themselves as too high according to the PAPI (if it's aligned too low) or; if it only indicates two white two red at any altitude; may follow the PAPI to an unsafe landing either outside of the touchdown zone or short of the runway. Synopsis: Air carrier Captain reported a problem with the alignment of the PAPI lights at LEX airport.",
+     "rerank_score": 0.922
+    },
+    {
+     "ref": "asrs:1640805",
+     "title": "B767 Captain reported challenging night approach due to numerous environmental and equipment factors.",
+     "passage": "This would have been safer. Between terrain; elevation; shortened runways; night; lack of vertical guidance; fuel pump deferrals; and administrative considerations from the FOM we worked very hard.Don't go to ZZZ at night until they get a PAPI or something set up to the displaced threshold to rwy XX. Rewrite night; visual approach requirements to change 'Runway alignment complete by 5nm' to 'On briefed course' or something to that effect. Synopsis: B767 Captain reported challenging night approach due to numerous environmental and equipment factors.",
+     "rerank_score": 0.915
+    },
+    {
+     "ref": "asrs:1181543",
+     "title": "CRJ-900 flight crew is informed during a night visual approach that the runway lights will not come on. The Captain elects to continue; the First Officer is not so sure; but agrees and a normal landin",
+     "passage": "Thus I assumed I would have been overruled. We were on final approach; we had declared the airport in sight and had been cleared for a visual approach. After transferring to Tower frequency (same Controller as approach frequency) and being cleared to land; the Controller stated that the runway lights would not illuminate. We had the PAPI lights in sight as well as taxiway lighting; we were on the ILS glide path. The Controller asked us to state our intentions for this arrival. I told the First Officer that I was comfortable landing on the runway. I also stated 'If you in any way feel uncomfortable with this approach at any time; we will go around and make an alternate decision. Are you okay with continuing?' He said he was okay to continue. I had him tell the Controller that we were okay to continue. The controller stated that he had contacted the county; but wasn't sure how long it would take them to fix the lighting.",
+     "rerank_score": 0.872
+    }
+   ]
+  }
+ },
+ {
+  "source": "ntsb-case",
+  "hazard": "KVAY: wildlife — Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on operation - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate - C",
+  "category": "wildlife",
+  "airport": "KVAY",
+  "query": "wildlife — Environmental issues-Physical environment-Object/animal/substance-Animals/birds-Effect on operation - C; Environmental issues-Physical environment-Object/animal/substance-Animals/birds-Ability to respond/compensate - C",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "ntsb:20171019X70539",
+     "title": "WPR18FA011 — Bowie, AZ — 2017-10-19",
+     "passage": "Probable cause: An in-flight loss of control due to a bird strike. Findings: Personnel issues-Task performance-Use of equip/info-Aircraft control-Pilot - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on operation - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate - C Sequence: Enroute-cruise Birdstrike; Enroute-cruise Loss of control in flight; Uncontrolled descent Collision with terr/obj (non-CFIT)",
+     "rerank_score": 0.99
+    },
+    {
+     "ref": "ntsb:20190228X40937",
+     "title": "GAA19CA153 — Princeton, NJ — 2019-02-23",
+     "passage": "The FAA's Part 139 CertAlert, No. 16-03, \"Recommended Wildlife Exclusion Fencing,\" which provides airfield exclusion methods for deer and other large mammals, recommends constructing fencing \"fully around the airfield without gaps.\" Probable cause: A collision with deer on the runway while landing at night and the airport's lack of a complete perimeter fence. Findings: Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on operation - C; Environmental issues-Physical environment-Object/animal/substance-Fence/fence post-Use of related info - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate - C; Environmental issues-Conditions/weather/phenomena-Light condition-Dark-Effect on personnel Sequence: Landing Wildlife encounter (non-bird)",
+     "rerank_score": 0.949
+    },
+    {
+     "ref": "ntsb:20201005102082",
+     "title": "CEN21LA003 — Hinckley, MN — 2020-10-03",
+     "passage": "Probable cause: The airplane’s impact with deer while landing. Findings: Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Contributed to outcome; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate Sequence: Landing-landing roll Wildlife encounter (non-bird)",
+     "rerank_score": 0.938
+    }
+   ],
+   "gate": [
+    {
+     "ref": "ntsb:20171019X70539",
+     "title": "WPR18FA011 — Bowie, AZ — 2017-10-19",
+     "passage": "Probable cause: An in-flight loss of control due to a bird strike. Findings: Personnel issues-Task performance-Use of equip/info-Aircraft control-Pilot - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on operation - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate - C Sequence: Enroute-cruise Birdstrike; Enroute-cruise Loss of control in flight; Uncontrolled descent Collision with terr/obj (non-CFIT)",
+     "rerank_score": 0.99
+    },
+    {
+     "ref": "ntsb:20190228X40937",
+     "title": "GAA19CA153 — Princeton, NJ — 2019-02-23",
+     "passage": "The FAA's Part 139 CertAlert, No. 16-03, \"Recommended Wildlife Exclusion Fencing,\" which provides airfield exclusion methods for deer and other large mammals, recommends constructing fencing \"fully around the airfield without gaps.\" Probable cause: A collision with deer on the runway while landing at night and the airport's lack of a complete perimeter fence. Findings: Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Effect on operation - C; Environmental issues-Physical environment-Object/animal/substance-Fence/fence post-Use of related info - C; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate - C; Environmental issues-Conditions/weather/phenomena-Light condition-Dark-Effect on personnel Sequence: Landing Wildlife encounter (non-bird)",
+     "rerank_score": 0.949
+    },
+    {
+     "ref": "ntsb:20201005102082",
+     "title": "CEN21LA003 — Hinckley, MN — 2020-10-03",
+     "passage": "Probable cause: The airplane’s impact with deer while landing. Findings: Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Contributed to outcome; Environmental issues-Physical environment-Object/animal/substance-Animal(s)/bird(s)-Ability to respond/compensate Sequence: Landing-landing roll Wildlife encounter (non-bird)",
+     "rerank_score": 0.938
+    }
+   ]
+  }
+ },
+ {
+  "source": "ntsb-case",
+  "hazard": "KFKN: lighting — Environmental issues-Operating environment-Airport facilities/design-Airport lighting-Contributed to outcome",
+  "category": "lighting",
+  "airport": "KFKN",
+  "query": "lighting — Environmental issues-Operating environment-Airport facilities/design-Airport lighting-Contributed to outcome. approach lights or PAPI out of service, night visual approach, glidepath judgment, unstable approach",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1750882",
+     "title": "Air carrier Captain reported non functional PAPI lights at airport for a specific runway and the safety hazards it could pose in weather conditions; especially when crews are not flying as often due t",
+     "passage": "Just reporting the PAPI lights for Runway X are out of service in ZZZZ. Due to the low visibility in rain showers; at night; we chose to land on Runway YY with a slight tailwind; with operable PAPI lights; only because we were in an empty type X Aircraft. If we were in a heavy type Y Aircraft we would be forced to use Runway X with no PAPI lights at night in the weather. Especially due to COVID; pilots are not as proficient flying; we should have all resources available to conduct a safe operation. And just because ZZZZ airport has so few flights (we were the first flight in 2 months); does not mean they can allow those items to slide. Synopsis: Air carrier Captain reported non functional PAPI lights at airport for a specific runway and the safety hazards it could pose in weather conditions; especially when crews are not flying as often due to the COVID-19 pandemic.",
+     "rerank_score": 0.954
+    },
+    {
+     "ref": "asrs:1779962",
+     "title": "Air carrier Captain reported a problem with the alignment of the PAPI lights at LEX airport.",
+     "passage": "The conditions were visual and easily fixed once we referenced the electronic glide slope fully.The Airport Operations Staff and the FAA need to conduct an alignment of the PAPI equipment. There could be a situation in low visibility or very dark conditions where an aircraft arrives at the minimum decision altitude; has the runway environment or approach lights in sight and relies on the PAPI to help keep the pilot's eyes outside to land; which could lead to an issue where they either see themselves as too high according to the PAPI (if it's aligned too low) or; if it only indicates two white two red at any altitude; may follow the PAPI to an unsafe landing either outside of the touchdown zone or short of the runway. Synopsis: Air carrier Captain reported a problem with the alignment of the PAPI lights at LEX airport.",
+     "rerank_score": 0.951
+    },
+    {
+     "ref": "asrs:1640805",
+     "title": "B767 Captain reported challenging night approach due to numerous environmental and equipment factors.",
+     "passage": "This would have been safer. Between terrain; elevation; shortened runways; night; lack of vertical guidance; fuel pump deferrals; and administrative considerations from the FOM we worked very hard.Don't go to ZZZ at night until they get a PAPI or something set up to the displaced threshold to rwy XX. Rewrite night; visual approach requirements to change 'Runway alignment complete by 5nm' to 'On briefed course' or something to that effect. Synopsis: B767 Captain reported challenging night approach due to numerous environmental and equipment factors.",
+     "rerank_score": 0.885
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1750882",
+     "title": "Air carrier Captain reported non functional PAPI lights at airport for a specific runway and the safety hazards it could pose in weather conditions; especially when crews are not flying as often due t",
+     "passage": "Just reporting the PAPI lights for Runway X are out of service in ZZZZ. Due to the low visibility in rain showers; at night; we chose to land on Runway YY with a slight tailwind; with operable PAPI lights; only because we were in an empty type X Aircraft. If we were in a heavy type Y Aircraft we would be forced to use Runway X with no PAPI lights at night in the weather. Especially due to COVID; pilots are not as proficient flying; we should have all resources available to conduct a safe operation. And just because ZZZZ airport has so few flights (we were the first flight in 2 months); does not mean they can allow those items to slide. Synopsis: Air carrier Captain reported non functional PAPI lights at airport for a specific runway and the safety hazards it could pose in weather conditions; especially when crews are not flying as often due to the COVID-19 pandemic.",
+     "rerank_score": 0.954
+    },
+    {
+     "ref": "asrs:1779962",
+     "title": "Air carrier Captain reported a problem with the alignment of the PAPI lights at LEX airport.",
+     "passage": "The conditions were visual and easily fixed once we referenced the electronic glide slope fully.The Airport Operations Staff and the FAA need to conduct an alignment of the PAPI equipment. There could be a situation in low visibility or very dark conditions where an aircraft arrives at the minimum decision altitude; has the runway environment or approach lights in sight and relies on the PAPI to help keep the pilot's eyes outside to land; which could lead to an issue where they either see themselves as too high according to the PAPI (if it's aligned too low) or; if it only indicates two white two red at any altitude; may follow the PAPI to an unsafe landing either outside of the touchdown zone or short of the runway. Synopsis: Air carrier Captain reported a problem with the alignment of the PAPI lights at LEX airport.",
+     "rerank_score": 0.951
+    },
+    {
+     "ref": "asrs:1640805",
+     "title": "B767 Captain reported challenging night approach due to numerous environmental and equipment factors.",
+     "passage": "This would have been safer. Between terrain; elevation; shortened runways; night; lack of vertical guidance; fuel pump deferrals; and administrative considerations from the FOM we worked very hard.Don't go to ZZZ at night until they get a PAPI or something set up to the displaced threshold to rwy XX. Rewrite night; visual approach requirements to change 'Runway alignment complete by 5nm' to 'On briefed course' or something to that effect. Synopsis: B767 Captain reported challenging night approach due to numerous environmental and equipment factors.",
+     "rerank_score": 0.885
+    }
+   ]
+  }
+ },
+ {
+  "source": "ntsb-case",
+  "hazard": "KDTW: runway — Takeoff Runway incursion veh/AC/person",
+  "category": "runway",
+  "airport": "KDTW",
+  "query": "runway — Takeoff Runway incursion veh/AC/person. runway closed, crew used the parallel runway, lined up with the wrong runway or a taxiway, confusion over which runway was in use",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1121123",
+     "title": "Air Carrier flight crew departing before Tower opening departs on a taxiway; being unaware that the pilot controlled lighting system only activates the runway lights for the runway in use when the Tow",
+     "passage": "I informed him that I had not noticed the color of the runway lights as being blue. After mentally reviewing the events of the takeoff; I have concluded that Runway 1/19 did not have runway lights on during our takeoff. All taxiways; and Runway 10/28 did in fact have lights on. These lights added to the confusion that all lights were in fact on. After pulling up the NOTAM for the airport after the end of the day; it states that only the runway in use when the Tower shuts down remains available for pilot controlled lighting. We; as a crew; missed that NOTAM. No other abnormalities occurred during the flight and the flight was completed safely. All the airport runways should be available for PCL. Having only part of the airport lights on; only adds to the confusion that leads you to believe all runway lights are activated. Personally; checking NOTAM's more carefully before departure; will be a top priority in my future flights.",
+     "rerank_score": 0.958
+    },
+    {
+     "ref": "asrs:1253502",
+     "title": "CRJ200 flight crew reports being cleared to Runway 21R at DTW via Runway 9L and M Taxiway. The Captain taxies past Taxiway M and the next intersection is Runway 21R where an incursion occurs; causing ",
+     "passage": "In the future I will be more alert to my situational awareness and stay heads up as long as possible. It also might be better for DTW ground control to use taxiway V which parallels runway 9L for aircraft going to 21R instead of using a closed runway as a taxiway. Synopsis: CRJ200 flight crew reports being cleared to Runway 21R at DTW via Runway 9L and M Taxiway. The Captain taxies past Taxiway M and the next intersection is Runway 21R where an incursion occurs; causing a rejected takeoff.",
+     "rerank_score": 0.954
+    },
+    {
+     "ref": "asrs:1776315",
+     "title": "Air carrier flight crew reported a runway incursion after landing.",
+     "passage": "We were across the hold short lines when I queried him about holding short; but I was late in warning him to avoid the confusion and mistake of going so far. At same time; an airplane had rotated for takeoff on RW (Runway) XXL just prior to our position making it a more serious event. ATC never said anything to us as the event happened or immediately after; so I asked them if we should continue across RW (Runway) XXL. They replied in the affirmative and to contact Ground Control after exiting on other side. At no time did ATC comment on the event. We continued to the gate without further incident.Contributing factors were the confusion about the intention of the aircraft on Taxiway XY near the [Taxiway] XX exit we were instructed to use; the short distance between the parallel runways; and lack of coordinated and deliberate attention to the immediate situation we were in.",
+     "rerank_score": 0.952
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1253502",
+     "title": "CRJ200 flight crew reports being cleared to Runway 21R at DTW via Runway 9L and M Taxiway. The Captain taxies past Taxiway M and the next intersection is Runway 21R where an incursion occurs; causing ",
+     "passage": "In the future I will be more alert to my situational awareness and stay heads up as long as possible. It also might be better for DTW ground control to use taxiway V which parallels runway 9L for aircraft going to 21R instead of using a closed runway as a taxiway. Synopsis: CRJ200 flight crew reports being cleared to Runway 21R at DTW via Runway 9L and M Taxiway. The Captain taxies past Taxiway M and the next intersection is Runway 21R where an incursion occurs; causing a rejected takeoff.",
+     "rerank_score": 0.954
+    },
+    {
+     "ref": "asrs:1776315",
+     "title": "Air carrier flight crew reported a runway incursion after landing.",
+     "passage": "We were across the hold short lines when I queried him about holding short; but I was late in warning him to avoid the confusion and mistake of going so far. At same time; an airplane had rotated for takeoff on RW (Runway) XXL just prior to our position making it a more serious event. ATC never said anything to us as the event happened or immediately after; so I asked them if we should continue across RW (Runway) XXL. They replied in the affirmative and to contact Ground Control after exiting on other side. At no time did ATC comment on the event. We continued to the gate without further incident.Contributing factors were the confusion about the intention of the aircraft on Taxiway XY near the [Taxiway] XX exit we were instructed to use; the short distance between the parallel runways; and lack of coordinated and deliberate attention to the immediate situation we were in.",
+     "rerank_score": 0.952
+    },
+    {
+     "ref": "asrs:1432990",
+     "title": "C402 pilot reported fatigue was a factor in a departure runway incursion.",
+     "passage": "I was flying my last leg of the day. Traffic was landing Runway XX and departing XY. I was on Taxiway Charlie and was asked if I could accept an intersection departure on XZ from Charlie. My performance data allowed for this departure and would not have violated any of the requirements for intersection departures. I told them I could accept. I was told to taxi into position and hold. Unfortunately; I was confused and saw traffic landing Runway XX and accidentally lined up facing XA [the wrong way on XZ]. The Tower cleared me for departure and then immediately said 'stop; you are lined up the wrong way; make a 180 on XA to face XZ.' I never advanced the throttles for takeoff; but did see my error. I then turned around on XZ and was cleared for takeoff. After departure I thanked the controller for his diligence and catching my mistake.",
+     "rerank_score": 0.883
+    }
+   ]
+  }
+ },
+ {
+  "source": "ntsb-case",
+  "hazard": "KBUR: runway — Takeoff Runway incursion veh/AC/person",
+  "category": "runway",
+  "airport": "KBUR",
+  "query": "runway — Takeoff Runway incursion veh/AC/person. runway closed, crew used the parallel runway, lined up with the wrong runway or a taxiway, confusion over which runway was in use",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1121123",
+     "title": "Air Carrier flight crew departing before Tower opening departs on a taxiway; being unaware that the pilot controlled lighting system only activates the runway lights for the runway in use when the Tow",
+     "passage": "I informed him that I had not noticed the color of the runway lights as being blue. After mentally reviewing the events of the takeoff; I have concluded that Runway 1/19 did not have runway lights on during our takeoff. All taxiways; and Runway 10/28 did in fact have lights on. These lights added to the confusion that all lights were in fact on. After pulling up the NOTAM for the airport after the end of the day; it states that only the runway in use when the Tower shuts down remains available for pilot controlled lighting. We; as a crew; missed that NOTAM. No other abnormalities occurred during the flight and the flight was completed safely. All the airport runways should be available for PCL. Having only part of the airport lights on; only adds to the confusion that leads you to believe all runway lights are activated. Personally; checking NOTAM's more carefully before departure; will be a top priority in my future flights.",
+     "rerank_score": 0.958
+    },
+    {
+     "ref": "asrs:1776315",
+     "title": "Air carrier flight crew reported a runway incursion after landing.",
+     "passage": "We were across the hold short lines when I queried him about holding short; but I was late in warning him to avoid the confusion and mistake of going so far. At same time; an airplane had rotated for takeoff on RW (Runway) XXL just prior to our position making it a more serious event. ATC never said anything to us as the event happened or immediately after; so I asked them if we should continue across RW (Runway) XXL. They replied in the affirmative and to contact Ground Control after exiting on other side. At no time did ATC comment on the event. We continued to the gate without further incident.Contributing factors were the confusion about the intention of the aircraft on Taxiway XY near the [Taxiway] XX exit we were instructed to use; the short distance between the parallel runways; and lack of coordinated and deliberate attention to the immediate situation we were in.",
+     "rerank_score": 0.952
+    },
+    {
+     "ref": "asrs:1432990",
+     "title": "C402 pilot reported fatigue was a factor in a departure runway incursion.",
+     "passage": "I was flying my last leg of the day. Traffic was landing Runway XX and departing XY. I was on Taxiway Charlie and was asked if I could accept an intersection departure on XZ from Charlie. My performance data allowed for this departure and would not have violated any of the requirements for intersection departures. I told them I could accept. I was told to taxi into position and hold. Unfortunately; I was confused and saw traffic landing Runway XX and accidentally lined up facing XA [the wrong way on XZ]. The Tower cleared me for departure and then immediately said 'stop; you are lined up the wrong way; make a 180 on XA to face XZ.' I never advanced the throttles for takeoff; but did see my error. I then turned around on XZ and was cleared for takeoff. After departure I thanked the controller for his diligence and catching my mistake.",
+     "rerank_score": 0.883
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1776315",
+     "title": "Air carrier flight crew reported a runway incursion after landing.",
+     "passage": "We were across the hold short lines when I queried him about holding short; but I was late in warning him to avoid the confusion and mistake of going so far. At same time; an airplane had rotated for takeoff on RW (Runway) XXL just prior to our position making it a more serious event. ATC never said anything to us as the event happened or immediately after; so I asked them if we should continue across RW (Runway) XXL. They replied in the affirmative and to contact Ground Control after exiting on other side. At no time did ATC comment on the event. We continued to the gate without further incident.Contributing factors were the confusion about the intention of the aircraft on Taxiway XY near the [Taxiway] XX exit we were instructed to use; the short distance between the parallel runways; and lack of coordinated and deliberate attention to the immediate situation we were in.",
+     "rerank_score": 0.952
+    },
+    {
+     "ref": "asrs:1432990",
+     "title": "C402 pilot reported fatigue was a factor in a departure runway incursion.",
+     "passage": "I was flying my last leg of the day. Traffic was landing Runway XX and departing XY. I was on Taxiway Charlie and was asked if I could accept an intersection departure on XZ from Charlie. My performance data allowed for this departure and would not have violated any of the requirements for intersection departures. I told them I could accept. I was told to taxi into position and hold. Unfortunately; I was confused and saw traffic landing Runway XX and accidentally lined up facing XA [the wrong way on XZ]. The Tower cleared me for departure and then immediately said 'stop; you are lined up the wrong way; make a 180 on XA to face XZ.' I never advanced the throttles for takeoff; but did see my error. I then turned around on XZ and was cleared for takeoff. After departure I thanked the controller for his diligence and catching my mistake.",
+     "rerank_score": 0.883
+    },
+    {
+     "ref": "asrs:1786187",
+     "title": "Air Carrier flight crew reported a taxiway/runway incursion and cited being rushed to beat an ATC Zero time contributed to the event.",
+     "passage": "We were not at the very end; rather somewhere between [Taxiway] 1C and [Taxiway] 1D; but behind [Taxiway] 1D. Upon reflection; we decided that our takeoff data may not have been valid since we were not sure of our start point. Additive conditions were an ATC zero hour at destination and the Captain admits his three weeks off prior to our day put him a little behind. I also didn't advise that my head would be down while taxiing out.Better verification of runway departure point and better awareness of taxi diagram. Synopsis: Air Carrier flight crew reported a taxiway/runway incursion and cited being rushed to beat an ATC Zero time contributed to the event.",
+     "rerank_score": 0.838
+    }
+   ]
+  }
+ },
+ {
+  "source": "ntsb-case",
+  "hazard": "KDET: runway — Environmental issues-Operating environment-Airport facilities/design-Runway/landing area condition-Decision related to condition",
+  "category": "runway",
+  "airport": "KDET",
+  "query": "runway — Environmental issues-Operating environment-Airport facilities/design-Runway/landing area condition-Decision related to condition. runway closed, crew used the parallel runway, lined up with the wrong runway or a taxiway, confusion over which runway was in use",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1749024",
+     "title": "Air taxi flight crew reported landing at an airport and being advised that the runway was closed.",
+     "passage": "If we received a clear transmission of Runway XL being closed a slight turn to Runway YY would have been made with no problems. Synopsis: Air taxi flight crew reported landing at an airport and being advised that the runway was closed.",
+     "rerank_score": 0.946
+    },
+    {
+     "ref": "asrs:1277725",
+     "title": "An EMB-145 flight crew incurred a runway while rushing for a time constrained takeoff with complex taxi instructions because of a closed taxiway.",
+     "passage": "The construction on Taxiway C; as well as the close intersection of D and A on the way to Runway XX must cause some confusion with pilots. The only other thing that I can think to prevent this is to tell the aircraft RIGHT turn on D to RWY XX; or to say A instead to prevent confusion. I don't believe that what was issued for taxi instructions was wrong; but maybe further clarification may have helped. Pavement markings and I believe wigwags were already in place for XY and D; and an airport diagram would clearly define a right turn on D for XX either way. Synopsis: An EMB-145 flight crew incurred a runway while rushing for a time constrained takeoff with complex taxi instructions because of a closed taxiway.",
+     "rerank_score": 0.901
+    },
+    {
+     "ref": "asrs:1612409",
+     "title": "EMB-145 flight crew reported the aircraft unable to taxi to the gate under its own power due to taxiway conditions.",
+     "passage": "That taxiway was not in good condition and it should have been closed at some point during the day. It was a VFR evening so I believe there was plenty of time to determine this taxiway was supposed to be closed.The second main cause was the fact that no one decided to create a NOTAM showing the type of contamination and depth on Taxiway Juliet between Runway XX and Taxiway A for crews to at least be aware of the condition of that taxiway before landing. For some reason they created a NOTAM specifying there was 1/8 Inch of Dry Snow over Ice on Juliet between Taxiway Alpha and Foxtrot; but nothing between Runway XX and Alpha.Third cause was that the Control Tower just closed 11 minutes before we landed. Meaning that the controller was probably directing all aircraft that landed prior to us to taxi to the end of the runway and exit there instead of rolling out on Juliet.",
+     "rerank_score": 0.874
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1749024",
+     "title": "Air taxi flight crew reported landing at an airport and being advised that the runway was closed.",
+     "passage": "If we received a clear transmission of Runway XL being closed a slight turn to Runway YY would have been made with no problems. Synopsis: Air taxi flight crew reported landing at an airport and being advised that the runway was closed.",
+     "rerank_score": 0.946
+    },
+    {
+     "ref": "asrs:1277725",
+     "title": "An EMB-145 flight crew incurred a runway while rushing for a time constrained takeoff with complex taxi instructions because of a closed taxiway.",
+     "passage": "The construction on Taxiway C; as well as the close intersection of D and A on the way to Runway XX must cause some confusion with pilots. The only other thing that I can think to prevent this is to tell the aircraft RIGHT turn on D to RWY XX; or to say A instead to prevent confusion. I don't believe that what was issued for taxi instructions was wrong; but maybe further clarification may have helped. Pavement markings and I believe wigwags were already in place for XY and D; and an airport diagram would clearly define a right turn on D for XX either way. Synopsis: An EMB-145 flight crew incurred a runway while rushing for a time constrained takeoff with complex taxi instructions because of a closed taxiway.",
+     "rerank_score": 0.901
+    },
+    {
+     "ref": "asrs:1612409",
+     "title": "EMB-145 flight crew reported the aircraft unable to taxi to the gate under its own power due to taxiway conditions.",
+     "passage": "That taxiway was not in good condition and it should have been closed at some point during the day. It was a VFR evening so I believe there was plenty of time to determine this taxiway was supposed to be closed.The second main cause was the fact that no one decided to create a NOTAM showing the type of contamination and depth on Taxiway Juliet between Runway XX and Taxiway A for crews to at least be aware of the condition of that taxiway before landing. For some reason they created a NOTAM specifying there was 1/8 Inch of Dry Snow over Ice on Juliet between Taxiway Alpha and Foxtrot; but nothing between Runway XX and Alpha.Third cause was that the Control Tower just closed 11 minutes before we landed. Meaning that the controller was probably directing all aircraft that landed prior to us to taxi to the end of the runway and exit there instead of rolling out on Juliet.",
+     "rerank_score": 0.874
+    }
+   ]
+  }
+ },
+ {
+  "source": "ntsb-case",
+  "hazard": "KTTD: lighting — Environmental issues-Operating environment-Airport facilities/design-Runway lighting-Not specified",
+  "category": "lighting",
+  "airport": "KTTD",
+  "query": "lighting — Environmental issues-Operating environment-Airport facilities/design-Runway lighting-Not specified. approach lights or PAPI out of service, night visual approach, glidepath judgment, unstable approach",
+  "considered": 15,
+  "arms": {
+   "base": [
+    {
+     "ref": "asrs:1750882",
+     "title": "Air carrier Captain reported non functional PAPI lights at airport for a specific runway and the safety hazards it could pose in weather conditions; especially when crews are not flying as often due t",
+     "passage": "Just reporting the PAPI lights for Runway X are out of service in ZZZZ. Due to the low visibility in rain showers; at night; we chose to land on Runway YY with a slight tailwind; with operable PAPI lights; only because we were in an empty type X Aircraft. If we were in a heavy type Y Aircraft we would be forced to use Runway X with no PAPI lights at night in the weather. Especially due to COVID; pilots are not as proficient flying; we should have all resources available to conduct a safe operation. And just because ZZZZ airport has so few flights (we were the first flight in 2 months); does not mean they can allow those items to slide. Synopsis: Air carrier Captain reported non functional PAPI lights at airport for a specific runway and the safety hazards it could pose in weather conditions; especially when crews are not flying as often due to the COVID-19 pandemic.",
+     "rerank_score": 0.98
+    },
+    {
+     "ref": "asrs:1779962",
+     "title": "Air carrier Captain reported a problem with the alignment of the PAPI lights at LEX airport.",
+     "passage": "The conditions were visual and easily fixed once we referenced the electronic glide slope fully.The Airport Operations Staff and the FAA need to conduct an alignment of the PAPI equipment. There could be a situation in low visibility or very dark conditions where an aircraft arrives at the minimum decision altitude; has the runway environment or approach lights in sight and relies on the PAPI to help keep the pilot's eyes outside to land; which could lead to an issue where they either see themselves as too high according to the PAPI (if it's aligned too low) or; if it only indicates two white two red at any altitude; may follow the PAPI to an unsafe landing either outside of the touchdown zone or short of the runway. Synopsis: Air carrier Captain reported a problem with the alignment of the PAPI lights at LEX airport.",
+     "rerank_score": 0.957
+    },
+    {
+     "ref": "asrs:1772902",
+     "title": "E175 flight crew reported that as the Tower Controller was closing up the Tower; had inadvertently turned off the runway lights; resulting in a non-functional PAPI lighting system while the crew was o",
+     "passage": "CA (Captain) asked if I found the circumstances to land safe versus a missed approach late at night and snow in the forecast. [We] agreed it would be safe to land given the real time circumstances. Upon landing with no issue; Tower Controller got on CTAF frequency to apologize that they configured the runway lighting incorrectly; which is why it turned off momentarily. The First Officer reported the PAPI was also not working when lights returned. [The] ATC Controller reported on CTAF; 'That is weird;' and would be reporting it to airport operations. Great example in how reality and goal for safety require pilot judgment. Synopsis: E175 flight crew reported that as the Tower Controller was closing up the Tower; had inadvertently turned off the runway lights; resulting in a non-functional PAPI lighting system while the crew was on approach.",
+     "rerank_score": 0.951
+    }
+   ],
+   "gate": [
+    {
+     "ref": "asrs:1750882",
+     "title": "Air carrier Captain reported non functional PAPI lights at airport for a specific runway and the safety hazards it could pose in weather conditions; especially when crews are not flying as often due t",
+     "passage": "Just reporting the PAPI lights for Runway X are out of service in ZZZZ. Due to the low visibility in rain showers; at night; we chose to land on Runway YY with a slight tailwind; with operable PAPI lights; only because we were in an empty type X Aircraft. If we were in a heavy type Y Aircraft we would be forced to use Runway X with no PAPI lights at night in the weather. Especially due to COVID; pilots are not as proficient flying; we should have all resources available to conduct a safe operation. And just because ZZZZ airport has so few flights (we were the first flight in 2 months); does not mean they can allow those items to slide. Synopsis: Air carrier Captain reported non functional PAPI lights at airport for a specific runway and the safety hazards it could pose in weather conditions; especially when crews are not flying as often due to the COVID-19 pandemic.",
+     "rerank_score": 0.98
+    },
+    {
+     "ref": "asrs:1779962",
+     "title": "Air carrier Captain reported a problem with the alignment of the PAPI lights at LEX airport.",
+     "passage": "The conditions were visual and easily fixed once we referenced the electronic glide slope fully.The Airport Operations Staff and the FAA need to conduct an alignment of the PAPI equipment. There could be a situation in low visibility or very dark conditions where an aircraft arrives at the minimum decision altitude; has the runway environment or approach lights in sight and relies on the PAPI to help keep the pilot's eyes outside to land; which could lead to an issue where they either see themselves as too high according to the PAPI (if it's aligned too low) or; if it only indicates two white two red at any altitude; may follow the PAPI to an unsafe landing either outside of the touchdown zone or short of the runway. Synopsis: Air carrier Captain reported a problem with the alignment of the PAPI lights at LEX airport.",
+     "rerank_score": 0.957
+    },
+    {
+     "ref": "asrs:1772902",
+     "title": "E175 flight crew reported that as the Tower Controller was closing up the Tower; had inadvertently turned off the runway lights; resulting in a non-functional PAPI lighting system while the crew was o",
+     "passage": "CA (Captain) asked if I found the circumstances to land safe versus a missed approach late at night and snow in the forecast. [We] agreed it would be safe to land given the real time circumstances. Upon landing with no issue; Tower Controller got on CTAF frequency to apologize that they configured the runway lighting incorrectly; which is why it turned off momentarily. The First Officer reported the PAPI was also not working when lights returned. [The] ATC Controller reported on CTAF; 'That is weird;' and would be reporting it to airport operations. Great example in how reality and goal for safety require pilot judgment. Synopsis: E175 flight crew reported that as the Tower Controller was closing up the Tower; had inadvertently turned off the runway lights; resulting in a non-functional PAPI lighting system while the crew was on approach.",
+     "rerank_score": 0.951
+    }
+   ]
+  }
+ }
+]

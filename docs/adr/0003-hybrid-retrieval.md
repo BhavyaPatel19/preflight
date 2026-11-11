@@ -70,3 +70,13 @@ Decision 4 named `bge-m3` as the upgrade path. The ablation that was supposed to
 rebuilt by `preflight corpus reindex` with `ef_construction=128`). Cost: 3.6× the embedding time
 (~20 chunks/s on an M5; the full corpus is ~4.5 h) and 1.3 GB of weights instead of 0.4. The
 measured effect on the real corpus is run 7 in `evals/retrieval/HISTORY.md`.
+
+## Addendum (2026-11-10): fine-tuned embedder
+
+`bge-large-en-v1.5` fine-tuned on 34,891 ASRS synopsis → narrative pairs, every report the evals
+use excluded (`preflight corpus finetune`, `notebooks/finetune_colab.ipynb`). Full-corpus
+hybrid+rerank Recall@20 0.597 → 0.707, nDCG@10 0.407 → 0.450, identifier P@10 flat at 0.776
+(`evals/retrieval/HISTORY.md`, run 10). The code default stays the public base model so a fresh
+clone works without the weights; a deployment that has re-embedded with the fine-tuned model
+sets `EMBEDDING_MODEL=models/bge-large-asrs`, because search filters chunks by embedder name.
+Open consequence: the reranker's lift turned negative (−0.092), so decision 2 is up for re-test.

@@ -76,6 +76,9 @@ class Settings(BaseSettings):
     # 0.5 is deliberately conservative for a safety-adjacent output).
     precedent_k: int = 3
     precedent_min_score: float = 0.5
+    # Attach a report only if it mentions the hazard's mechanism (brief/mechanism.py); when on,
+    # precedent_min_score is not applied (evals/precedent/HISTORY.md, run 3).
+    precedent_gate: bool = True
 
     # Decoder routing: below this the rule parse is escalated to the model.
     decode_escalation_threshold: float = 0.6

@@ -16,8 +16,8 @@ $ preflight brief KSFO KJFK --alt KBOS --off-block 2026-09-11T02:30Z --type A320
 > preflight briefing.
 
 **In numbers.** 47,723 ASRS + 27,986 NTSB reports indexed as 316k chunks in pgvector; hybrid
-retrieval measured over 9 recorded runs (Recall@20 0.78 on unambiguous queries, 0.60 overall, with
-the ceiling located); an NLI grounding verifier at 1.000 / 0.972 accept / reject; a local-model
+retrieval measured over 10 recorded runs (Recall@20 0.84 on unambiguous queries, 0.71 overall, after
+fine-tuning the embedder on held-out-safe corpus pairs); an NLI grounding verifier at 1.000 / 0.972 accept / reject; a local-model
 narrative layer at a 1% unsupported-claim rate; 26-case abstention eval at 1.000 / 0.000; a 60-case
 injection red-team at 1.000 / 0.000; a ModernBERT NOTAM extractor at 0.898 macro-F1 on a hand-labelled
 gold set; a Chronos delay forecast at MASE 0.715; a time-travel eval whose first real number (0.19
@@ -239,9 +239,9 @@ the history file next to it says what was tried and what the ceiling turned out 
 | Layer | Metric | Target | Measured |
 |---|---|---:|---:|
 | Extraction | macro entity F1 over 8 types, hand-labelled real-format gold set (124 bodies) | ≥ 0.92 | **0.898** fine-tuned ModernBERT (rules 0.875) · exact-span 0.842 vs 0.172 · TIME F1 0.984 vs 0 · **trained on synthetic NOTAMs** — [details](evals/extraction/RESULTS.md) · [history](evals/extraction/HISTORY.md) · [model card](docs/model-card-notam-extractor.md) |
-| Retrieval | Recall@20 / nDCG@10 — synopsis→narrative, 300 queries | ≥ 0.90 / 0.65 | 0.60 / 0.41 overall; **0.78** Recall@20 on the 151 specific synopses (> 25 words) — the short half is a labelling ceiling, not a retrieval one — [details](evals/retrieval/RESULTS.md) · [history](evals/retrieval/HISTORY.md) |
+| Retrieval | Recall@20 / nDCG@10 — synopsis→narrative, 300 queries | ≥ 0.90 / 0.65 | 0.71 / 0.45 overall (0.60 / 0.41 before fine-tuning the embedder); **0.84** Recall@20 on the 151 specific synopses (> 25 words) — the short half is a labelling ceiling, not a retrieval one — [details](evals/retrieval/RESULTS.md) · [history](evals/retrieval/HISTORY.md) |
 | Retrieval | P@10 on exact-identifier queries (`runway 28R` at an airport) | ≥ 0.80 | 0.77 |
-| Rerank | nDCG@10 lift over dense-only | +0.12 | +0.09 |
+| Rerank | nDCG@10 lift over dense-only | +0.12 | **−0.09** with the fine-tuned embedder (+0.06 before): the stock reranker now reorders a better first stage; kept for identifier queries, under review (run 10) |
 | Forecast | MASE, 24 h arrival delay, rolling-origin backtest | < 0.85 | **0.715** Chronos-Bolt · 0.751 climatology · 1.067 seasonal-naive — [details](evals/forecast/RESULTS.md) |
 | End-to-end | implicated-hazard recall (300 NTSB positives) | ≥ 0.85 | **0.188** on the weather slice — 117 of 142 weather-implicated events, briefed against the public historical METAR at the time; the 158 NOTAM-implicated events are uncoverable by choice. 74 of the 117 had calm wind in that METAR: the ceiling of a METAR-based weather layer — [details](evals/briefing/RESULTS.md) |
 | End-to-end | false-alarm rate (300 matched negatives) | < 0.15 | **0.103** on the 117 matched weather negatives |
@@ -250,6 +250,7 @@ the history file next to it says what was tried and what the ceiling turned out 
 | Abstention | recall on constructed data-gap cases · false-abstention rate on clean cases | ≥ 0.90 | **1.000 · 0.000** (26 cases, 20 gaps; 0.55 before this eval named three silent gaps — [details](evals/abstention/README.md)) |
 | Safety | injection detector on 60 adversarial NOTAMs: recall · false positives on benign | 100% | **1.000 · 0.000** (detector; LLM resistance scored against the same set later) — [details](evals/safety/RESULTS.md) |
 | Judge | LLM-judge vs human agreement (Cohen's κ) on precedent relevance | ≥ 0.70 | — (judge run on 304 pairs; 100-row sheet awaits human labels — [how](evals/precedent/README.md)) |
+| Precedent | precision of the prior reports a briefing attaches, 30 held-out hazards | ≥ 0.65 | **0.911** with the mechanism check (0.816 with the old score threshold); labels are Claude's, blind, not yet human-audited — [history](evals/precedent/HISTORY.md) |
 | Cost | p50 $/briefing · p95 latency, full briefing with precedent + narrative | < $0.08 · 25 s | **$0 · 26.2 s** local `qwen3:14b` on an M5 (was 53.2 s) · 4.0 s without the model — [details](evals/latency/RESULTS.md) |
 
 The κ row matters as much as the rest: an LLM judge nobody validated is a number nobody should trust.
@@ -263,7 +264,9 @@ said so, with the failed attempts kept in the history files:
   Recall@20; the full re-embed delivered +0.04 nDCG on the dense channel and nothing after
   reranking — the ablation measured ranking, not recall at depth (run 7). An LLM query rewrite made
   every bucket worse (run 8). The miss analysis found the ceiling: half the golden queries are short
-  synopses with hundreds of equally matching reports (run 9).
+  synopses with hundreds of equally matching reports (run 9). Fine-tuning `bge-large` on 34,891
+  synopsis → narrative pairs from reports outside every eval set took hybrid+rerank Recall@20
+  0.597 → 0.707 and nDCG@10 0.407 → 0.450, against a pass rule written before the re-embed (run 10).
 - *Grounding* — the NLI verifier accepted a fabricated "44 min" at 0.98; an exact-figure gate took
   corruption rejection from 0.44 back to 0.97.
 - *Narrative* — unsupported-claim rate 0.50 → 0.22 → 0.01 across three runs by changing the prompt,

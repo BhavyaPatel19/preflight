@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, replace
 from datetime import date
@@ -14,6 +15,22 @@ from preflight.retrieval.chunk import chunk_text
 from preflight.retrieval.embed import Embedder, Reranker
 
 Mode = Literal["hybrid", "dense", "lexical"]
+SearchMode = Literal["hybrid", "dense", "lexical", "auto"]
+
+# A runway or taxiway designator in the query text: "runway 28R", "RWY 10L", "taxiway B".
+_DESIGNATOR = re.compile(
+    r"\b(?:RWY|[Rr]unway|TWY|[Tt]axiway)s?\s?(?:\d{1,2}[LRC]?|[A-Z]{1,2}\d?)\b")
+
+
+def route(query: str) -> tuple[Mode, bool]:
+    """``mode="auto"``: which channels and whether to rerank, from the query text alone.
+
+    A query naming a runway or taxiway needs the exact match only the lexical channel and the
+    cross-encoder give (identifier P@10: dense 0.62, hybrid+rerank 0.78). Any other query is a
+    description, where the fine-tuned dense channel alone ranks best and the stock reranker
+    reorders it worse (retrieval HISTORY, run 10).
+    """
+    return ("hybrid", True) if _DESIGNATOR.search(query) else ("dense", False)
 
 
 @dataclass(frozen=True)
@@ -49,13 +66,18 @@ class Retriever:
         k: int = 10,
         icao: str | None = None,
         source: str | None = None,
-        mode: Mode = "hybrid",
+        mode: SearchMode = "hybrid",
         rerank: bool = True,
         candidates: int | None = None,
         exclude_like: str | None = None,
         icao_strict: bool = False,
     ) -> list[Hit]:
-        """Fused candidates from Postgres, optionally reranked; top ``k``."""
+        """Fused candidates from Postgres, optionally reranked; top ``k``.
+
+        ``mode="auto"`` lets :func:`route` choose the channels and the rerank from the query,
+        overriding ``rerank``."""
+        if mode == "auto":
+            mode, rerank = route(query)
         n = candidates or settings().retrieval_candidates
         qvec = self.embedder.encode([query], query=True)[0] if mode != "lexical" else None
         found = corpus.hybrid_search(

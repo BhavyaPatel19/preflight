@@ -109,3 +109,93 @@ are a reranker upgrade (`bge-reranker-v2-m3`, now that the reranker is the large
 latency and the lift has shrunk) and a golden set v2 that labels *all* equivalent reports for a
 synopsis rather than one — which would measure precision of the top-k rather than recall of a
 single draw.
+
+**Run 10: fine-tuning the embedder on the corpus's own pairs moved every recall number.**
+`bge-large-en-v1.5` was fine-tuned on 34,891 synopsis → narrative pairs drawn from ASRS reports
+outside every eval set (each retrieval golden target and each precedent hit is excluded by report
+id, `finetune.held_out_ids`): one epoch of cached multiple-negatives ranking loss, batch 128,
+lr 2e-5, on a Colab GPU (`notebooks/finetune_colab.ipynb`). The subset ablation priced it first
+(`evals/embedder/RESULTS.md`: +0.200 Recall@20 on 40k chunks), then all 316,226 chunks were
+re-embedded and the HNSW index rebuilt. The pass rule was written down before the re-embed:
+hybrid+rerank Recall@20 ≥ 0.65, nDCG@10 ≥ 0.407, identifier P@10 ≥ 0.75.
+
+| config | Recall@20 | nDCG@10 | identifier P@10 | target not in pool |
+|---|---:|---:|---:|---:|
+| hybrid+rerank, base model (run 9) | 0.597 | 0.407 | 0.774 | 36.7% |
+| **hybrid+rerank, fine-tuned** | **0.707** | **0.450** | **0.776** | **21.7%** |
+| dense, base model (run 9) | 0.527 | 0.351 | 0.624 | |
+| dense, fine-tuned | 0.750 | 0.542 | 0.620 | |
+
+All three conditions met. The specific slice (> 25 words) went 0.781 → 0.841; short synopses
+0.385 → 0.462. Unlike run 7, the subset ablation transferred: it predicted +0.20 dense Recall@20
+and the full corpus delivered +0.22.
+
+What this does and does not show:
+
+- **The training task is the eval task.** No eval report was trained on, but the queries are the
+  same kind of text (analyst synopses) as the training queries. The gain is real for this task;
+  it is not evidence about briefing-style precedent queries, which wait on the judged set (κ).
+- **Exact identifiers are flat** (0.774 → 0.776). The fine-tune neither helped nor hurt them.
+- **The reranker now subtracts.** Dense alone (0.750 / 0.542) beats hybrid+rerank (0.707 / 0.450);
+  the rerank lift went +0.056 → −0.092. The stock `bge-reranker-base` reorders a now-better
+  first stage. Dense alone loses identifier queries (0.620), so the deployed config stays
+  hybrid+rerank for this run: one change per run. Next candidates: hybrid without rerank
+  (0.733 / 0.499, but identifier 0.746, just under its floor), rerank only when the query carries
+  an identifier, or a reranker trained on the same pairs.
+
+Reproduce: the weights are not committed (`models/` is ignored). Train them with the notebook or
+`preflight corpus finetune`, set `EMBEDDING_MODEL=models/bge-large-asrs`, then
+`preflight corpus reembed` and `preflight corpus reindex`. The base model's vectors are kept in
+`chunks_embedding_backup_bge_large` for rollback.
+
+**Run 11: route by query, and the reranker stays where it is a filter.** Run 10 left the stock
+reranker hurting description queries and still needed for identifier queries. `mode="auto"`
+(`search.route`) sends a query that names a runway or taxiway ("runway 28R", "RWY 10L",
+"taxiway B") to hybrid+rerank and every other query to dense alone. The rule depends only on
+query text; 12 of the 300 synopses name a runway or taxiway and take the reranked path. Pass rule
+written before the run: synopsis nDCG@10 ≥ 0.52 and Recall@20 ≥ 0.73, identifier P@10 ≥ 0.77.
+
+| config | Recall@20 | nDCG@10 | identifier P@10 | p50 ms |
+|---|---:|---:|---:|---:|
+| hybrid+rerank | 0.707 | 0.450 | 0.776 | 993 |
+| dense | 0.750 | 0.542 | 0.620 | 169 |
+| **routed** | **0.750** | **0.536** | **0.776** | **39** |
+
+All three met: dense's ranking on descriptions, hybrid+rerank's precision on identifiers, and the
+reranker's cost only where it pays. (Dense p50 here is inflated by other work on the machine
+during this run; run 10 measured 54 ms.)
+
+**Not deployed yet, and why.** The briefing's precedent step uses the reranker as a calibrated
+relevance filter as well as a sorter: a precedent is attached only above
+`precedent_min_score` = 0.5 (`brief/precedent.py`), which is how a briefing abstains when no
+prior report is relevant. Dense hits carry no reranker score, so routing that path would drop
+every precedent. Routing therefore fits the ranking-only surfaces (`preflight search`, the MCP
+search tool); for briefings the fix has to be a reranker that agrees with the fine-tuned
+embedder, which is the next run (`corpus finetune-reranker`, `notebooks/finetune_reranker_colab.ipynb`;
+pass rule: hybrid+rerank nDCG@10 ≥ 0.542 and identifier P@10 ≥ 0.776).
+
+**Run 12: the fine-tuned reranker fixed the ranking and missed the identifier condition by 3 slots.**
+`bge-reranker-base` fine-tuned on the run-10 pairs (34,891 synopses, 141,767 negatives mined by the
+fine-tuned embedder from ranks 10–50, one epoch on a Colab T4; `corpus finetune-reranker`). Pass
+rule written before training: hybrid+rerank nDCG@10 ≥ 0.542 (beat dense alone) and identifier
+P@10 ≥ 0.776 (no loss).
+
+| config | Recall@20 | nDCG@10 | identifier P@10 | p50 ms |
+|---|---:|---:|---:|---:|
+| dense | 0.750 | 0.542 | 0.620 | 130 |
+| hybrid+rerank, stock reranker (run 11) | 0.707 | 0.450 | 0.776 | 993 |
+| dense+rerank, fine-tuned reranker | 0.773 | **0.602** | 0.740 | 742 |
+| hybrid+rerank, fine-tuned reranker | 0.757 | **0.587** | 0.770 | 978 |
+
+nDCG met (0.587 ≥ 0.542; rerank lift −0.092 → +0.045). Identifier missed (0.770 < 0.776: three
+relevant chunks fewer out of 500 slots, well inside noise, but the rule said no loss). **Not
+adopted**; the stock reranker stays the default and `RESULTS.md` / `summary.json` stay on run 11.
+The weights are kept locally at `models/bge-reranker-asrs`.
+
+Two cautions for whoever picks this up. The reranker was trained only on synopsis → narrative, so
+identifier queries ("runway 28R") are outside what it learned; that is the likely source of the
+small loss. And its scores run high (an unrelated passage scored 0.59 in a smoke test, because
+positives were weighted 5× against negatives), so it must not be paired with the 0.5
+`precedent_min_score` threshold; the mechanism gate (precedent run 3) does not use the score.
+A split config (fine-tuned reranker for descriptions, stock for identifiers) would be chosen by
+looking at these numbers, so it needs a fresh query set to be tested honestly.

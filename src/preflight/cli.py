@@ -74,6 +74,11 @@ def main(argv: list[str] | None = None) -> int:
     ep.add_argument("--build", action="store_true", help="rebuild pairs.jsonl and the sheet")
     ep.add_argument("--score", action="store_true", help="score the filled labels.csv (κ)")
     ep.add_argument("--limit", type=int, help="judge only the first N pairs")
+    ep.add_argument("--test-build", action="store_true",
+                    help="attachment test: run both attachment rules on the held-out hazards and "
+                         "write the blind sheet evals/precedent/test/labels.csv")
+    ep.add_argument("--test-score", action="store_true",
+                    help="attachment test: score the filled test sheet per rule")
     eb = evsub.add_parser("briefing", help="time-travel briefing eval on NTSB-derived cases")
     eb.add_argument("--build", action="store_true", help="(re)build evals/briefing/golden.jsonl")
     eb.add_argument("--limit", type=int)
@@ -113,6 +118,39 @@ def main(argv: list[str] | None = None) -> int:
     cr = cosub.add_parser("reembed", help="re-embed every chunk with the configured model "
                                           "(resumable; drop the index first — migration 007)")
     cr.add_argument("--model", help="sentence-transformers id (default: settings)")
+    cf = cosub.add_parser("finetune", help="fine-tune the embedder on ASRS synopsis→narrative "
+                                           "pairs, eval reports held out (needs the ml extra)")
+    cf.add_argument("--base", default=None, help="model to start from (default: settings)")
+    cf.add_argument("--out", type=Path, default=Path("models/embedder-asrs"))
+    cf.add_argument("--pairs", type=int, default=40_000, help="training pairs to sample")
+    cf.add_argument("--epochs", type=int, default=1)
+    cf.add_argument("--batch-size", type=int, default=128)
+    cf.add_argument("--mini-batch-size", type=int, default=16,
+                    help="lower this if the GPU/MPS runs out of memory")
+    cf.add_argument("--lr", type=float, default=2e-5)
+    cf.add_argument("--dry-run", action="store_true", help="build and count pairs, do not train")
+    cf.add_argument("--export-pairs", type=Path, metavar="JSONL",
+                    help="write the pairs to a file and exit (to train elsewhere, e.g. Colab)")
+    cf.add_argument("--pairs-file", type=Path, metavar="JSONL",
+                    help="train from an exported pairs file; no database needed")
+    cf.add_argument("--resume", action="store_true",
+                    help="continue from the newest checkpoint under --out")
+    crf = cosub.add_parser("finetune-reranker",
+                           help="fine-tune the cross-encoder on exported pairs with negatives "
+                                "mined by the embedder (needs the ml extra; GPU)")
+    crf.add_argument("--pairs-file", type=Path, metavar="JSONL", required=True,
+                     help="pairs from `corpus finetune --export-pairs` (eval reports held out)")
+    crf.add_argument("--embedder", default=None,
+                     help="embedder that mines the negatives (default: settings)")
+    crf.add_argument("--base", default="BAAI/bge-reranker-base")
+    crf.add_argument("--out", type=Path, default=Path("models/bge-reranker-asrs"))
+    crf.add_argument("--pairs", type=int, default=None, help="use only the first N pairs")
+    crf.add_argument("--negatives", type=int, default=5, help="hard negatives per synopsis")
+    crf.add_argument("--epochs", type=int, default=1)
+    crf.add_argument("--batch-size", type=int, default=32)
+    crf.add_argument("--lr", type=float, default=2e-5)
+    crf.add_argument("--resume", action="store_true",
+                     help="continue from the newest checkpoint under --out")
     cr.add_argument("--batch", type=int, default=128)
     cr.add_argument("--source", choices=["asrs", "ntsb", "far_aim", "ops_note"],
                     help="only this document source")
@@ -129,7 +167,7 @@ def main(argv: list[str] | None = None) -> int:
     se.add_argument("query")
     se.add_argument("-k", type=int, default=5)
     se.add_argument("--icao")
-    se.add_argument("--mode", choices=["hybrid", "dense", "lexical"], default="hybrid")
+    se.add_argument("--mode", choices=["hybrid", "dense", "lexical", "auto"], default="hybrid")
     se.add_argument("--no-rerank", action="store_true")
 
     b = sub.add_parser("brief", help="build a briefing from what is in the database")
@@ -365,6 +403,32 @@ def main(argv: list[str] | None = None) -> int:
             finally:
                 close_pool()
             return 0
+        if args.op == "finetune-reranker":
+            from preflight.config import settings
+            from preflight.retrieval import finetune as FT
+            from preflight.retrieval import rerank_finetune as RF
+
+            ft_pairs = FT.load_pairs(args.pairs_file)[: args.pairs]
+            print(f"{len(ft_pairs):,} pairs from {args.pairs_file}", file=sys.stderr)
+            card = RF.train_reranker(
+                ft_pairs, embedder=args.embedder or settings().embedding_model, out=args.out,
+                base=args.base, num_negatives=args.negatives, epochs=args.epochs,
+                batch_size=args.batch_size, lr=args.lr, resume=args.resume)
+            print(f"saved {args.out}: {card}")
+            print(f"next: RERANKER_MODEL={args.out} preflight eval retrieval")
+            return 0
+        if args.op == "finetune" and args.pairs_file:
+            from preflight.config import settings
+            from preflight.retrieval import finetune as FT
+
+            ft_pairs = FT.load_pairs(args.pairs_file)[: args.pairs]
+            print(f"{len(ft_pairs):,} pairs from {args.pairs_file}", file=sys.stderr)
+            card = FT.train(ft_pairs, base=args.base or settings().embedding_model, out=args.out,
+                            epochs=args.epochs, batch_size=args.batch_size,
+                            mini_batch_size=args.mini_batch_size, lr=args.lr,
+                            resume=args.resume)
+            print(f"saved {args.out}: {card}")
+            return 0
         try:
             with get_pool().connection() as conn:
                 if args.op == "stats":
@@ -379,6 +443,26 @@ def main(argv: list[str] | None = None) -> int:
                     n_done = reembed(conn, emb, batch=args.batch, source=args.source,
                                      log=lambda m: print(m, file=sys.stderr, flush=True))
                     print(f"re-embedded {n_done:,} chunks with {emb.name}")
+                elif args.op == "finetune":
+                    from preflight.config import settings
+                    from preflight.retrieval import finetune as FT
+
+                    held = FT.held_out_ids()
+                    ft_pairs = FT.build_pairs(conn, exclude=held, limit=args.pairs)
+                    print(f"{len(ft_pairs):,} pairs from reports outside the {len(held)} the "
+                          "evals read", file=sys.stderr)
+                    if args.export_pairs:
+                        FT.save_pairs(ft_pairs, args.export_pairs)
+                        print(f"wrote {args.export_pairs}")
+                    elif not args.dry_run:
+                        card = FT.train(ft_pairs, base=args.base or settings().embedding_model,
+                                        out=args.out, epochs=args.epochs,
+                                        batch_size=args.batch_size,
+                                        mini_batch_size=args.mini_batch_size, lr=args.lr,
+                                        resume=args.resume)
+                        print(f"saved {args.out}: {card}")
+                        print(f"next: preflight eval embedder --models "
+                              f"{card['base']} {args.out}")
                 elif args.op == "reindex":
                     from preflight.retrieval.search import reindex
 
@@ -426,6 +510,25 @@ def main(argv: list[str] | None = None) -> int:
         from preflight.evals import precedent as P
         from preflight.llm import load_llm
 
+        if args.test_build or args.test_score:
+            import json as _json
+
+            try:
+                if args.test_build:
+                    from preflight.retrieval.embed import STEmbedder, STReranker
+                    from preflight.retrieval.search import Retriever
+
+                    with get_pool().connection() as conn:
+                        pool = P.build_test_pool(conn, Retriever(STEmbedder(), STReranker()))
+                    P.TEST_DIR.mkdir(parents=True, exist_ok=True)
+                    P.TEST_POOL.write_text(_json.dumps(pool, indent=1, ensure_ascii=False) + "\n")
+                    print(f"{len(pool)} hazards; {P.write_test_sheet(pool)} rows → {P.TEST_SHEET}")
+                else:
+                    pool = _json.loads(P.TEST_POOL.read_text())
+                    print(_json.dumps(P.score_test(pool, P.read_sheet(P.TEST_SHEET)), indent=1))
+            finally:
+                close_pool()
+            return 0
         llm = load_llm()
         try:
             if args.score:

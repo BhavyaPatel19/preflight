@@ -7,7 +7,9 @@ extras. Tests use hash-based fakes; ``pytest -m ml`` exercises the real models.
 
 from __future__ import annotations
 
+import json
 from collections.abc import Sequence
+from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 
 from preflight.config import settings
@@ -35,19 +37,36 @@ def _device() -> str:
     try:
         import torch
 
+        if torch.cuda.is_available():
+            return "cuda"
         return "mps" if torch.backends.mps.is_available() else "cpu"
     except ImportError:
         return "cpu"
 
 
+_BGE_QUERY = "Represent this sentence for searching relevant passages: "
+_QUERY_PREFIX = {
+    "BAAI/bge-base-en-v1.5": _BGE_QUERY,
+    "BAAI/bge-small-en-v1.5": _BGE_QUERY,
+    "BAAI/bge-large-en-v1.5": _BGE_QUERY,
+}
+
+
+def query_prefix(name: str) -> str:
+    """The instruction a model wants before queries. A fine-tuned model saved by
+    ``preflight corpus finetune`` records the prefix it was trained with beside its weights."""
+    if name in _QUERY_PREFIX:
+        return _QUERY_PREFIX[name]
+    card = Path(name) / "preflight_finetune.json"
+    if card.is_file():
+        return str(json.loads(card.read_text()).get("query_prefix") or "")
+    return ""
+
+
 class STEmbedder:
     """sentence-transformers embedder. bge-style models want a query instruction."""
 
-    _QUERY_PREFIX = {
-        "BAAI/bge-base-en-v1.5": "Represent this sentence for searching relevant passages: ",
-        "BAAI/bge-small-en-v1.5": "Represent this sentence for searching relevant passages: ",
-        "BAAI/bge-large-en-v1.5": "Represent this sentence for searching relevant passages: ",
-    }
+    _QUERY_PREFIX = _QUERY_PREFIX
 
     def __init__(self, model: str | None = None, *, batch_size: int = 32):
         self.name = model or settings().embedding_model
@@ -69,7 +88,7 @@ class STEmbedder:
         if not texts:
             return []
         model = self._load()
-        prefix = self._QUERY_PREFIX.get(self.name, "") if query else ""
+        prefix = query_prefix(self.name) if query else ""
         vecs = model.encode(
             [prefix + t for t in texts],
             batch_size=self.batch_size,

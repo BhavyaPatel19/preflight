@@ -40,7 +40,7 @@ runway or a taxiway") matched the report.
 
 | Row | What was measured | What it does not claim |
 |---|---|---|
-| **Retrieval** nDCG@10 0.405 · Recall@20 0.607 | Paraphrase-to-passage: an ASRS analyst's synopsis finds the narrative it summarises, synopsis chunks hidden. 300 queries, objective labels. | Not judged precedent relevance for briefing-style queries. Below target; the ceiling is the embedder (candidate-pool experiment ruled out the pool). |
+| **Retrieval** nDCG@10 0.450 · Recall@20 0.707 (fine-tuned embedder; 0.407 · 0.597 base) | Paraphrase-to-passage: an ASRS analyst's synopsis finds the narrative it summarises, synopsis chunks hidden. 300 queries, objective labels. | Not judged precedent relevance for briefing-style queries. Below target. The embedder was the lever: fine-tuning on corpus pairs (eval reports held out) gave +0.11 Recall@20. Training and eval queries are the same kind of text. |
 | **Identifier** P@10 0.772 | `runway 28R` with the airport as a metadata filter. Dense-only gets 0.54 — the exact-identifier weakness hybrid exists to cover, with a number on it. | 50 queries. |
 | **Forecast** MASE 0.715 | Chronos-Bolt zero-shot vs seasonal-naive (1.067) and climatology (0.751) on a rolling-origin backtest, 406 forecasts across 29 airports. | The briefing cites climatology, not the model — BTS lands ~3 months late and a flight next week is beyond any honest horizon. |
 | **Grounding** 1.000 / 1.000 | NLI verifier accepts every true claim and rejects every materially corrupted one (74 + 74) at threshold 0.5. | Deterministic core's own phrasing only. LLM prose is what this harness will gate. Building it forced citations to carry the evidence (validity windows, decoded METAR fields). |

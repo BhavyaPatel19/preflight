@@ -109,3 +109,41 @@ are a reranker upgrade (`bge-reranker-v2-m3`, now that the reranker is the large
 latency and the lift has shrunk) and a golden set v2 that labels *all* equivalent reports for a
 synopsis rather than one — which would measure precision of the top-k rather than recall of a
 single draw.
+
+**Run 10: fine-tuning the embedder on the corpus's own pairs moved every recall number.**
+`bge-large-en-v1.5` was fine-tuned on 34,891 synopsis → narrative pairs drawn from ASRS reports
+outside every eval set (each retrieval golden target and each precedent hit is excluded by report
+id, `finetune.held_out_ids`): one epoch of cached multiple-negatives ranking loss, batch 128,
+lr 2e-5, on a Colab GPU (`notebooks/finetune_colab.ipynb`). The subset ablation priced it first
+(`evals/embedder/RESULTS.md`: +0.200 Recall@20 on 40k chunks), then all 316,226 chunks were
+re-embedded and the HNSW index rebuilt. The pass rule was written down before the re-embed:
+hybrid+rerank Recall@20 ≥ 0.65, nDCG@10 ≥ 0.407, identifier P@10 ≥ 0.75.
+
+| config | Recall@20 | nDCG@10 | identifier P@10 | target not in pool |
+|---|---:|---:|---:|---:|
+| hybrid+rerank, base model (run 9) | 0.597 | 0.407 | 0.774 | 36.7% |
+| **hybrid+rerank, fine-tuned** | **0.707** | **0.450** | **0.776** | **21.7%** |
+| dense, base model (run 9) | 0.527 | 0.351 | 0.624 | |
+| dense, fine-tuned | 0.750 | 0.542 | 0.620 | |
+
+All three conditions met. The specific slice (> 25 words) went 0.781 → 0.841; short synopses
+0.385 → 0.462. Unlike run 7, the subset ablation transferred: it predicted +0.20 dense Recall@20
+and the full corpus delivered +0.22.
+
+What this does and does not show:
+
+- **The training task is the eval task.** No eval report was trained on, but the queries are the
+  same kind of text (analyst synopses) as the training queries. The gain is real for this task;
+  it is not evidence about briefing-style precedent queries, which wait on the judged set (κ).
+- **Exact identifiers are flat** (0.774 → 0.776). The fine-tune neither helped nor hurt them.
+- **The reranker now subtracts.** Dense alone (0.750 / 0.542) beats hybrid+rerank (0.707 / 0.450);
+  the rerank lift went +0.056 → −0.092. The stock `bge-reranker-base` reorders a now-better
+  first stage. Dense alone loses identifier queries (0.620), so the deployed config stays
+  hybrid+rerank for this run: one change per run. Next candidates: hybrid without rerank
+  (0.733 / 0.499, but identifier 0.746, just under its floor), rerank only when the query carries
+  an identifier, or a reranker trained on the same pairs.
+
+Reproduce: the weights are not committed (`models/` is ignored). Train them with the notebook or
+`preflight corpus finetune`, set `EMBEDDING_MODEL=models/bge-large-asrs`, then
+`preflight corpus reembed` and `preflight corpus reindex`. The base model's vectors are kept in
+`chunks_embedding_backup_bge_large` for rollback.

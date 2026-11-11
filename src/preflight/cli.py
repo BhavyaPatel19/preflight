@@ -74,6 +74,11 @@ def main(argv: list[str] | None = None) -> int:
     ep.add_argument("--build", action="store_true", help="rebuild pairs.jsonl and the sheet")
     ep.add_argument("--score", action="store_true", help="score the filled labels.csv (κ)")
     ep.add_argument("--limit", type=int, help="judge only the first N pairs")
+    ep.add_argument("--test-build", action="store_true",
+                    help="attachment test: run both attachment rules on the held-out hazards and "
+                         "write the blind sheet evals/precedent/test/labels.csv")
+    ep.add_argument("--test-score", action="store_true",
+                    help="attachment test: score the filled test sheet per rule")
     eb = evsub.add_parser("briefing", help="time-travel briefing eval on NTSB-derived cases")
     eb.add_argument("--build", action="store_true", help="(re)build evals/briefing/golden.jsonl")
     eb.add_argument("--limit", type=int)
@@ -505,6 +510,25 @@ def main(argv: list[str] | None = None) -> int:
         from preflight.evals import precedent as P
         from preflight.llm import load_llm
 
+        if args.test_build or args.test_score:
+            import json as _json
+
+            try:
+                if args.test_build:
+                    from preflight.retrieval.embed import STEmbedder, STReranker
+                    from preflight.retrieval.search import Retriever
+
+                    with get_pool().connection() as conn:
+                        pool = P.build_test_pool(conn, Retriever(STEmbedder(), STReranker()))
+                    P.TEST_DIR.mkdir(parents=True, exist_ok=True)
+                    P.TEST_POOL.write_text(_json.dumps(pool, indent=1, ensure_ascii=False) + "\n")
+                    print(f"{len(pool)} hazards; {P.write_test_sheet(pool)} rows → {P.TEST_SHEET}")
+                else:
+                    pool = _json.loads(P.TEST_POOL.read_text())
+                    print(_json.dumps(P.score_test(pool, P.read_sheet(P.TEST_SHEET)), indent=1))
+            finally:
+                close_pool()
+            return 0
         llm = load_llm()
         try:
             if args.score:

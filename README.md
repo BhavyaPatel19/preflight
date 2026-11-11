@@ -250,6 +250,7 @@ the history file next to it says what was tried and what the ceiling turned out 
 | Abstention | recall on constructed data-gap cases · false-abstention rate on clean cases | ≥ 0.90 | **1.000 · 0.000** (26 cases, 20 gaps; 0.55 before this eval named three silent gaps — [details](evals/abstention/README.md)) |
 | Safety | injection detector on 60 adversarial NOTAMs: recall · false positives on benign | 100% | **1.000 · 0.000** (detector; LLM resistance scored against the same set later) — [details](evals/safety/RESULTS.md) |
 | Judge | LLM-judge vs human agreement (Cohen's κ) on precedent relevance | ≥ 0.70 | — (judge run on 304 pairs; 100-row sheet awaits human labels — [how](evals/precedent/README.md)) |
+| Precedent | precision of the prior reports a briefing attaches, 30 held-out hazards | ≥ 0.65 | **0.911** with the mechanism check (0.816 with the old score threshold); labels are Claude's, blind, not yet human-audited — [history](evals/precedent/HISTORY.md) |
 | Cost | p50 $/briefing · p95 latency, full briefing with precedent + narrative | < $0.08 · 25 s | **$0 · 26.2 s** local `qwen3:14b` on an M5 (was 53.2 s) · 4.0 s without the model — [details](evals/latency/RESULTS.md) |
 
 The κ row matters as much as the rest: an LLM judge nobody validated is a number nobody should trust.

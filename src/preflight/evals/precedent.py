@@ -332,3 +332,110 @@ def save_run(res: dict[str, Any], verdicts: dict[str, dict[str, Any]]) -> tuple[
     RESULTS.write_text(to_markdown(res))
     summary.write("precedent", res, summarise(res), judge=res["judge"], pairs=res["pairs"])
     return p, RESULTS
+
+
+# --------------------------------------------------------------------------
+# Attachment test: what a briefing attaches, today's rule vs the mechanism gate
+# --------------------------------------------------------------------------
+#
+# The judged pairs above are the dev set: the mechanism gate (brief/mechanism.py) was designed on
+# them. This test set is separate: hazards absent from the dev set (TEST_NOTAMS, and NTSB cases
+# after the first 60 of the same shuffle), both attachment rules run on the same ranked hits, and
+# every attached (hazard, report) pair goes onto one shuffled sheet with no rule named, so the
+# labeller cannot tell which rule attached it.
+
+TEST_DIR = DIR / "test"
+TEST_POOL = TEST_DIR / "pool.json"
+TEST_SHEET = TEST_DIR / "labels.csv"
+TEST_CASES = slice(60, 76)
+
+
+def _test_findings() -> list[tuple[str, Finding]]:
+    from preflight.evals.precedent_test_notams import TEST_NOTAMS
+
+    out: list[tuple[str, Finding]] = []
+    for raw in TEST_NOTAMS:
+        rec = parse_notam(raw)
+        fs = notam_findings(rec.icao or "ZZZZ", "departure", [rec])
+        out.extend(("test-notam", f) for f in fs if f.category != "notam")
+    cases = [c for c in load_cases() if c.label == "positive" and c.implicated != "weather"]
+    random.Random(42).shuffle(cases)                     # the same shuffle as build_pairs
+    out.extend(("ntsb-case", _case_finding(c)) for c in cases[TEST_CASES])
+    return out
+
+
+def build_test_pool(conn: Connection[Any], retriever: Retriever, *, k: int = 3,
+                    min_score: float = 0.5) -> list[dict[str, Any]]:
+    """Per test hazard, the reports each rule attaches from one ranked list of hits.
+
+    ``base`` is the rule before the gate (top ``3k`` hits, reranker ≥ ``min_score``); ``gate``
+    is the new one (top ``5k`` hits, mechanism check, no score floor). Queries are the
+    deterministic templates, so the two rules differ only in selection."""
+    from preflight.brief.precedent import select_precedent
+
+    out: list[dict[str, Any]] = []
+    for source, f in _test_findings():
+        q = precedent_query(f) or f.headline
+        hits = retriever.search(conn, q, k=k * 5, icao=f.airport, rerank=True)
+        arms = {
+            "base": select_precedent(f, hits[: k * 3], k=k, min_score=min_score, gate=False),
+            "gate": select_precedent(f, hits, k=k, min_score=0.0, gate=True),
+        }
+        out.append({
+            "source": source, "hazard": f.headline, "category": f.category,
+            "airport": f.airport, "query": q, "considered": len(hits),
+            "arms": {name: [{"ref": f"{h.source}:{h.external_id}", "title": h.title,
+                             "passage": " ".join(h.text.split()),
+                             "rerank_score": round(h.rerank_score or 0.0, 3)} for h in hs]
+                     for name, hs in arms.items()},
+        })
+    return out
+
+
+def _pair_id(hazard: str, ref: str) -> str:
+    import hashlib
+
+    return hashlib.sha256(f"{hazard}\x00{ref}".encode()).hexdigest()[:12]
+
+
+def write_test_sheet(pool: list[dict[str, Any]], path: Path = TEST_SHEET,
+                     seed: int = 11) -> int:
+    """One row per unique (hazard, report) any rule attached, shuffled, no rule named."""
+    rows: dict[str, dict[str, str]] = {}
+    for item in pool:
+        for hits in item["arms"].values():
+            for h in hits:
+                pid = _pair_id(item["hazard"], h["ref"])
+                text = f"{h['title'] or ''} | {h['passage']}" if h["title"] else h["passage"]
+                if pid in rows:
+                    if h["passage"][:80] not in rows[pid]["prior_report"]:
+                        rows[pid]["prior_report"] += f"  [another passage] {text}"
+                    continue
+                rows[pid] = {"id": pid, "hazard": item["hazard"], "prior_report": text,
+                             "relevant_precedent (y/n)": "", "notes": ""}
+    out = list(rows.values())
+    random.Random(seed).shuffle(out)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=["id", "hazard", "prior_report",
+                                          "relevant_precedent (y/n)", "notes"])
+        w.writeheader()
+        w.writerows(out)
+    return len(out)
+
+
+def score_test(pool: list[dict[str, Any]], labels: dict[str, bool]) -> dict[str, Any]:
+    """Precision of what each rule attaches, and how many relevant reports per hazard."""
+    res: dict[str, Any] = {"hazards": len(pool)}
+    for arm in ("base", "gate"):
+        attached = [(item, h) for item in pool for h in item["arms"][arm]]
+        judged = [labels[_pair_id(i["hazard"], h["ref"])] for i, h in attached
+                  if _pair_id(i["hazard"], h["ref"]) in labels]
+        rel = sum(judged)
+        res[arm] = {
+            "attached": len(attached), "labelled": len(judged), "relevant": rel,
+            "precision": round(rel / len(judged), 3) if judged else None,
+            "relevant_per_hazard": round(rel / len(pool), 3) if pool else None,
+            "hazards_with_none": sum(1 for i in pool if not i["arms"][arm]),
+        }
+    return res

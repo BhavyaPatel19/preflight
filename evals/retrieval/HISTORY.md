@@ -173,3 +173,29 @@ every precedent. Routing therefore fits the ranking-only surfaces (`preflight se
 search tool); for briefings the fix has to be a reranker that agrees with the fine-tuned
 embedder, which is the next run (`corpus finetune-reranker`, `notebooks/finetune_reranker_colab.ipynb`;
 pass rule: hybrid+rerank nDCG@10 ≥ 0.542 and identifier P@10 ≥ 0.776).
+
+**Run 12: the fine-tuned reranker fixed the ranking and missed the identifier condition by 3 slots.**
+`bge-reranker-base` fine-tuned on the run-10 pairs (34,891 synopses, 141,767 negatives mined by the
+fine-tuned embedder from ranks 10–50, one epoch on a Colab T4; `corpus finetune-reranker`). Pass
+rule written before training: hybrid+rerank nDCG@10 ≥ 0.542 (beat dense alone) and identifier
+P@10 ≥ 0.776 (no loss).
+
+| config | Recall@20 | nDCG@10 | identifier P@10 | p50 ms |
+|---|---:|---:|---:|---:|
+| dense | 0.750 | 0.542 | 0.620 | 130 |
+| hybrid+rerank, stock reranker (run 11) | 0.707 | 0.450 | 0.776 | 993 |
+| dense+rerank, fine-tuned reranker | 0.773 | **0.602** | 0.740 | 742 |
+| hybrid+rerank, fine-tuned reranker | 0.757 | **0.587** | 0.770 | 978 |
+
+nDCG met (0.587 ≥ 0.542; rerank lift −0.092 → +0.045). Identifier missed (0.770 < 0.776: three
+relevant chunks fewer out of 500 slots, well inside noise, but the rule said no loss). **Not
+adopted**; the stock reranker stays the default and `RESULTS.md` / `summary.json` stay on run 11.
+The weights are kept locally at `models/bge-reranker-asrs`.
+
+Two cautions for whoever picks this up. The reranker was trained only on synopsis → narrative, so
+identifier queries ("runway 28R") are outside what it learned; that is the likely source of the
+small loss. And its scores run high (an unrelated passage scored 0.59 in a smoke test, because
+positives were weighted 5× against negatives), so it must not be paired with the 0.5
+`precedent_min_score` threshold; the mechanism gate (precedent run 3) does not use the score.
+A split config (fine-tuned reranker for descriptions, stock for identifiers) would be chosen by
+looking at these numbers, so it needs a fresh query set to be tested honestly.

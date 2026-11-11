@@ -16,13 +16,13 @@ $ preflight brief KSFO KJFK --alt KBOS --off-block 2026-09-11T02:30Z --type A320
 > preflight briefing.
 
 **In numbers.** 47,723 ASRS + 27,986 NTSB reports indexed as 316k chunks in pgvector; hybrid
-retrieval measured over 10 recorded runs (Recall@20 0.84 on unambiguous queries, 0.71 overall, after
-fine-tuning the embedder on held-out-safe corpus pairs); an NLI grounding verifier at 1.000 / 0.972 accept / reject; a local-model
+retrieval measured over 12 recorded runs (Recall@20 0.84 on unambiguous queries, 0.71 overall, after
+fine-tuning the embedder on held-out-safe corpus pairs; routed search at nDCG@10 0.54, 39 ms p50); an NLI grounding verifier at 1.000 / 0.972 accept / reject; a local-model
 narrative layer at a 1% unsupported-claim rate; 26-case abstention eval at 1.000 / 0.000; a 60-case
 injection red-team at 1.000 / 0.000; a ModernBERT NOTAM extractor at 0.898 macro-F1 on a hand-labelled
-gold set; a Chronos delay forecast at MASE 0.715; a time-travel eval whose first real number (0.19
-recall on 117 weather cases) came with the reason it is low; 25 s per full briefing on a laptop,
-halved from 50; **16 evaluation floors enforced in CI on every pull request.** All on public data,
+gold set; a Chronos delay forecast at MASE 0.715; a time-travel eval at 0.27 recall on 119 weather cases (0.19 before
+TAFs), reported with the reason it is low; 25 s per full briefing on a laptop,
+halved from 50; **19 evaluation floors enforced in CI on every pull request.** All on public data,
 zero API spend.
 
 ---
@@ -65,8 +65,8 @@ account and an approval, and this project uses only public data that needs neith
 ([ADR 0002](docs/adr/0002-notam-access-and-the-provider-abstraction.md)). So the 158 cases whose
 hazard was a NOTAM — a closed runway, dark lights, wildlife — are reported as uncoverable, and the
 142 weather cases are scored against the public historical METAR at their airport an hour before
-the event. The result (recall 0.19, false alarms 0.10) is low, and the analysis says why: in 74 of
-117 cases the wind the investigation named was not in the observation yet. A ceiling, measured,
+the event, with the TAFs then in force. The result (recall 0.27, false alarms 0.16) is low, and the
+analysis says why: in 75 of 119 cases the wind the investigation named was not in the observation yet. A ceiling, measured,
 beats a target, assumed.
 
 This eval design is the centre of the project. Everything else is in service of it — including
@@ -171,7 +171,7 @@ Built in the open, six sprints over twelve weeks.
 | 2 | Fine-tuned NOTAM entity extractor | 🟢 done, re-scoped — ModernBERT-base fine-tuned on generated NOTAMs, evaluated on a 124-body hand-labelled gold set: macro-F1 0.898 vs the rule decoder's 0.875, prose false positives 54 → 3 over three data iterations. Weights local (`models/`), card in `docs/`; Hub publish is one command for the owner |
 | 3 | Hybrid retrieval over ASRS/NTSB + reranking | 🟢 done — corpus, golden set, measured |
 | 4 | LangGraph orchestration, LLM layer, grounding, abstention | 🟢 done — graph with Postgres checkpointer over gather → precedent → verify → narrate |
-| 5 | Time-travel eval harness + CI regression gate | 🟡 600-case set built; **weather slice scored** (117 cases against public historical METARs: recall 0.19, false alarms 0.10 — and why the ceiling is low); NOTAM slices uncoverable by choice; **CI gate live** — 16 floors over 7 suites, three re-measured on every PR; κ awaits the human sheet |
+| 5 | Time-travel eval harness + CI regression gate | 🟡 600-case set built; **weather slice scored** (119 cases against public historical METARs and TAFs: recall 0.27, false alarms 0.16 — and why the ceiling is low); NOTAM slices uncoverable by choice; **CI gate live** — 19 floors over 7 suites, three suites re-measured on every PR; κ awaits the human sheet |
 | 6 | Delay forecasting, cost/latency, UI, MCP server | 🟢 done — forecasting, UI, MCP server; latency pass halved the full briefing (49.5 → 25.4 s p50, local model) |
 
 **Working today**
@@ -232,19 +232,19 @@ Built in the open, six sprints over twelve weeks.
 
 ## Evaluation targets
 
-Every row but one is measured; the CI gate holds 16 of these numbers to floors on every pull
+Every row but one is measured; the CI gate holds 19 numbers to floors on every pull
 request (`evals/gates.toml`). Targets were set before building. Where a number is below its target,
 the history file next to it says what was tried and what the ceiling turned out to be.
 
 | Layer | Metric | Target | Measured |
 |---|---|---:|---:|
 | Extraction | macro entity F1 over 8 types, hand-labelled real-format gold set (124 bodies) | ≥ 0.92 | **0.898** fine-tuned ModernBERT (rules 0.875) · exact-span 0.842 vs 0.172 · TIME F1 0.984 vs 0 · **trained on synthetic NOTAMs** — [details](evals/extraction/RESULTS.md) · [history](evals/extraction/HISTORY.md) · [model card](docs/model-card-notam-extractor.md) |
-| Retrieval | Recall@20 / nDCG@10 — synopsis→narrative, 300 queries | ≥ 0.90 / 0.65 | 0.71 / 0.45 overall (0.60 / 0.41 before fine-tuning the embedder); **0.84** Recall@20 on the 151 specific synopses (> 25 words) — the short half is a labelling ceiling, not a retrieval one — [details](evals/retrieval/RESULTS.md) · [history](evals/retrieval/HISTORY.md) |
+| Retrieval | Recall@20 / nDCG@10 — synopsis→narrative, 300 queries | ≥ 0.90 / 0.65 | 0.71 / 0.45 overall (0.60 / 0.41 before fine-tuning the embedder); **0.84** Recall@20 on the 151 specific synopses (> 25 words) — the short half is a labelling ceiling, not a retrieval one. Routed search (`--mode auto`: runway/taxiway queries to hybrid+rerank, the rest dense only) reaches **0.750 / 0.536** at **39 ms** p50 with identifier P@10 0.776 (run 11); not yet used by briefings — [details](evals/retrieval/RESULTS.md) · [history](evals/retrieval/HISTORY.md) |
 | Retrieval | P@10 on exact-identifier queries (`runway 28R` at an airport) | ≥ 0.80 | 0.77 |
-| Rerank | nDCG@10 lift over dense-only | +0.12 | **−0.09** with the fine-tuned embedder (+0.06 before): the stock reranker now reorders a better first stage; kept for identifier queries, under review (run 10) |
+| Rerank | nDCG@10 lift over dense-only | +0.12 | **−0.09** with the fine-tuned embedder (+0.06 before): the stock reranker now reorders a better first stage, so routed search uses it only for identifier queries (run 11). A reranker fine-tuned on the same pairs reached +0.045 but lost identifier P@10 (0.770 < 0.776), so it was not adopted (run 12) — [history](evals/retrieval/HISTORY.md) |
 | Forecast | MASE, 24 h arrival delay, rolling-origin backtest | < 0.85 | **0.715** Chronos-Bolt · 0.751 climatology · 1.067 seasonal-naive — [details](evals/forecast/RESULTS.md) |
-| End-to-end | implicated-hazard recall (300 NTSB positives) | ≥ 0.85 | **0.188** on the weather slice — 117 of 142 weather-implicated events, briefed against the public historical METAR at the time; the 158 NOTAM-implicated events are uncoverable by choice. 74 of the 117 had calm wind in that METAR: the ceiling of a METAR-based weather layer — [details](evals/briefing/RESULTS.md) |
-| End-to-end | false-alarm rate (300 matched negatives) | < 0.15 | **0.103** on the 117 matched weather negatives |
+| End-to-end | implicated-hazard recall (300 NTSB positives) | ≥ 0.85 | **0.27** on the weather slice — 119 of 142 weather-implicated events, briefed against the public historical METAR and the TAFs in force at the time (0.19 before TAFs); the 158 NOTAM-implicated events are uncoverable by choice. 75 of the 119 had calm wind in that METAR: the ceiling of a METAR-based weather layer. TEMPO groups alarm at full severity, an owner decision ([decisions](evals/briefing/DECISIONS.md)) — [details](evals/briefing/RESULTS.md) |
+| End-to-end | false-alarm rate (300 matched negatives) | < 0.15 | **0.16** on the 119 matched weather negatives (0.10 before TAFs; 8 of the 12 TAF-only findings on negatives came from TEMPO groups) |
 | Grounding | hybrid verifier (NLI + exact-figure gate): true-claim acceptance · corruption rejection | ≥ 0.97 | **1.000 · 0.972** at 0.5 — [details](evals/grounding/RESULTS.md) |
 | Narrative | unsupported-claim rate of model-written sentences, `qwen3:14b` local | ≤ 0.05 | **0.010** (98 / 99 kept; 1 genuine catch) — [history](evals/narrative/HISTORY.md) |
 | Abstention | recall on constructed data-gap cases · false-abstention rate on clean cases | ≥ 0.90 | **1.000 · 0.000** (26 cases, 20 gaps; 0.55 before this eval named three silent gaps — [details](evals/abstention/README.md)) |
@@ -329,7 +329,7 @@ to a record, and the verifier drops the model's sentences that don't.
 ```bash
 git clone git@github.com:BhavyaPatel19/preflight.git && cd preflight
 uv sync                             # .venv from the lockfile
-pytest                              # 128 tests, no keys, no network; db-marked tests skip without Postgres
+pytest                              # 427 tests (live and ml markers deselected), no keys, no network; db-marked tests skip without Postgres
 
 python -m preflight.decode.notam --demo     # decode three NOTAMs with zero setup
 ```
@@ -519,7 +519,7 @@ evals/latency/          RESULTS.md — before/after per stage, what each change 
 evals/abstention/       RESULTS.md (latest run), README.md — case design, the three gaps it exposed
 evals/extraction/       gold.jsonl (124 bodies, hand-labelled), RESULTS.md, HISTORY.md — three data iterations
 evals/precedent/        pairs.jsonl, labels.csv (the human sheet), verdicts.json, RESULTS.md
-tests/                  129 tests; markers: db, live, ml
+tests/                  429 tests; markers: db, live, ml (live and ml are opt-in)
 data/samples/           bundled sample NOTAMs (real corpora are gitignored under data/raw)
 ```
 

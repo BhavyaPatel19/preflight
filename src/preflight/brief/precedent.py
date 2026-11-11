@@ -19,6 +19,7 @@ from typing import Any
 
 from psycopg import Connection
 
+from preflight.brief.mechanism import involves
 from preflight.config import settings
 from preflight.llm import LLM, fan_out
 from preflight.retrieval.search import Hit, Retriever
@@ -102,6 +103,34 @@ def precedent_claim(hits: list[Hit], airport: str | None) -> Claim | None:
     return Claim(text=text, citations=tuple(_citation(h) for h in hits))
 
 
+def select_precedent(
+    f: Finding, hits: list[Hit], *, k: int, min_score: float, gate: bool,
+    seen: set[str] | None = None,
+) -> list[Hit]:
+    """The prior reports a briefing attaches for one finding, in rank order.
+
+    With ``gate`` (the default since the precedent sheet was labelled), a report is attached only
+    if its title or passage mentions the hazard's mechanism (``brief.mechanism``), and
+    ``min_score`` is not applied: on the labelled sheet the reranker score did not separate
+    relevant precedent from irrelevant (0.42 above and below 0.5), while the mechanism check
+    did. ``seen`` carries report ids already cited elsewhere in the briefing."""
+    seen = set() if seen is None else seen
+    keep: list[Hit] = []
+    for h in hits:
+        if h.external_id in seen:
+            continue
+        if gate:
+            if not involves(f, f"{h.title or ''} {h.text}"):
+                continue
+        elif (h.rerank_score or 0.0) < min_score:
+            continue
+        seen.add(h.external_id)
+        keep.append(h)
+        if len(keep) == k:
+            break
+    return keep
+
+
 def with_precedent(
     conn: Connection[Any],
     briefing: Briefing,
@@ -110,6 +139,7 @@ def with_precedent(
     k: int | None = None,
     min_score: float | None = None,
     llm: LLM | None = None,
+    gate: bool | None = None,
 ) -> Briefing:
     """Return a briefing with precedent claims attached where warranted.
 
@@ -119,6 +149,7 @@ def with_precedent(
     t0 = perf_counter()
     k = k or settings().precedent_k
     min_score = settings().precedent_min_score if min_score is None else min_score
+    gate = settings().precedent_gate if gate is None else gate
 
     if retriever is None:
         gap = Abstention(
@@ -145,18 +176,11 @@ def with_precedent(
         if q is None:
             findings.append(f)
             continue
-        # Ask for more than k: several chunks of one report can rank together, and a
-        # report is cited once per briefing.
-        hits = retriever.search(conn, q, k=k * 3, icao=f.airport, rerank=True)
+        # Ask for more than k: several chunks of one report can rank together, a report is
+        # cited once per briefing, and the mechanism gate drops reports off the hazard.
+        hits = retriever.search(conn, q, k=k * (5 if gate else 3), icao=f.airport, rerank=True)
         considered += len(hits)
-        keep: list[Hit] = []
-        for h in hits:
-            if (h.rerank_score or 0.0) < min_score or h.external_id in seen:
-                continue
-            seen.add(h.external_id)
-            keep.append(h)
-            if len(keep) == k:
-                break
+        keep = select_precedent(f, hits, k=k, min_score=min_score, gate=gate, seen=seen)
         claim = precedent_claim(keep, f.airport)
         findings.append(f.model_copy(update={"claims": (*f.claims, claim)}) if claim else f)
 

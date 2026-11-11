@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from datetime import UTC, datetime, timedelta
 from time import perf_counter
 from typing import Any, Literal
@@ -11,6 +12,7 @@ from preflight.db import notams as ndb
 from preflight.db import runs as rdb
 from preflight.db import weather as wdb
 from preflight.decode.contractions import expand
+from preflight.decode.taf import TafParseError, TafPeriod, parse_taf
 from preflight.forecast.delay import climatology, local_time
 from preflight.schemas import (
     Abstention,
@@ -217,6 +219,88 @@ def _metar_summary(parsed: dict[str, Any]) -> str:
     return ", ".join(bits)
 
 
+# Forecast weather that warrants a word in a briefing. Thunderstorms, freezing precipitation and
+# hail are hazards in themselves; squalls and funnel clouds are the worst of them.
+_WX_HAZARD: tuple[tuple[re.Pattern[str], Severity], ...] = (
+    (re.compile(r"FC|SQ"), Severity.HIGH),
+    (re.compile(r"TS|FZ|GR|GS|PL|\+SN|BLSN"), Severity.MEDIUM),
+)
+_DOWNGRADE = {Severity.HIGH: Severity.MEDIUM, Severity.MEDIUM: Severity.LOW,
+              Severity.LOW: Severity.LOW, Severity.INFO: Severity.INFO}
+
+
+def _period_severity(p: TafPeriod) -> Severity:
+    sev = _WX_SEVERITY.get(p.flight_category or "", Severity.INFO)
+    sev = max(sev, _wind_severity({"wind_kt": p.wind_kt, "gust_kt": p.gust_kt}),
+              key=lambda s: s.rank)
+    for tok in p.wx:
+        for pattern, wsev in _WX_HAZARD:
+            if pattern.search(tok):
+                sev = max(sev, wsev, key=lambda s: s.rank)
+    # A 30-40 % chance is briefed one step below the same conditions forecast outright.
+    return _DOWNGRADE[sev] if p.kind == "PROB" else sev
+
+
+def _period_summary(p: TafPeriod) -> str:
+    parsed: dict[str, Any] = {"wind_kt": p.wind_kt, "gust_kt": p.gust_kt,
+                              "visibility_sm": p.visibility_sm, "ceiling_ft": p.ceiling_ft,
+                              "wx": " ".join(p.wx) or None}
+    bits = _metar_summary({**parsed, "wind_dir": None}).replace("wind VRB/", "wind ")
+    cat = p.flight_category
+    parts = [x for x in (cat if cat and cat != "VFR" else "", bits) if x]
+    return ", ".join(parts) or "conditions"
+
+
+_KIND_WORD = {"BASE": "forecast", "FM": "forecast from", "BECMG": "becoming",
+              "TEMPO": "temporarily", "PROB": "chance of"}
+
+
+def forecast_hazards(
+    icao: str, role: Role, taf: wdb.WeatherRow, *, window_start: datetime, window_end: datetime,
+) -> tuple[Finding | None, Abstention | None]:
+    """What the TAF forecasts for the flight's window at this airport, if any of it is a hazard.
+
+    Every hazardous period that overlaps the window becomes a claim quoting the forecaster's own
+    group (``FM141400 27025G38KT ...``), worst first; quiet periods say nothing. A TAF that cannot
+    be read is an abstention, never a silent "no hazards".
+    """
+    try:
+        periods = parse_taf(taf.raw, issued_at=_utc(taf.issued_at),
+                            valid_from=taf.valid_from, valid_to=taf.valid_to)
+    except TafParseError as e:
+        return None, Abstention(topic=f"{icao} forecast", reason="parse_failure",
+                                detail=f"TAF for {icao} could not be decoded ({e}); not assessed.")
+    rated = [(p, _period_severity(p)) for p in periods
+             if p.overlaps(window_start, window_end)]
+    hazards = sorted(((p, s) for p, s in rated if s is not Severity.INFO),
+                     key=lambda ps: (-ps[1].rank, ps[0].start))[:3]
+    if not hazards:
+        return None, None
+    worst, sev = hazards[0]
+    ref = f"{icao}@{_utc(taf.issued_at):%d%H%M}Z"
+    claims = []
+    for p, _ in hazards:
+        when = f"{_fmt(max(p.start, window_start))}–{_fmt(min(p.end, window_end))}"
+        word = _KIND_WORD[p.kind] + (f" {p.probability} %" if p.probability else "")
+        summary = _period_summary(p)
+        claims.append(Claim(
+            text=f"The {icao} TAF forecasts {summary} ({word}) during {when}.",
+            citations=(Citation(
+                kind="taf", ref=ref, issued_at=taf.issued_at,
+                quote=f"{p.text} — decoded: {icao} {word}, {summary}, {when}.",
+            ),),
+        ))
+    return Finding(
+        category="weather",
+        severity=sev,
+        phases=_PHASES_BY_ROLE[role],
+        airport=icao,
+        headline=f"{icao} forecast: {_period_summary(worst)}"
+                 + (" (temporary)" if worst.temporary else ""),
+        claims=tuple(claims),
+    ), None
+
+
 def weather_findings(
     icao: str,
     role: Role,
@@ -267,6 +351,17 @@ def weather_findings(
                 ),),
             ),),
         ))
+
+    # Forecast hazards: what the TAF says about the window, for every role. A departure an hour
+    # out is decided as much by the forecast as by the observation.
+    if (taf is not None and taf.valid_from is not None and taf.valid_to is not None
+            and _utc(taf.valid_from) <= window_end and _utc(taf.valid_to) >= window_start):
+        hazard, gap = forecast_hazards(icao, role, taf, window_start=window_start,
+                                       window_end=window_end)
+        if hazard is not None:
+            findings.append(hazard)
+        if gap is not None:
+            abstain.append(gap)
 
     # Forecast coverage: a TAF that does not span the window is a gap, not a fact.
     if role != "departure":

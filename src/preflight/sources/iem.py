@@ -1,9 +1,11 @@
-"""Historical METARs from the Iowa Environmental Mesonet ASOS archive (Iowa State).
+"""Historical METARs and TAFs from the Iowa Environmental Mesonet archives (Iowa State).
 
 Public, no account, and scripted access is what the service is for — IEM
 publishes its own download scripts for this endpoint. Used by the time-travel
 briefing eval to backfill the weather at an NTSB event's airport, which turns
-"coverage: 0" into a measured number for the weather-implicated cases. Every
+"coverage: 0" into a measured number for the weather-implicated cases. TAFs come from the
+IEM's archive of NWS text products (``TAFxxx``, back to 1996), as the raw bulletin, so a briefing
+can quote the forecaster's words. Every
 response is archived raw before it is decoded (ADR 0002), and requests are
 spaced out: this is someone else's server.
 """
@@ -12,6 +14,7 @@ from __future__ import annotations
 
 import csv
 import io
+import re
 import time
 from collections.abc import Callable
 from datetime import UTC, datetime
@@ -19,11 +22,15 @@ from datetime import UTC, datetime
 import httpx
 
 from preflight.archive import archive_raw
-from preflight.sources.aviationweather import Metar
+from preflight.decode.taf import TafParseError, taf_header
+from preflight.sources.aviationweather import Metar, Taf
 from preflight.sources.metar_text import parse_metar
 from preflight.sources.notams import SourceUnavailable
 
 BASE = "https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py"
+AFOS = "https://mesonet.agron.iastate.edu/cgi-bin/afos/retrieve.py"
+# One TAF inside a text product: from "TAF" (optionally AMD/COR) to the terminating "=".
+_TAF_TEXT = re.compile(r"TAF(?:\s+(?:AMD|COR))?\s+[A-Z0-9]{4}\s+\d{6}Z\s.*?=", re.S)
 
 
 def iem_station(icao: str) -> str:
@@ -49,14 +56,14 @@ class IemAsos:
         self._last = 0.0
         self.retries = retries
 
-    def _get(self, params: dict[str, str | int]) -> httpx.Response:
+    def _get(self, params: dict[str, str | int], url: str = BASE) -> httpx.Response:
         backoff = 30.0
         for attempt in range(self.retries + 1):
             wait = self.min_interval_s - (time.monotonic() - self._last)
             if wait > 0:
                 self._sleep(wait)
             try:
-                r = self._client.get(BASE, params=params)
+                r = self._client.get(url, params=params)
             finally:
                 self._last = time.monotonic()
             if r.status_code in self.RETRY_STATUSES and attempt < self.retries:
@@ -96,3 +103,29 @@ class IemAsos:
                 continue
             out.append(parse_metar(raw, icao=icao, observed_at=observed))
         return out
+
+    def fetch_tafs(self, icao: str, start: datetime, end: datetime) -> list[Taf]:
+        """Every TAF for ``icao`` issued in [start, end], oldest first, as the raw text."""
+        start, end = start.astimezone(UTC), end.astimezone(UTC)
+        params: dict[str, str | int] = {
+            "pil": f"TAF{icao[-3:]}", "fmt": "text", "limit": 9999, "order": "asc",
+            "sdate": f"{start:%Y-%m-%dT%H:%M}Z", "edate": f"{end:%Y-%m-%dT%H:%M}Z",
+        }
+        try:
+            r = self._get(params, url=AFOS)
+        except httpx.HTTPError as e:
+            raise SourceUnavailable(f"IEM AFOS: {e}") from e
+        if self.archive:
+            archive_raw("weather", f"iem-taf-{icao}", r.text)
+        out: dict[datetime, Taf] = {}
+        for m in _TAF_TEXT.finditer(r.text):
+            raw = " ".join(m.group(0).split())
+            try:
+                station, issued, vfrom, vto = taf_header(raw, ref=end)
+            except TafParseError:
+                continue
+            if station != icao or not start <= issued <= end:
+                continue
+            out[issued] = Taf(icao=icao, issued_at=issued, valid_from=vfrom, valid_to=vto,
+                              raw=raw)            # an amendment at the same minute wins
+        return [out[k] for k in sorted(out)]

@@ -1,6 +1,7 @@
 """Precedent attachment: query building and claim wording are pure; attachment uses fakes."""
 
-from datetime import UTC, datetime, timedelta, timezone
+import csv
+from datetime import UTC, date, datetime, timedelta, timezone
 
 from preflight.brief.core import _fmt, notam_findings
 from preflight.brief.precedent import precedent_claim, precedent_query, with_precedent
@@ -86,6 +87,7 @@ class _Retriever(Retriever):
 
     def search(self, conn, query, **kw):
         self.calls.append((query, kw.get("icao")))
+        self.kwargs = kw
         return self._hits
 
 
@@ -105,6 +107,17 @@ def test_attaches_only_hits_above_threshold_and_updates_counts():
     assert r.calls[0][0].startswith("Runway 28R closed work in progress. ")
     assert out.sources_considered == 3 and out.latency_ms >= 5
     assert out.grounded                                              # citations, no verifier yet
+
+
+def test_precedent_search_is_bounded_by_the_briefing_day():
+    """The time-travel leak: only reports dated before the briefing's UTC day are searched."""
+    r = _Retriever([])
+    with_precedent(None, _briefing(), r)
+    assert r.kwargs["published_before"] == T0.date()
+    late = _briefing().model_copy(update={            # 23:30 at UTC-5 is the next UTC day
+        "generated_at": datetime(2026, 9, 11, 23, 30, tzinfo=timezone(timedelta(hours=-5)))})
+    with_precedent(None, late, r)
+    assert r.kwargs["published_before"] == date(2026, 9, 12)
 
 
 def test_no_hits_leaves_finding_untouched():
@@ -171,3 +184,28 @@ def test_attachment_test_sheet_is_blind_and_scores_per_rule(tmp_path):
     res = P.score_test(pool, labels)
     assert res["base"]["precision"] == 0.5 and res["gate"]["precision"] == 1.0
     assert res["gate"]["relevant_per_hazard"] == 1.0
+
+
+def test_rebuilding_the_test_sheet_keeps_labels_and_drops_stale_pairs(tmp_path):
+    from preflight.evals import precedent as P
+
+    hit = {"title": None, "passage": "landed on the closed runway", "rerank_score": 0.9}
+    hz = "KAAA: Runway 1 closed"
+    sheet = tmp_path / "labels.csv"
+    P.write_test_sheet([{"hazard": hz, "arms": {"gate": [{**hit, "ref": "ntsb:1"},
+                                                          {**hit, "ref": "ntsb:2"}]}}], sheet)
+    kept = P._pair_id(hz, "ntsb:1")
+    with sheet.open(newline="") as f:
+        rows = list(csv.DictReader(f))
+    for r in rows:                                            # the labeller marks ntsb:1 relevant
+        if r["id"] == kept:
+            r["relevant_precedent (y/n)"] = "y"
+    with sheet.open("w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=list(rows[0]))
+        w.writeheader()
+        w.writerows(rows)
+    # ntsb:2 was the leak and is gone; ntsb:3 is new.
+    n = P.write_test_sheet([{"hazard": hz, "arms": {"gate": [{**hit, "ref": "ntsb:1"},
+                                                              {**hit, "ref": "ntsb:3"}]}}], sheet)
+    assert n == 2
+    assert P.read_sheet(sheet) == {kept: True}                # kept; ntsb:3 still to label

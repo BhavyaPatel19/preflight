@@ -522,7 +522,9 @@ def main(argv: list[str] | None = None) -> int:
                         pool = P.build_test_pool(conn, Retriever(STEmbedder(), STReranker()))
                     P.TEST_DIR.mkdir(parents=True, exist_ok=True)
                     P.TEST_POOL.write_text(_json.dumps(pool, indent=1, ensure_ascii=False) + "\n")
-                    print(f"{len(pool)} hazards; {P.write_test_sheet(pool)} rows → {P.TEST_SHEET}")
+                    n_rows = P.write_test_sheet(pool)
+                    todo = n_rows - len(P.read_sheet(P.TEST_SHEET))
+                    print(f"{len(pool)} hazards; {n_rows} rows → {P.TEST_SHEET} ({todo} to label)")
                 else:
                     pool = _json.loads(P.TEST_POOL.read_text())
                     print(_json.dumps(P.score_test(pool, P.read_sheet(P.TEST_SHEET)), indent=1))

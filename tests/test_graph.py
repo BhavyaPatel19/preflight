@@ -116,3 +116,23 @@ def test_resume_after_a_failed_node_does_not_redo_earlier_stages(db):
     # connect() is used by gather and precedent; neither ran again on resume
     assert calls["gather"] == gather_calls_after_failure
     assert b.trace_id == "t-resume"
+
+
+@pytest.mark.parametrize(("options", "expected"), [
+    ({}, T0),                                                    # default: the deps clock
+    ({"as_of": "2026-09-10T23:00:00+00:00"}, datetime(2026, 9, 10, 23, tzinfo=UTC)),
+])
+def test_gather_briefs_as_of_the_requested_instant(monkeypatch, options, expected):
+    from preflight import graph as G
+    from preflight.schemas import Briefing
+
+    seen = []
+
+    def fake_build(conn, req, *, now=None):
+        seen.append(now)
+        return Briefing(request=req, generated_at=T0)
+
+    monkeypatch.setattr(G, "build_briefing", fake_build)
+    g = build_graph(Deps(connect=lambda: nullcontext(None), now=lambda: T0))
+    run_briefing(g, REQ, options=options, thread_id="t-asof")
+    assert seen == [expected]

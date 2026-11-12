@@ -1,0 +1,810 @@
+{
+ "request": {
+  "departure": "KJFK",
+  "destination": "KSFO",
+  "alternates": "KOAK",
+  "off_block": "2026-09-11T05:00:00Z",
+  "aircraft_type": "B738",
+  "as_of": "2026-09-11T04:00:00Z"
+ },
+ "recorded_at": "2026-11-12T06:26:19.551951+00:00",
+ "events": [
+  {
+   "event": "start",
+   "t_ms": 17,
+   "data": {
+    "departure": "KJFK",
+    "destination": "KSFO",
+    "alternates": [
+     "KOAK"
+    ],
+    "as_of": "2026-09-11T04:00:00+00:00"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 102013,
+   "data": {
+    "category": "runway",
+    "severity": "HIGH",
+    "phases": [
+     "landing",
+     "approach"
+    ],
+    "headline": "KSFO: Runway 28R closed (work in progress) until 11 Sep 0700Z",
+    "claims": [
+     {
+      "text": "KSFO \u2014 Runway 28R closed (work in progress) until 11 Sep 0700Z.",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "A1477/26",
+        "issued_at": "2026-09-10T16:00:00-07:00",
+        "quote": "RWY 28R CLSD DUE WIP. TWY B BTN TWY A AND TWY F CLSD. ALTN RWY 28L AVBL. PAPI RWY 28L U/S. \u2014 valid 10 Sep 2300Z to 11 Sep 0700Z."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9224,
+      "author": "core"
+     },
+     {
+      "text": "3 prior reports with no airport recorded describe similar conditions: \u201cThe coordinator relayed the incorrect information to the local controllers responsible for the runways. The local controllers subsequently r\u2026\u201d; \u201cCenter Controller reported difficulty reading NOTAMS and almost authorizing an aircraft to depart from a closed runway\u201d; \u201cPrior to the incident, the Airport Authority and the construction contractor had jointly established and agreed to follow specific routes to\u2026\u201d.",
+      "citations": [
+       {
+        "kind": "ntsb",
+        "ref": "20120802X64749",
+        "issued_at": null,
+        "quote": "The coordinator relayed the incorrect information to the local controllers responsible for the runways. The local controllers subsequently released two departures from runway 1 and both flights lost required separation with the first arrivi"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1605568",
+        "issued_at": null,
+        "quote": "Only on questioning the pilot did it reveal that the pilot was unaware of the runway closure. During discussion in the control room; some other questions arose.For departures at uncontrolled airports; what are the controller's responsibilit"
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20090619X84742",
+        "issued_at": null,
+        "quote": "Prior to the incident, the Airport Authority and the construction contractor had jointly established and agreed to follow specific routes to and from the construction site. The two routes established for this project were the \u201cnorth haul\u201d r"
+       }
+      ],
+      "verified": null,
+      "entailment_score": null,
+      "author": "core"
+     },
+     {
+      "text": "Runway 28R at KSFO is closed due to work in progress until 11 Sep 0700Z.",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "A1477/26",
+        "issued_at": "2026-09-10T16:00:00-07:00",
+        "quote": "RWY 28R CLSD DUE WIP. TWY B BTN TWY A AND TWY F CLSD. ALTN RWY 28L AVBL. PAPI RWY 28L U/S. \u2014 valid 10 Sep 2300Z to 11 Sep 0700Z."
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20120802X64749",
+        "issued_at": null,
+        "quote": "The coordinator relayed the incorrect information to the local controllers responsible for the runways. The local controllers subsequently released two departures from runway 1 and both flights lost required separation with the first arrivi"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1605568",
+        "issued_at": null,
+        "quote": "Only on questioning the pilot did it reveal that the pilot was unaware of the runway closure. During discussion in the control room; some other questions arose.For departures at uncontrolled airports; what are the controller's responsibilit"
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20090619X84742",
+        "issued_at": null,
+        "quote": "Prior to the incident, the Airport Authority and the construction contractor had jointly established and agreed to follow specific routes to and from the construction site. The two routes established for this project were the \u201cnorth haul\u201d r"
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.8999,
+      "author": "llm"
+     },
+     {
+      "text": "Taxiway B between Taxiway A and Taxiway F is closed.",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "A1477/26",
+        "issued_at": "2026-09-10T16:00:00-07:00",
+        "quote": "RWY 28R CLSD DUE WIP. TWY B BTN TWY A AND TWY F CLSD. ALTN RWY 28L AVBL. PAPI RWY 28L U/S. \u2014 valid 10 Sep 2300Z to 11 Sep 0700Z."
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20120802X64749",
+        "issued_at": null,
+        "quote": "The coordinator relayed the incorrect information to the local controllers responsible for the runways. The local controllers subsequently released two departures from runway 1 and both flights lost required separation with the first arrivi"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1605568",
+        "issued_at": null,
+        "quote": "Only on questioning the pilot did it reveal that the pilot was unaware of the runway closure. During discussion in the control room; some other questions arose.For departures at uncontrolled airports; what are the controller's responsibilit"
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20090619X84742",
+        "issued_at": null,
+        "quote": "Prior to the incident, the Airport Authority and the construction contractor had jointly established and agreed to follow specific routes to and from the construction site. The two routes established for this project were the \u201cnorth haul\u201d r"
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9946,
+      "author": "llm"
+     },
+     {
+      "text": "Alternate runway 28L is available, but its PAPI is out of service.",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "A1477/26",
+        "issued_at": "2026-09-10T16:00:00-07:00",
+        "quote": "RWY 28R CLSD DUE WIP. TWY B BTN TWY A AND TWY F CLSD. ALTN RWY 28L AVBL. PAPI RWY 28L U/S. \u2014 valid 10 Sep 2300Z to 11 Sep 0700Z."
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20120802X64749",
+        "issued_at": null,
+        "quote": "The coordinator relayed the incorrect information to the local controllers responsible for the runways. The local controllers subsequently released two departures from runway 1 and both flights lost required separation with the first arrivi"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1605568",
+        "issued_at": null,
+        "quote": "Only on questioning the pilot did it reveal that the pilot was unaware of the runway closure. During discussion in the control room; some other questions arose.For departures at uncontrolled airports; what are the controller's responsibilit"
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20090619X84742",
+        "issued_at": null,
+        "quote": "Prior to the incident, the Airport Authority and the construction contractor had jointly established and agreed to follow specific routes to and from the construction site. The two routes established for this project were the \u201cnorth haul\u201d r"
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.5288,
+      "author": "llm"
+     }
+    ],
+    "airport": "KSFO"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 102015,
+   "data": {
+    "category": "approach aids",
+    "severity": "HIGH",
+    "phases": [
+     "taxi",
+     "takeoff",
+     "climb"
+    ],
+    "headline": "KJFK: ILS 22L unserviceable (maintenance) until 11 Sep 1600Z (est)",
+    "claims": [
+     {
+      "text": "KJFK \u2014 ILS 22L unserviceable (maintenance) until 11 Sep 1600Z (est).",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "A0912/26",
+        "issued_at": "2026-09-10T21:00:00-07:00",
+        "quote": "ILS RWY 22L U/S DUE MAINT. \u2014 valid 11 Sep 0400Z to 11 Sep 1600Z (estimated)."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9863,
+      "author": "core"
+     },
+     {
+      "text": "3 prior reports with no airport recorded describe similar conditions: \u201cA320 Captain reported ambiguity in procedures; AIM guidance; and ATC expectations during missed approaches that occur following a go-around\u2026\u201d; \u201cB737 flight crew reported they were cleared to 3100 ft on an approach to OAK; but misunderstood the clearance and descended to 2500 ft; prom\u2026\u201d; \u201cB737 Captain reported a mode control panel failure led to distraction and high workload\u201d.",
+      "citations": [
+       {
+        "kind": "asrs",
+        "ref": "1445626",
+        "issued_at": null,
+        "quote": "Issue: Procedural clarification requested for go-around/missed approach procedures for aircraft on a ILS approach procedure and subsequently cleared for a visual approach. Specifically; precarious situations could rapidly develop during hig"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1339058",
+        "issued_at": null,
+        "quote": "I remember thinking that 2500 feet seemed like it was assigned a few miles early; but the VFR conditions at the field and no terrain threats ahead kept me from querying the clearance as we quickly discussed the changes to the approach. Also"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1592808",
+        "issued_at": null,
+        "quote": "Crossing checking all systems; Captain; First Officer; [and] Standby showed IAS was same. As we finally slowed and started to configure for the approach; the IAS indications started to respond normally. We received vectors for ILS XXR at ZZ"
+       }
+      ],
+      "verified": null,
+      "entailment_score": null,
+      "author": "core"
+     },
+     {
+      "text": "ILS 22L at KJFK is unserviceable due to maintenance until 11 Sep 1600Z (estimated).",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "A0912/26",
+        "issued_at": "2026-09-10T21:00:00-07:00",
+        "quote": "ILS RWY 22L U/S DUE MAINT. \u2014 valid 11 Sep 0400Z to 11 Sep 1600Z (estimated)."
+       },
+       {
+        "kind": "asrs",
+        "ref": "1445626",
+        "issued_at": null,
+        "quote": "Issue: Procedural clarification requested for go-around/missed approach procedures for aircraft on a ILS approach procedure and subsequently cleared for a visual approach. Specifically; precarious situations could rapidly develop during hig"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1339058",
+        "issued_at": null,
+        "quote": "I remember thinking that 2500 feet seemed like it was assigned a few miles early; but the VFR conditions at the field and no terrain threats ahead kept me from querying the clearance as we quickly discussed the changes to the approach. Also"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1592808",
+        "issued_at": null,
+        "quote": "Crossing checking all systems; Captain; First Officer; [and] Standby showed IAS was same. As we finally slowed and started to configure for the approach; the IAS indications started to respond normally. We received vectors for ILS XXR at ZZ"
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9751,
+      "author": "llm"
+     }
+    ],
+    "airport": "KJFK"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 102015,
+   "data": {
+    "category": "taxiway",
+    "severity": "MEDIUM",
+    "phases": [
+     "descent",
+     "approach",
+     "landing"
+    ],
+    "headline": "KSFO: Taxiway A closed between B and C until 11 Sep 0700Z (est)",
+    "claims": [
+     {
+      "text": "KSFO \u2014 Taxiway A closed between B and C until 11 Sep 0700Z (est).",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "!SFO 09/142",
+        "issued_at": "2026-09-10T16:30:00-07:00",
+        "quote": "TWY A BTN TWY B AND TWY C CLSD \u2014 valid 10 Sep 2330Z to 11 Sep 0700Z (estimated)."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9927,
+      "author": "core"
+     },
+     {
+      "text": "3 prior reports with no airport recorded describe similar conditions: \u201cAir carrier flight crew reported a taxiway incursion and ground conflict resulted from receiving ATC taxi instructions during a high workloa\u2026\u201d; \u201cAir Carrier Flight Crew taxiing 747-8 aircraft reported taxiway incursion on closed taxiway\u201d; \u201cAn EMB-145 flight crew incurred a runway while rushing for a time constrained takeoff with complex taxi instructions because of a closed tax\u2026\u201d.",
+      "citations": [
+       {
+        "kind": "asrs",
+        "ref": "1822878",
+        "issued_at": null,
+        "quote": "Minimal length of Taxiway 2 resulted in a) limited area to clear runway and still hold short taxiway A; and b) insufficient time to query ground regarding blocked transmission and/or verify with Captain understood taxi instructions. Synopsi"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1783446",
+        "issued_at": null,
+        "quote": "I overlooked that information largely due to an incorrect expectation bias. I am aware of my ultimate responsibility to digest that information and will make an effort in the future to pay more attention to the 'Plan B' options in addition "
+       },
+       {
+        "kind": "asrs",
+        "ref": "1277725",
+        "issued_at": null,
+        "quote": "The construction on Taxiway C; as well as the close intersection of D and A on the way to Runway XX must cause some confusion with pilots. The only other thing that I can think to prevent this is to tell the aircraft RIGHT turn on D to RWY "
+       }
+      ],
+      "verified": null,
+      "entailment_score": null,
+      "author": "core"
+     },
+     {
+      "text": "Taxiway A at KSFO is closed between Taxiway B and Taxiway C until 11 Sep 0700Z (estimated).",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "!SFO 09/142",
+        "issued_at": "2026-09-10T16:30:00-07:00",
+        "quote": "TWY A BTN TWY B AND TWY C CLSD \u2014 valid 10 Sep 2330Z to 11 Sep 0700Z (estimated)."
+       },
+       {
+        "kind": "asrs",
+        "ref": "1822878",
+        "issued_at": null,
+        "quote": "Minimal length of Taxiway 2 resulted in a) limited area to clear runway and still hold short taxiway A; and b) insufficient time to query ground regarding blocked transmission and/or verify with Captain understood taxi instructions. Synopsi"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1783446",
+        "issued_at": null,
+        "quote": "I overlooked that information largely due to an incorrect expectation bias. I am aware of my ultimate responsibility to digest that information and will make an effort in the future to pay more attention to the 'Plan B' options in addition "
+       },
+       {
+        "kind": "asrs",
+        "ref": "1277725",
+        "issued_at": null,
+        "quote": "The construction on Taxiway C; as well as the close intersection of D and A on the way to Runway XX must cause some confusion with pilots. The only other thing that I can think to prevent this is to tell the aircraft RIGHT turn on D to RWY "
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9961,
+      "author": "llm"
+     }
+    ],
+    "airport": "KSFO"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 102015,
+   "data": {
+    "category": "weather",
+    "severity": "LOW",
+    "phases": [
+     "approach",
+     "landing"
+    ],
+    "headline": "KOAK forecast: MVFR, wind 7 kt, vis 6.2 SM, ceiling 1000 ft",
+    "claims": [
+     {
+      "text": "The KOAK TAF forecasts MVFR, wind 7 kt, vis 6.2 SM, ceiling 1000 ft (forecast from) during 11 Sep 0800Z\u201311 Sep 1300Z.",
+      "citations": [
+       {
+        "kind": "taf",
+        "ref": "KOAK@102326Z",
+        "issued_at": "2026-09-10T16:26:00-07:00",
+        "quote": "FM110800 25007KT P6SM SCT007 BKN010 \u2014 decoded: KOAK forecast from, MVFR, wind 7 kt, vis 6.2 SM, ceiling 1000 ft, 11 Sep 0800Z\u201311 Sep 1300Z."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.8218,
+      "author": "core"
+     },
+     {
+      "text": "KOAK forecast indicates MVFR conditions with wind at 7 kt, visibility of 6.2 SM, and a ceiling of 1000 ft from 11 Sep 0800Z to 11 Sep 1300Z.",
+      "citations": [
+       {
+        "kind": "taf",
+        "ref": "KOAK@102326Z",
+        "issued_at": "2026-09-10T16:26:00-07:00",
+        "quote": "FM110800 25007KT P6SM SCT007 BKN010 \u2014 decoded: KOAK forecast from, MVFR, wind 7 kt, vis 6.2 SM, ceiling 1000 ft, 11 Sep 0800Z\u201311 Sep 1300Z."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9951,
+      "author": "llm"
+     },
+     {
+      "text": "The TAF for KOAK shows MVFR conditions during the period from 11 Sep 0800Z to 11 Sep 1300Z.",
+      "citations": [
+       {
+        "kind": "taf",
+        "ref": "KOAK@102326Z",
+        "issued_at": "2026-09-10T16:26:00-07:00",
+        "quote": "FM110800 25007KT P6SM SCT007 BKN010 \u2014 decoded: KOAK forecast from, MVFR, wind 7 kt, vis 6.2 SM, ceiling 1000 ft, 11 Sep 0800Z\u201311 Sep 1300Z."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9263,
+      "author": "llm"
+     },
+     {
+      "text": "Visibility at KOAK is forecast to be 6.2 SM with a ceiling of 1000 ft between 11 Sep 0800Z and 11 Sep 1300Z.",
+      "citations": [
+       {
+        "kind": "taf",
+        "ref": "KOAK@102326Z",
+        "issued_at": "2026-09-10T16:26:00-07:00",
+        "quote": "FM110800 25007KT P6SM SCT007 BKN010 \u2014 decoded: KOAK forecast from, MVFR, wind 7 kt, vis 6.2 SM, ceiling 1000 ft, 11 Sep 0800Z\u201311 Sep 1300Z."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9946,
+      "author": "llm"
+     }
+    ],
+    "airport": "KOAK"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 102016,
+   "data": {
+    "category": "weather",
+    "severity": "LOW",
+    "phases": [
+     "descent",
+     "approach",
+     "landing"
+    ],
+    "headline": "KSFO forecast: MVFR, wind 8 kt, vis 6.2 SM, ceiling 1000 ft",
+    "claims": [
+     {
+      "text": "The KSFO TAF forecasts MVFR, wind 8 kt, vis 6.2 SM, ceiling 1000 ft (forecast from) during 11 Sep 1200Z\u201311 Sep 1300Z.",
+      "citations": [
+       {
+        "kind": "taf",
+        "ref": "KSFO@110305Z",
+        "issued_at": "2026-09-10T20:05:00-07:00",
+        "quote": "FM111200 25008KT P6SM BKN010 \u2014 decoded: KSFO forecast from, MVFR, wind 8 kt, vis 6.2 SM, ceiling 1000 ft, 11 Sep 1200Z\u201311 Sep 1300Z."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.874,
+      "author": "core"
+     },
+     {
+      "text": "The KSFO TAF forecasts MVFR conditions with wind at 8 kt, visibility of 6.2 SM, and a ceiling of 1000 ft.",
+      "citations": [
+       {
+        "kind": "taf",
+        "ref": "KSFO@110305Z",
+        "issued_at": "2026-09-10T20:05:00-07:00",
+        "quote": "FM111200 25008KT P6SM BKN010 \u2014 decoded: KSFO forecast from, MVFR, wind 8 kt, vis 6.2 SM, ceiling 1000 ft, 11 Sep 1200Z\u201311 Sep 1300Z."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9321,
+      "author": "llm"
+     },
+     {
+      "text": "These conditions are expected to occur from 11 Sep 1200Z to 11 Sep 1300Z.",
+      "citations": [
+       {
+        "kind": "taf",
+        "ref": "KSFO@110305Z",
+        "issued_at": "2026-09-10T20:05:00-07:00",
+        "quote": "FM111200 25008KT P6SM BKN010 \u2014 decoded: KSFO forecast from, MVFR, wind 8 kt, vis 6.2 SM, ceiling 1000 ft, 11 Sep 1200Z\u201311 Sep 1300Z."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9707,
+      "author": "llm"
+     }
+    ],
+    "airport": "KSFO"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 102016,
+   "data": {
+    "category": "delay",
+    "severity": "INFO",
+    "phases": [
+     "approach",
+     "landing"
+    ],
+    "headline": "KSFO: typical arrival delay Fri 01:00 local \u2014 median -0 min, 80% within -35\u202633",
+    "claims": [
+     {
+      "text": "Over 52 Fri 01:00 hours in the BTS record (Jun 2025\u2013May 2026), median arrival delay at KSFO was -0 min and 80% of hours fell within -35\u202633 min (~2 arrivals/h). Climatology, not a forecast.",
+      "citations": [
+       {
+        "kind": "forecast",
+        "ref": "climatology:KSFO:Fri01",
+        "issued_at": null,
+        "quote": "BTS On-Time Performance for KSFO, 52 Fri 01:00 hours from Jun 2025 to May 2026: median arrival delay -0 min; 80% of hours fell within -35 to 33 min (10th to 90th percentile); about 2 arrivals per hour. This is climatology \u2014 historical typical values \u2014 not a forecast."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9858,
+      "author": "core"
+     },
+     {
+      "text": "At KSFO, the typical arrival delay on Fridays at 01:00 local time has a median of -0 minutes.",
+      "citations": [
+       {
+        "kind": "forecast",
+        "ref": "climatology:KSFO:Fri01",
+        "issued_at": null,
+        "quote": "BTS On-Time Performance for KSFO, 52 Fri 01:00 hours from Jun 2025 to May 2026: median arrival delay -0 min; 80% of hours fell within -35 to 33 min (10th to 90th percentile); about 2 arrivals per hour. This is climatology \u2014 historical typical values \u2014 not a forecast."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9741,
+      "author": "llm"
+     },
+     {
+      "text": "Eighty percent of the recorded hours fell within a range of -35 to 33 minutes.",
+      "citations": [
+       {
+        "kind": "forecast",
+        "ref": "climatology:KSFO:Fri01",
+        "issued_at": null,
+        "quote": "BTS On-Time Performance for KSFO, 52 Fri 01:00 hours from Jun 2025 to May 2026: median arrival delay -0 min; 80% of hours fell within -35 to 33 min (10th to 90th percentile); about 2 arrivals per hour. This is climatology \u2014 historical typical values \u2014 not a forecast."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9937,
+      "author": "llm"
+     },
+     {
+      "text": "This data reflects historical patterns, not a forecast.",
+      "citations": [
+       {
+        "kind": "forecast",
+        "ref": "climatology:KSFO:Fri01",
+        "issued_at": null,
+        "quote": "BTS On-Time Performance for KSFO, 52 Fri 01:00 hours from Jun 2025 to May 2026: median arrival delay -0 min; 80% of hours fell within -35 to 33 min (10th to 90th percentile); about 2 arrivals per hour. This is climatology \u2014 historical typical values \u2014 not a forecast."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9966,
+      "author": "llm"
+     }
+    ],
+    "airport": "KSFO"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 102016,
+   "data": {
+    "category": "weather",
+    "severity": "INFO",
+    "phases": [
+     "taxi",
+     "takeoff",
+     "climb"
+    ],
+    "headline": "KJFK: VFR \u2014 wind 300/9 kt, vis 10 SM",
+    "claims": [
+     {
+      "text": "KJFK is reporting VFR at 11 Sep 0400Z: wind 300/9 kt, vis 10 SM.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KJFK@110400Z",
+        "issued_at": "2026-09-10T21:00:00-07:00",
+        "quote": "KJFK 110400Z AUTO 30009KT 10SM SCT075 27/18 A2988 RMK T02700180 MADISHF \u2014 decoded: KJFK reporting VFR at 11 Sep 0400Z, wind 300/9 kt, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9775,
+      "author": "core"
+     },
+     {
+      "text": "KJFK is reporting VFR conditions at 11 September 0400Z.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KJFK@110400Z",
+        "issued_at": "2026-09-10T21:00:00-07:00",
+        "quote": "KJFK 110400Z AUTO 30009KT 10SM SCT075 27/18 A2988 RMK T02700180 MADISHF \u2014 decoded: KJFK reporting VFR at 11 Sep 0400Z, wind 300/9 kt, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9922,
+      "author": "llm"
+     },
+     {
+      "text": "The wind is blowing from 300 degrees at 9 knots.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KJFK@110400Z",
+        "issued_at": "2026-09-10T21:00:00-07:00",
+        "quote": "KJFK 110400Z AUTO 30009KT 10SM SCT075 27/18 A2988 RMK T02700180 MADISHF \u2014 decoded: KJFK reporting VFR at 11 Sep 0400Z, wind 300/9 kt, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.8394,
+      "author": "llm"
+     }
+    ],
+    "airport": "KJFK"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 102016,
+   "data": {
+    "category": "weather",
+    "severity": "INFO",
+    "phases": [
+     "approach",
+     "landing"
+    ],
+    "headline": "KOAK: VFR \u2014 wind 290/11 kt, vis 10 SM",
+    "claims": [
+     {
+      "text": "KOAK is reporting VFR at 11 Sep 0400Z: wind 290/11 kt, vis 10 SM.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KOAK@110400Z",
+        "issued_at": "2026-09-10T21:00:00-07:00",
+        "quote": "KOAK 110400Z AUTO 29011KT 10SM CLR 17/15 A2994 RMK T01700150 MADISHF \u2014 decoded: KOAK reporting VFR at 11 Sep 0400Z, wind 290/11 kt, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9775,
+      "author": "core"
+     },
+     {
+      "text": "KOAK is reporting VFR conditions at 11 September 0400Z.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KOAK@110400Z",
+        "issued_at": "2026-09-10T21:00:00-07:00",
+        "quote": "KOAK 110400Z AUTO 29011KT 10SM CLR 17/15 A2994 RMK T01700150 MADISHF \u2014 decoded: KOAK reporting VFR at 11 Sep 0400Z, wind 290/11 kt, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9917,
+      "author": "llm"
+     },
+     {
+      "text": "The wind at KOAK is blowing from 290 degrees at 11 knots.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KOAK@110400Z",
+        "issued_at": "2026-09-10T21:00:00-07:00",
+        "quote": "KOAK 110400Z AUTO 29011KT 10SM CLR 17/15 A2994 RMK T01700150 MADISHF \u2014 decoded: KOAK reporting VFR at 11 Sep 0400Z, wind 290/11 kt, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9131,
+      "author": "llm"
+     }
+    ],
+    "airport": "KOAK"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 102016,
+   "data": {
+    "category": "weather",
+    "severity": "INFO",
+    "phases": [
+     "descent",
+     "approach",
+     "landing"
+    ],
+    "headline": "KSFO: VFR \u2014 vis 10 SM",
+    "claims": [
+     {
+      "text": "KSFO is reporting VFR at 11 Sep 0400Z: vis 10 SM.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KSFO@110400Z",
+        "issued_at": "2026-09-10T21:00:00-07:00",
+        "quote": "KSFO 110400Z AUTO /////KT 10SM CLR 17/14 A2994 RMK T01700140 CHINO RWY L10 MADISHF \u2014 decoded: KSFO reporting VFR at 11 Sep 0400Z, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9663,
+      "author": "core"
+     },
+     {
+      "text": "KSFO is reporting VFR conditions at 11 September 0400Z.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KSFO@110400Z",
+        "issued_at": "2026-09-10T21:00:00-07:00",
+        "quote": "KSFO 110400Z AUTO /////KT 10SM CLR 17/14 A2994 RMK T01700140 CHINO RWY L10 MADISHF \u2014 decoded: KSFO reporting VFR at 11 Sep 0400Z, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9912,
+      "author": "llm"
+     }
+    ],
+    "airport": "KSFO"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 102016,
+   "data": {
+    "category": "forecast",
+    "severity": "INFO",
+    "phases": [
+     "descent",
+     "approach",
+     "landing"
+    ],
+    "headline": "KSFO: TAF valid 11 Sep 0300Z\u201312 Sep 0600Z",
+    "claims": [
+     {
+      "text": "A TAF for KSFO issued 11 Sep 0305Z covers the arrival window.",
+      "citations": [
+       {
+        "kind": "taf",
+        "ref": "KSFO@110305Z",
+        "issued_at": "2026-09-10T20:05:00-07:00",
+        "quote": "TAF AMD KSFO 110305Z 1103/1206 32012KT P6SM FEW003 BKN200 FM111200 25008KT P6SM BKN010 FM111800 27013KT P6SM SKC FM112100 28017KT P6SM SKC="
+       }
+      ],
+      "verified": false,
+      "entailment_score": 0.0,
+      "author": "core"
+     }
+    ],
+    "airport": "KSFO"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 102016,
+   "data": {
+    "category": "forecast",
+    "severity": "INFO",
+    "phases": [
+     "approach",
+     "landing"
+    ],
+    "headline": "KOAK: TAF valid 11 Sep 0000Z\u201312 Sep 0600Z",
+    "claims": [
+     {
+      "text": "A TAF for KOAK issued 10 Sep 2326Z covers the arrival window.",
+      "citations": [
+       {
+        "kind": "taf",
+        "ref": "KOAK@102326Z",
+        "issued_at": "2026-09-10T16:26:00-07:00",
+        "quote": "TAF KOAK 102326Z 1100/1206 27010KT P6SM SCT200 FM110800 25007KT P6SM SCT007 BKN010 FM111800 26010KT P6SM SKC FM112100 29014KT P6SM SKC="
+       }
+      ],
+      "verified": false,
+      "entailment_score": 0.0,
+      "author": "core"
+     }
+    ],
+    "airport": "KOAK"
+   }
+  },
+  {
+   "event": "abstention",
+   "t_ms": 102016,
+   "data": {
+    "topic": "KOAK NOTAMs",
+    "reason": "no_coverage",
+    "detail": "No NOTAMs on record for KOAK; the archive does not cover this airport, so NOTAM hazards were not assessed."
+   }
+  },
+  {
+   "event": "abstention",
+   "t_ms": 102016,
+   "data": {
+    "topic": "KOAK arrival delay",
+    "reason": "no_coverage",
+    "detail": "No arrival-delay history for KOAK in the BTS record; no delay climatology given."
+   }
+  },
+  {
+   "event": "done",
+   "t_ms": 102016,
+   "data": {
+    "findings": 11,
+    "abstentions": 2,
+    "sources_considered": 55,
+    "latency_ms": 51778,
+    "generated_at": "2026-09-11T04:00:00+00:00"
+   }
+  }
+ ]
+}

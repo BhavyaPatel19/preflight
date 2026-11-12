@@ -28,6 +28,7 @@ from preflight.db import close_pool, get_pool
 from preflight.decode.notam import NotamParseError, parse_notam
 from preflight.graph import (
     Deps,
+    Options,
     build_graph,
     pooled_connect,
     postgres_checkpointer,
@@ -87,9 +88,11 @@ async def decode(req: DecodeRequest) -> NotamRecord:
 
 
 def _build(req: FlightRequest, precedent: bool = True, verify: bool = True,
-           narrative: bool = True) -> Briefing:
-    b, _ = run_briefing(_graph, req, options={"precedent": precedent, "verify": verify,
-                                              "narrative": narrative})
+           narrative: bool = True, as_of: datetime | None = None) -> Briefing:
+    options: Options = {"precedent": precedent, "verify": verify, "narrative": narrative}
+    if as_of is not None:
+        options["as_of"] = as_of.isoformat()
+    b, _ = run_briefing(_graph, req, options=options)
     return b
 
 
@@ -110,13 +113,17 @@ async def brief(req: FlightRequest, precedent: bool = True, verify: bool = True,
 
 
 async def _brief_events(
-    req: FlightRequest, precedent: bool = True, narrative: bool = True
+    req: FlightRequest, precedent: bool = True, narrative: bool = True,
+    as_of: datetime | None = None,
 ) -> AsyncIterator[dict[str, str]]:
-    yield {"event": "start", "data": json.dumps({
+    start: dict[str, Any] = {
         "departure": req.departure, "destination": req.destination,
         "alternates": list(req.alternates),
-    })}
-    b = await asyncio.to_thread(_build, req, precedent, True, narrative)
+    }
+    if as_of is not None:
+        start["as_of"] = as_of.isoformat()
+    yield {"event": "start", "data": json.dumps(start)}
+    b = await asyncio.to_thread(_build, req, precedent, True, narrative, as_of)
     for f in b.ranked():
         yield {"event": "finding", "data": f.model_dump_json()}
     for a in b.abstentions:
@@ -142,6 +149,8 @@ async def brief_stream_get(
     aircraft_type: str | None = None,
     precedent: bool = True,
     narrative: bool = True,
+    as_of: Annotated[datetime | None, Query(
+        description="brief as of this instant (time-travel); default now")] = None,
 ) -> EventSourceResponse:
     """Query-string form of the stream, for EventSource (which can only GET)."""
     req = FlightRequest(
@@ -149,4 +158,4 @@ async def brief_stream_get(
         alternates=tuple(a.strip().upper() for a in alternates.split(",") if a.strip()),
         off_block=off_block, aircraft_type=aircraft_type or None,
     )
-    return EventSourceResponse(_brief_events(req, precedent, narrative))
+    return EventSourceResponse(_brief_events(req, precedent, narrative, as_of))

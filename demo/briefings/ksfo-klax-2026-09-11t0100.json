@@ -1,0 +1,690 @@
+{
+ "request": {
+  "departure": "KSFO",
+  "destination": "KLAX",
+  "alternates": "KSAN",
+  "off_block": "2026-09-11T01:00:00Z",
+  "aircraft_type": "A320",
+  "as_of": "2026-09-11T00:00:00Z"
+ },
+ "recorded_at": "2026-11-12T06:27:45.606848+00:00",
+ "events": [
+  {
+   "event": "start",
+   "t_ms": 21,
+   "data": {
+    "departure": "KSFO",
+    "destination": "KLAX",
+    "alternates": [
+     "KSAN"
+    ],
+    "as_of": "2026-09-11T00:00:00+00:00"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 86041,
+   "data": {
+    "category": "runway",
+    "severity": "HIGH",
+    "phases": [
+     "takeoff",
+     "taxi"
+    ],
+    "headline": "KSFO: Runway 28R closed (work in progress) until 11 Sep 0700Z",
+    "claims": [
+     {
+      "text": "KSFO \u2014 Runway 28R closed (work in progress) until 11 Sep 0700Z.",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "A1477/26",
+        "issued_at": "2026-09-10T16:00:00-07:00",
+        "quote": "RWY 28R CLSD DUE WIP. TWY B BTN TWY A AND TWY F CLSD. ALTN RWY 28L AVBL. PAPI RWY 28L U/S. \u2014 valid 10 Sep 2300Z to 11 Sep 0700Z."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9224,
+      "author": "core"
+     },
+     {
+      "text": "3 prior reports with no airport recorded describe similar conditions: \u201cThe coordinator relayed the incorrect information to the local controllers responsible for the runways. The local controllers subsequently r\u2026\u201d; \u201cCenter Controller reported difficulty reading NOTAMS and almost authorizing an aircraft to depart from a closed runway\u201d; \u201cPrior to the incident, the Airport Authority and the construction contractor had jointly established and agreed to follow specific routes to\u2026\u201d.",
+      "citations": [
+       {
+        "kind": "ntsb",
+        "ref": "20120802X64749",
+        "issued_at": null,
+        "quote": "The coordinator relayed the incorrect information to the local controllers responsible for the runways. The local controllers subsequently released two departures from runway 1 and both flights lost required separation with the first arrivi"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1605568",
+        "issued_at": null,
+        "quote": "Only on questioning the pilot did it reveal that the pilot was unaware of the runway closure. During discussion in the control room; some other questions arose.For departures at uncontrolled airports; what are the controller's responsibilit"
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20090619X84742",
+        "issued_at": null,
+        "quote": "Prior to the incident, the Airport Authority and the construction contractor had jointly established and agreed to follow specific routes to and from the construction site. The two routes established for this project were the \u201cnorth haul\u201d r"
+       }
+      ],
+      "verified": null,
+      "entailment_score": null,
+      "author": "core"
+     },
+     {
+      "text": "Runway 28R at KSFO is closed due to work in progress until 11 Sep 0700Z.",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "A1477/26",
+        "issued_at": "2026-09-10T16:00:00-07:00",
+        "quote": "RWY 28R CLSD DUE WIP. TWY B BTN TWY A AND TWY F CLSD. ALTN RWY 28L AVBL. PAPI RWY 28L U/S. \u2014 valid 10 Sep 2300Z to 11 Sep 0700Z."
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20120802X64749",
+        "issued_at": null,
+        "quote": "The coordinator relayed the incorrect information to the local controllers responsible for the runways. The local controllers subsequently released two departures from runway 1 and both flights lost required separation with the first arrivi"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1605568",
+        "issued_at": null,
+        "quote": "Only on questioning the pilot did it reveal that the pilot was unaware of the runway closure. During discussion in the control room; some other questions arose.For departures at uncontrolled airports; what are the controller's responsibilit"
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20090619X84742",
+        "issued_at": null,
+        "quote": "Prior to the incident, the Airport Authority and the construction contractor had jointly established and agreed to follow specific routes to and from the construction site. The two routes established for this project were the \u201cnorth haul\u201d r"
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.8999,
+      "author": "llm"
+     },
+     {
+      "text": "Taxiway B between Taxiway A and Taxiway F is closed.",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "A1477/26",
+        "issued_at": "2026-09-10T16:00:00-07:00",
+        "quote": "RWY 28R CLSD DUE WIP. TWY B BTN TWY A AND TWY F CLSD. ALTN RWY 28L AVBL. PAPI RWY 28L U/S. \u2014 valid 10 Sep 2300Z to 11 Sep 0700Z."
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20120802X64749",
+        "issued_at": null,
+        "quote": "The coordinator relayed the incorrect information to the local controllers responsible for the runways. The local controllers subsequently released two departures from runway 1 and both flights lost required separation with the first arrivi"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1605568",
+        "issued_at": null,
+        "quote": "Only on questioning the pilot did it reveal that the pilot was unaware of the runway closure. During discussion in the control room; some other questions arose.For departures at uncontrolled airports; what are the controller's responsibilit"
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20090619X84742",
+        "issued_at": null,
+        "quote": "Prior to the incident, the Airport Authority and the construction contractor had jointly established and agreed to follow specific routes to and from the construction site. The two routes established for this project were the \u201cnorth haul\u201d r"
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9946,
+      "author": "llm"
+     },
+     {
+      "text": "Alternate runway 28L is available, but its PAPI is out of service.",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "A1477/26",
+        "issued_at": "2026-09-10T16:00:00-07:00",
+        "quote": "RWY 28R CLSD DUE WIP. TWY B BTN TWY A AND TWY F CLSD. ALTN RWY 28L AVBL. PAPI RWY 28L U/S. \u2014 valid 10 Sep 2300Z to 11 Sep 0700Z."
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20120802X64749",
+        "issued_at": null,
+        "quote": "The coordinator relayed the incorrect information to the local controllers responsible for the runways. The local controllers subsequently released two departures from runway 1 and both flights lost required separation with the first arrivi"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1605568",
+        "issued_at": null,
+        "quote": "Only on questioning the pilot did it reveal that the pilot was unaware of the runway closure. During discussion in the control room; some other questions arose.For departures at uncontrolled airports; what are the controller's responsibilit"
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20090619X84742",
+        "issued_at": null,
+        "quote": "Prior to the incident, the Airport Authority and the construction contractor had jointly established and agreed to follow specific routes to and from the construction site. The two routes established for this project were the \u201cnorth haul\u201d r"
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.5288,
+      "author": "llm"
+     }
+    ],
+    "airport": "KSFO"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 86043,
+   "data": {
+    "category": "taxiway",
+    "severity": "MEDIUM",
+    "phases": [
+     "taxi"
+    ],
+    "headline": "KSFO: Taxiway A closed between B and C until 11 Sep 0700Z (est)",
+    "claims": [
+     {
+      "text": "KSFO \u2014 Taxiway A closed between B and C until 11 Sep 0700Z (est).",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "!SFO 09/142",
+        "issued_at": "2026-09-10T16:30:00-07:00",
+        "quote": "TWY A BTN TWY B AND TWY C CLSD \u2014 valid 10 Sep 2330Z to 11 Sep 0700Z (estimated)."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9927,
+      "author": "core"
+     },
+     {
+      "text": "1 prior report at KSFO and 2 prior reports with no airport recorded describe similar conditions: \u201cTypically it is a complex or confusing taxiway/taxiway or taxiway/runway intersection. The area of increased risk has either a history of or\u2026\u201d; \u201cAir Carrier Flight Crew taxiing 747-8 aircraft reported taxiway incursion on closed taxiway\u201d; \u201cBE300 pilot reported unfamiliarity and distraction during taxi; resulting in an inadvertent deviation from taxi clearance\u201d.",
+      "citations": [
+       {
+        "kind": "ntsb",
+        "ref": "20161219X82155",
+        "issued_at": null,
+        "quote": "Typically it is a complex or confusing taxiway/taxiway or taxiway/runway intersection. The area of increased risk has either a history of or potential for runway incursions or surface incidents, due to a variety of causes, such as but not l"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1783446",
+        "issued_at": null,
+        "quote": "I overlooked that information largely due to an incorrect expectation bias. I am aware of my ultimate responsibility to digest that information and will make an effort in the future to pay more attention to the 'Plan B' options in addition "
+       },
+       {
+        "kind": "asrs",
+        "ref": "1687824",
+        "issued_at": null,
+        "quote": "The following events occurred while taxiing for a Part 91 repositioning flight from ZZZ (where the aircraft had undergone maintenance in the [Company] hangar) to ZZZ1. Our original destination; ZZZ2; was an EOD (Extended Overrun Distance) f"
+       }
+      ],
+      "verified": null,
+      "entailment_score": null,
+      "author": "core"
+     },
+     {
+      "text": "Taxiway A at KSFO is closed between Taxiway B and Taxiway C until 11 Sep 0700Z (estimated).",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "!SFO 09/142",
+        "issued_at": "2026-09-10T16:30:00-07:00",
+        "quote": "TWY A BTN TWY B AND TWY C CLSD \u2014 valid 10 Sep 2330Z to 11 Sep 0700Z (estimated)."
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20161219X82155",
+        "issued_at": null,
+        "quote": "Typically it is a complex or confusing taxiway/taxiway or taxiway/runway intersection. The area of increased risk has either a history of or potential for runway incursions or surface incidents, due to a variety of causes, such as but not l"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1783446",
+        "issued_at": null,
+        "quote": "I overlooked that information largely due to an incorrect expectation bias. I am aware of my ultimate responsibility to digest that information and will make an effort in the future to pay more attention to the 'Plan B' options in addition "
+       },
+       {
+        "kind": "asrs",
+        "ref": "1687824",
+        "issued_at": null,
+        "quote": "The following events occurred while taxiing for a Part 91 repositioning flight from ZZZ (where the aircraft had undergone maintenance in the [Company] hangar) to ZZZ1. Our original destination; ZZZ2; was an EOD (Extended Overrun Distance) f"
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9961,
+      "author": "llm"
+     }
+    ],
+    "airport": "KSFO"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 86043,
+   "data": {
+    "category": "weather",
+    "severity": "MEDIUM",
+    "phases": [
+     "approach",
+     "landing"
+    ],
+    "headline": "KSAN forecast: IFR, vis 5 SM, ceiling 500 ft, BR (temporary)",
+    "claims": [
+     {
+      "text": "The KSAN TAF forecasts IFR, vis 5 SM, ceiling 500 ft, BR (temporarily) during 11 Sep 0600Z\u201311 Sep 0900Z.",
+      "citations": [
+       {
+        "kind": "taf",
+        "ref": "KSAN@102337Z",
+        "issued_at": "2026-09-10T16:37:00-07:00",
+        "quote": "TEMPO 1106/1110 5SM BR BKN005 \u2014 decoded: KSAN temporarily, IFR, vis 5 SM, ceiling 500 ft, BR, 11 Sep 0600Z\u201311 Sep 0900Z."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.8506,
+      "author": "core"
+     }
+    ],
+    "airport": "KSAN"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 86043,
+   "data": {
+    "category": "delay",
+    "severity": "INFO",
+    "phases": [
+     "approach",
+     "landing"
+    ],
+    "headline": "KLAX: typical arrival delay Thu 21:00 local \u2014 median 8 min, 80% within -6\u202629",
+    "claims": [
+     {
+      "text": "Over 52 Thu 21:00 hours in the BTS record (Jun 2025\u2013May 2026), median arrival delay at KLAX was 8 min and 80% of hours fell within -6\u202629 min (~40 arrivals/h). Climatology, not a forecast.",
+      "citations": [
+       {
+        "kind": "forecast",
+        "ref": "climatology:KLAX:Thu21",
+        "issued_at": null,
+        "quote": "BTS On-Time Performance for KLAX, 52 Thu 21:00 hours from Jun 2025 to May 2026: median arrival delay 8 min; 80% of hours fell within -6 to 29 min (10th to 90th percentile); about 40 arrivals per hour. This is climatology \u2014 historical typical values \u2014 not a forecast."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9849,
+      "author": "core"
+     },
+     {
+      "text": "At KLAX, the typical arrival delay on Thursdays at 21:00 local time is 8 minutes.",
+      "citations": [
+       {
+        "kind": "forecast",
+        "ref": "climatology:KLAX:Thu21",
+        "issued_at": null,
+        "quote": "BTS On-Time Performance for KLAX, 52 Thu 21:00 hours from Jun 2025 to May 2026: median arrival delay 8 min; 80% of hours fell within -6 to 29 min (10th to 90th percentile); about 40 arrivals per hour. This is climatology \u2014 historical typical values \u2014 not a forecast."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.959,
+      "author": "llm"
+     },
+     {
+      "text": "On 80% of Thursdays at 21:00, arrival delays at KLAX ranged from -6 to 29 minutes.",
+      "citations": [
+       {
+        "kind": "forecast",
+        "ref": "climatology:KLAX:Thu21",
+        "issued_at": null,
+        "quote": "BTS On-Time Performance for KLAX, 52 Thu 21:00 hours from Jun 2025 to May 2026: median arrival delay 8 min; 80% of hours fell within -6 to 29 min (10th to 90th percentile); about 40 arrivals per hour. This is climatology \u2014 historical typical values \u2014 not a forecast."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9912,
+      "author": "llm"
+     },
+     {
+      "text": "This data reflects historical patterns, not a forecast, and is based on 52 hours of arrivals between June 2025 and May 2026.",
+      "citations": [
+       {
+        "kind": "forecast",
+        "ref": "climatology:KLAX:Thu21",
+        "issued_at": null,
+        "quote": "BTS On-Time Performance for KLAX, 52 Thu 21:00 hours from Jun 2025 to May 2026: median arrival delay 8 min; 80% of hours fell within -6 to 29 min (10th to 90th percentile); about 40 arrivals per hour. This is climatology \u2014 historical typical values \u2014 not a forecast."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9922,
+      "author": "llm"
+     }
+    ],
+    "airport": "KLAX"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 86044,
+   "data": {
+    "category": "delay",
+    "severity": "INFO",
+    "phases": [
+     "approach",
+     "landing"
+    ],
+    "headline": "KSAN: typical arrival delay Thu 21:00 local \u2014 median 20 min, 80% within -0\u202645",
+    "claims": [
+     {
+      "text": "Over 52 Thu 21:00 hours in the BTS record (Jun 2025\u2013May 2026), median arrival delay at KSAN was 20 min and 80% of hours fell within -0\u202645 min (~18 arrivals/h). Climatology, not a forecast.",
+      "citations": [
+       {
+        "kind": "forecast",
+        "ref": "climatology:KSAN:Thu21",
+        "issued_at": null,
+        "quote": "BTS On-Time Performance for KSAN, 52 Thu 21:00 hours from Jun 2025 to May 2026: median arrival delay 20 min; 80% of hours fell within -0 to 45 min (10th to 90th percentile); about 18 arrivals per hour. This is climatology \u2014 historical typical values \u2014 not a forecast."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9863,
+      "author": "core"
+     },
+     {
+      "text": "At KSAN, the typical arrival delay on Thursdays at 21:00 local time is a median of 20 minutes.",
+      "citations": [
+       {
+        "kind": "forecast",
+        "ref": "climatology:KSAN:Thu21",
+        "issued_at": null,
+        "quote": "BTS On-Time Performance for KSAN, 52 Thu 21:00 hours from Jun 2025 to May 2026: median arrival delay 20 min; 80% of hours fell within -0 to 45 min (10th to 90th percentile); about 18 arrivals per hour. This is climatology \u2014 historical typical values \u2014 not a forecast."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9761,
+      "author": "llm"
+     },
+     {
+      "text": "On 80% of Thursdays at 21:00 local time, arrival delays at KSAN fell between -0 and 45 minutes.",
+      "citations": [
+       {
+        "kind": "forecast",
+        "ref": "climatology:KSAN:Thu21",
+        "issued_at": null,
+        "quote": "BTS On-Time Performance for KSAN, 52 Thu 21:00 hours from Jun 2025 to May 2026: median arrival delay 20 min; 80% of hours fell within -0 to 45 min (10th to 90th percentile); about 18 arrivals per hour. This is climatology \u2014 historical typical values \u2014 not a forecast."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9609,
+      "author": "llm"
+     },
+     {
+      "text": "During the period from June 2025 to May 2026, there were 52 Thursday 21:00 hours recorded at KSAN with about 18 arrivals per hour.",
+      "citations": [
+       {
+        "kind": "forecast",
+        "ref": "climatology:KSAN:Thu21",
+        "issued_at": null,
+        "quote": "BTS On-Time Performance for KSAN, 52 Thu 21:00 hours from Jun 2025 to May 2026: median arrival delay 20 min; 80% of hours fell within -0 to 45 min (10th to 90th percentile); about 18 arrivals per hour. This is climatology \u2014 historical typical values \u2014 not a forecast."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9976,
+      "author": "llm"
+     }
+    ],
+    "airport": "KSAN"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 86044,
+   "data": {
+    "category": "weather",
+    "severity": "INFO",
+    "phases": [
+     "descent",
+     "approach",
+     "landing"
+    ],
+    "headline": "KLAX: VFR \u2014 wind 240/9 kt, vis 10 SM",
+    "claims": [
+     {
+      "text": "KLAX is reporting VFR at 11 Sep 0000Z: wind 240/9 kt, vis 10 SM.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KLAX@110000Z",
+        "issued_at": "2026-09-10T17:00:00-07:00",
+        "quote": "KLAX 110000Z AUTO 24009KT 10SM CLR 28/21 A2982 RMK T02800210 MADISHF \u2014 decoded: KLAX reporting VFR at 11 Sep 0000Z, wind 240/9 kt, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9756,
+      "author": "core"
+     },
+     {
+      "text": "KLAX is reporting VFR conditions at 11 September 0000Z.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KLAX@110000Z",
+        "issued_at": "2026-09-10T17:00:00-07:00",
+        "quote": "KLAX 110000Z AUTO 24009KT 10SM CLR 28/21 A2982 RMK T02800210 MADISHF \u2014 decoded: KLAX reporting VFR at 11 Sep 0000Z, wind 240/9 kt, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9912,
+      "author": "llm"
+     },
+     {
+      "text": "The wind at KLAX is blowing from 240 degrees at 9 knots.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KLAX@110000Z",
+        "issued_at": "2026-09-10T17:00:00-07:00",
+        "quote": "KLAX 110000Z AUTO 24009KT 10SM CLR 28/21 A2982 RMK T02800210 MADISHF \u2014 decoded: KLAX reporting VFR at 11 Sep 0000Z, wind 240/9 kt, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9321,
+      "author": "llm"
+     }
+    ],
+    "airport": "KLAX"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 86044,
+   "data": {
+    "category": "weather",
+    "severity": "INFO",
+    "phases": [
+     "approach",
+     "landing"
+    ],
+    "headline": "KSAN: VFR \u2014 wind 200/8 kt, vis 10 SM",
+    "claims": [
+     {
+      "text": "KSAN is reporting VFR at 11 Sep 0000Z: wind 200/8 kt, vis 10 SM.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KSAN@110000Z",
+        "issued_at": "2026-09-10T17:00:00-07:00",
+        "quote": "KSAN 110000Z AUTO 20008KT 10SM CLR 27/21 A2987 RMK T02700210 MADISHF \u2014 decoded: KSAN reporting VFR at 11 Sep 0000Z, wind 200/8 kt, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9751,
+      "author": "core"
+     },
+     {
+      "text": "KSAN is reporting VFR conditions at 11 September 0000Z.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KSAN@110000Z",
+        "issued_at": "2026-09-10T17:00:00-07:00",
+        "quote": "KSAN 110000Z AUTO 20008KT 10SM CLR 27/21 A2987 RMK T02700210 MADISHF \u2014 decoded: KSAN reporting VFR at 11 Sep 0000Z, wind 200/8 kt, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9907,
+      "author": "llm"
+     },
+     {
+      "text": "The wind at KSAN is blowing from 200 degrees at 8 knots.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KSAN@110000Z",
+        "issued_at": "2026-09-10T17:00:00-07:00",
+        "quote": "KSAN 110000Z AUTO 20008KT 10SM CLR 27/21 A2987 RMK T02700210 MADISHF \u2014 decoded: KSAN reporting VFR at 11 Sep 0000Z, wind 200/8 kt, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.7617,
+      "author": "llm"
+     }
+    ],
+    "airport": "KSAN"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 86045,
+   "data": {
+    "category": "weather",
+    "severity": "INFO",
+    "phases": [
+     "taxi",
+     "takeoff",
+     "climb"
+    ],
+    "headline": "KSFO: VFR \u2014 vis 10 SM",
+    "claims": [
+     {
+      "text": "KSFO is reporting VFR at 11 Sep 0000Z: vis 10 SM.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KSFO@110000Z",
+        "issued_at": "2026-09-10T17:00:00-07:00",
+        "quote": "KSFO 110000Z AUTO ///19KT 10SM CLR 21/15 A2990 RMK T02100150 MADISHF \u2014 decoded: KSFO reporting VFR at 11 Sep 0000Z, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.958,
+      "author": "core"
+     },
+     {
+      "text": "KSFO is reporting VFR conditions at 11 September 0000Z.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KSFO@110000Z",
+        "issued_at": "2026-09-10T17:00:00-07:00",
+        "quote": "KSFO 110000Z AUTO ///19KT 10SM CLR 21/15 A2990 RMK T02100150 MADISHF \u2014 decoded: KSFO reporting VFR at 11 Sep 0000Z, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9893,
+      "author": "llm"
+     }
+    ],
+    "airport": "KSFO"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 86045,
+   "data": {
+    "category": "forecast",
+    "severity": "INFO",
+    "phases": [
+     "descent",
+     "approach",
+     "landing"
+    ],
+    "headline": "KLAX: TAF valid 11 Sep 0000Z\u201312 Sep 0600Z",
+    "claims": [
+     {
+      "text": "A TAF for KLAX issued 10 Sep 2331Z covers the arrival window.",
+      "citations": [
+       {
+        "kind": "taf",
+        "ref": "KLAX@102331Z",
+        "issued_at": "2026-09-10T16:31:00-07:00",
+        "quote": "TAF KLAX 102331Z 1100/1206 26012KT P6SM FEW250 FM110200 25006KT P6SM SKC FM111000 12005KT P6SM BKN015 FM111700 26006KT P6SM SCT250 FM112100 26012KT P6SM SCT250 FM120300 25008KT P6SM SCT250="
+       }
+      ],
+      "verified": false,
+      "entailment_score": 0.0,
+      "author": "core"
+     }
+    ],
+    "airport": "KLAX"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 86045,
+   "data": {
+    "category": "forecast",
+    "severity": "INFO",
+    "phases": [
+     "approach",
+     "landing"
+    ],
+    "headline": "KSAN: TAF valid 11 Sep 0000Z\u201312 Sep 0600Z",
+    "claims": [
+     {
+      "text": "A TAF for KSAN issued 10 Sep 2337Z covers the arrival window.",
+      "citations": [
+       {
+        "kind": "taf",
+        "ref": "KSAN@102337Z",
+        "issued_at": "2026-09-10T16:37:00-07:00",
+        "quote": "TAF KSAN 102337Z 1100/1206 17007KT P6SM FEW150 TEMPO 1106/1110 5SM BR BKN005 FM111000 18006KT 4SM BR BKN004 TEMPO 1110/1114 1SM BR BKN003 FM111630 19009KT P6SM FEW010 FM120100 VRB04KT P6SM FEW120="
+       }
+      ],
+      "verified": false,
+      "entailment_score": 0.0,
+      "author": "core"
+     }
+    ],
+    "airport": "KSAN"
+   }
+  },
+  {
+   "event": "abstention",
+   "t_ms": 86045,
+   "data": {
+    "topic": "KLAX NOTAMs",
+    "reason": "no_coverage",
+    "detail": "No NOTAMs on record for KLAX; the archive does not cover this airport, so NOTAM hazards were not assessed."
+   }
+  },
+  {
+   "event": "abstention",
+   "t_ms": 86045,
+   "data": {
+    "topic": "KSAN NOTAMs",
+    "reason": "no_coverage",
+    "detail": "No NOTAMs on record for KSAN; the archive does not cover this airport, so NOTAM hazards were not assessed."
+   }
+  },
+  {
+   "event": "done",
+   "t_ms": 86045,
+   "data": {
+    "findings": 10,
+    "abstentions": 2,
+    "sources_considered": 40,
+    "latency_ms": 32258,
+    "generated_at": "2026-09-11T00:00:00+00:00"
+   }
+  }
+ ]
+}

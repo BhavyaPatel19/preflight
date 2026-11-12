@@ -17,7 +17,7 @@ import json
 import re
 import sys
 import time
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -29,6 +29,8 @@ DEFAULT_FLIGHTS = [
     "KJFK-KSFO/KOAK@2026-09-11T05:00Z:B738",
     "KSFO-KLAX/KSAN@2026-09-11T01:00Z:A320",
 ]
+
+AS_OF_BEFORE = timedelta(minutes=60)
 
 _FLIGHT = re.compile(
     r"^(?P<dep>[A-Z]{4})-(?P<dest>[A-Z]{4})(?:/(?P<alt>[A-Z]{4}(?:,[A-Z]{4})*))?"
@@ -42,12 +44,16 @@ def parse_flight(spec: str) -> dict[str, str]:
         raise SystemExit(
             f"bad flight spec {spec!r}; want DEP-DEST[/ALT,ALT]@YYYY-MM-DDTHH:MMZ[:TYPE]"
         )
+    off = datetime.fromisoformat(m["off"]).replace(tzinfo=UTC)
     return {
         "departure": m["dep"],
         "destination": m["dest"],
         "alternates": m["alt"] or "",
         "off_block": m["off"] + ":00Z",
         "aircraft_type": m["type"] or "",
+        # Brief as a dispatcher would have, an hour before off-block (the time-travel eval's
+        # snapshot rule), so the recording shows the weather and NOTAMs then in force.
+        "as_of": (off - AS_OF_BEFORE).strftime("%Y-%m-%dT%H:%M:00Z"),
     }
 
 
@@ -103,11 +109,11 @@ def main(argv: list[str] | None = None) -> int:
                 "request": params,
                 "findings": done["findings"],
                 "abstentions": done["abstentions"],
-                "latency_ms": done["latency_ms"],
+                "wall_ms": rec["events"][-1]["t_ms"],     # whole briefing, request to done
                 "recorded_at": rec["recorded_at"],
             })
             print(f"  {done['findings']} findings, {done['abstentions']} abstentions, "
-                  f"{done['latency_ms']} ms", file=sys.stderr)
+                  f"{rec['events'][-1]['t_ms']} ms wall", file=sys.stderr)
     (args.out / "flights.json").write_text(json.dumps(manifest, indent=1) + "\n")
     print(f"wrote {len(manifest)} recordings to {args.out}/", file=sys.stderr)
     return 0

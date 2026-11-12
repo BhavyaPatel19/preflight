@@ -1,0 +1,50 @@
+[
+ {
+  "id": "ksfo-kjfk-2026-09-11t0230",
+  "label": "KSFO \u2192 KJFK (alt KBOS)",
+  "request": {
+   "departure": "KSFO",
+   "destination": "KJFK",
+   "alternates": "KBOS",
+   "off_block": "2026-09-11T02:30:00Z",
+   "aircraft_type": "A320",
+   "as_of": "2026-09-11T01:30:00Z"
+  },
+  "findings": 10,
+  "abstentions": 1,
+  "wall_ms": 82779,
+  "recorded_at": "2026-11-12T05:58:19.601792+00:00"
+ },
+ {
+  "id": "kjfk-ksfo-2026-09-11t0500",
+  "label": "KJFK \u2192 KSFO (alt KOAK)",
+  "request": {
+   "departure": "KJFK",
+   "destination": "KSFO",
+   "alternates": "KOAK",
+   "off_block": "2026-09-11T05:00:00Z",
+   "aircraft_type": "B738",
+   "as_of": "2026-09-11T04:00:00Z"
+  },
+  "findings": 11,
+  "abstentions": 2,
+  "wall_ms": 102016,
+  "recorded_at": "2026-11-12T06:26:19.551951+00:00"
+ },
+ {
+  "id": "ksfo-klax-2026-09-11t0100",
+  "label": "KSFO \u2192 KLAX (alt KSAN)",
+  "request": {
+   "departure": "KSFO",
+   "destination": "KLAX",
+   "alternates": "KSAN",
+   "off_block": "2026-09-11T01:00:00Z",
+   "aircraft_type": "A320",
+   "as_of": "2026-09-11T00:00:00Z"
+  },
+  "findings": 10,
+  "abstentions": 2,
+  "wall_ms": 86045,
+  "recorded_at": "2026-11-12T06:27:45.606848+00:00"
+ }
+]

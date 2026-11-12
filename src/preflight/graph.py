@@ -44,6 +44,7 @@ class Options(TypedDict, total=False):
     precedent: bool
     verify: bool
     narrative: bool
+    as_of: str        # ISO instant to brief as of (time-travel, as the eval does); default now
 
 
 class BriefingState(TypedDict, total=False):
@@ -87,8 +88,10 @@ def _timed(name: str, node: Callable[[BriefingState], BriefingState]) -> Any:
 def build_graph(deps: Deps, checkpointer: BaseCheckpointSaver[Any] | None = None) -> Any:
     def gather(state: BriefingState) -> BriefingState:
         req = FlightRequest.model_validate(state["request"])
+        as_of = state.get("options", {}).get("as_of")
+        now = datetime.fromisoformat(as_of) if as_of else deps.now()
         with deps.connect() as conn:
-            b = build_briefing(conn, req, now=deps.now())
+            b = build_briefing(conn, req, now=now)
         return _put(b, f"gather: {len(b.findings)} findings, {len(b.abstentions)} abstentions",
                     state)
 

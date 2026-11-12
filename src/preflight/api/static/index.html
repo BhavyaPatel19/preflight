@@ -197,7 +197,9 @@ body.is-demo form input:not([type=checkbox]){opacity:.75}
       let t = 700;
       for (const ev of rec.events) {
         if (ev.event === "start") continue;
-        const d = JSON.stringify(ev.data);
+        // The done event carries the recorded wall time and the as-of instant for the status line.
+        const d = JSON.stringify(ev.event === "done"
+          ? {...ev.data, wall_ms: ev.t_ms, as_of: rec.request.as_of} : ev.data);
         timers.push(setTimeout(() => on[ev.event] && on[ev.event]({data: d}, true), t));
         t += ev.event === "finding" ? 450 : 150;
       }
@@ -224,7 +226,8 @@ body.is-demo form input:not([type=checkbox]){opacity:.75}
         const d = JSON.parse(e.data);
         status.innerHTML = `<span>${d.findings} finding${d.findings === 1 ? "" : "s"}</span><span>${d.abstentions} abstention${d.abstentions === 1 ? "" : "s"}</span>` +
           `<span>sources considered ${d.sources_considered}</span>` +
-          (replayed ? `<span>original run ${(d.latency_ms / 1000).toFixed(1)} s · replayed</span>` : `<span>${d.latency_ms} ms</span>`);
+          (replayed ? (d.as_of ? `<span>briefed as of ${esc(d.as_of.slice(0, 16).replace("T", " "))}Z</span>` : "") +
+            `<span>original run ${(d.wall_ms / 1000).toFixed(1)} s · replayed</span>` : `<span>${d.latency_ms} ms</span>`);
         if (!n) findings.innerHTML = `<p class="empty">No findings for this flight in the current data.</p>`;
         stop(); $("go").disabled = false;
       },

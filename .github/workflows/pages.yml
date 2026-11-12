@@ -1,0 +1,46 @@
+name: Demo site
+
+# Publishes the briefing UI with recorded briefings to GitHub Pages. The page detects that it has
+# no API behind it and replays demo/briefings/*.json, recorded by scripts/record_demo.py.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/preflight/api/static/**"
+      - "demo/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assemble site
+        run: |
+          test -f demo/flights.json || { echo "no recordings: run scripts/record_demo.py"; exit 1; }
+          mkdir -p site
+          cp src/preflight/api/static/index.html site/index.html
+          cp -r demo site/demo
+          touch site/.nojekyll
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4

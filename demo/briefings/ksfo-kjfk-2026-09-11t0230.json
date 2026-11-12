@@ -1,0 +1,738 @@
+{
+ "request": {
+  "departure": "KSFO",
+  "destination": "KJFK",
+  "alternates": "KBOS",
+  "off_block": "2026-09-11T02:30:00Z",
+  "aircraft_type": "A320",
+  "as_of": "2026-09-11T01:30:00Z"
+ },
+ "recorded_at": "2026-11-12T05:58:19.601792+00:00",
+ "events": [
+  {
+   "event": "start",
+   "t_ms": 22,
+   "data": {
+    "departure": "KSFO",
+    "destination": "KJFK",
+    "alternates": [
+     "KBOS"
+    ],
+    "as_of": "2026-09-11T01:30:00+00:00"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 82773,
+   "data": {
+    "category": "runway",
+    "severity": "HIGH",
+    "phases": [
+     "takeoff",
+     "taxi"
+    ],
+    "headline": "KSFO: Runway 28R closed (work in progress) until 11 Sep 0700Z",
+    "claims": [
+     {
+      "text": "KSFO \u2014 Runway 28R closed (work in progress) until 11 Sep 0700Z.",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "A1477/26",
+        "issued_at": "2026-09-10T16:00:00-07:00",
+        "quote": "RWY 28R CLSD DUE WIP. TWY B BTN TWY A AND TWY F CLSD. ALTN RWY 28L AVBL. PAPI RWY 28L U/S. \u2014 valid 10 Sep 2300Z to 11 Sep 0700Z."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9224,
+      "author": "core"
+     },
+     {
+      "text": "3 prior reports with no airport recorded describe similar conditions: \u201cThe coordinator relayed the incorrect information to the local controllers responsible for the runways. The local controllers subsequently r\u2026\u201d; \u201cCenter Controller reported difficulty reading NOTAMS and almost authorizing an aircraft to depart from a closed runway\u201d; \u201cPrior to the incident, the Airport Authority and the construction contractor had jointly established and agreed to follow specific routes to\u2026\u201d.",
+      "citations": [
+       {
+        "kind": "ntsb",
+        "ref": "20120802X64749",
+        "issued_at": null,
+        "quote": "The coordinator relayed the incorrect information to the local controllers responsible for the runways. The local controllers subsequently released two departures from runway 1 and both flights lost required separation with the first arrivi"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1605568",
+        "issued_at": null,
+        "quote": "Only on questioning the pilot did it reveal that the pilot was unaware of the runway closure. During discussion in the control room; some other questions arose.For departures at uncontrolled airports; what are the controller's responsibilit"
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20090619X84742",
+        "issued_at": null,
+        "quote": "Prior to the incident, the Airport Authority and the construction contractor had jointly established and agreed to follow specific routes to and from the construction site. The two routes established for this project were the \u201cnorth haul\u201d r"
+       }
+      ],
+      "verified": null,
+      "entailment_score": null,
+      "author": "core"
+     },
+     {
+      "text": "Runway 28R at KSFO is closed due to work in progress until 11 Sep 0700Z.",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "A1477/26",
+        "issued_at": "2026-09-10T16:00:00-07:00",
+        "quote": "RWY 28R CLSD DUE WIP. TWY B BTN TWY A AND TWY F CLSD. ALTN RWY 28L AVBL. PAPI RWY 28L U/S. \u2014 valid 10 Sep 2300Z to 11 Sep 0700Z."
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20120802X64749",
+        "issued_at": null,
+        "quote": "The coordinator relayed the incorrect information to the local controllers responsible for the runways. The local controllers subsequently released two departures from runway 1 and both flights lost required separation with the first arrivi"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1605568",
+        "issued_at": null,
+        "quote": "Only on questioning the pilot did it reveal that the pilot was unaware of the runway closure. During discussion in the control room; some other questions arose.For departures at uncontrolled airports; what are the controller's responsibilit"
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20090619X84742",
+        "issued_at": null,
+        "quote": "Prior to the incident, the Airport Authority and the construction contractor had jointly established and agreed to follow specific routes to and from the construction site. The two routes established for this project were the \u201cnorth haul\u201d r"
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.8999,
+      "author": "llm"
+     },
+     {
+      "text": "Taxiway B between Taxiway A and Taxiway F is closed.",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "A1477/26",
+        "issued_at": "2026-09-10T16:00:00-07:00",
+        "quote": "RWY 28R CLSD DUE WIP. TWY B BTN TWY A AND TWY F CLSD. ALTN RWY 28L AVBL. PAPI RWY 28L U/S. \u2014 valid 10 Sep 2300Z to 11 Sep 0700Z."
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20120802X64749",
+        "issued_at": null,
+        "quote": "The coordinator relayed the incorrect information to the local controllers responsible for the runways. The local controllers subsequently released two departures from runway 1 and both flights lost required separation with the first arrivi"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1605568",
+        "issued_at": null,
+        "quote": "Only on questioning the pilot did it reveal that the pilot was unaware of the runway closure. During discussion in the control room; some other questions arose.For departures at uncontrolled airports; what are the controller's responsibilit"
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20090619X84742",
+        "issued_at": null,
+        "quote": "Prior to the incident, the Airport Authority and the construction contractor had jointly established and agreed to follow specific routes to and from the construction site. The two routes established for this project were the \u201cnorth haul\u201d r"
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9946,
+      "author": "llm"
+     },
+     {
+      "text": "Alternate runway 28L is available, but its PAPI is out of service.",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "A1477/26",
+        "issued_at": "2026-09-10T16:00:00-07:00",
+        "quote": "RWY 28R CLSD DUE WIP. TWY B BTN TWY A AND TWY F CLSD. ALTN RWY 28L AVBL. PAPI RWY 28L U/S. \u2014 valid 10 Sep 2300Z to 11 Sep 0700Z."
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20120802X64749",
+        "issued_at": null,
+        "quote": "The coordinator relayed the incorrect information to the local controllers responsible for the runways. The local controllers subsequently released two departures from runway 1 and both flights lost required separation with the first arrivi"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1605568",
+        "issued_at": null,
+        "quote": "Only on questioning the pilot did it reveal that the pilot was unaware of the runway closure. During discussion in the control room; some other questions arose.For departures at uncontrolled airports; what are the controller's responsibilit"
+       },
+       {
+        "kind": "ntsb",
+        "ref": "20090619X84742",
+        "issued_at": null,
+        "quote": "Prior to the incident, the Airport Authority and the construction contractor had jointly established and agreed to follow specific routes to and from the construction site. The two routes established for this project were the \u201cnorth haul\u201d r"
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.5288,
+      "author": "llm"
+     }
+    ],
+    "airport": "KSFO"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 82777,
+   "data": {
+    "category": "approach aids",
+    "severity": "HIGH",
+    "phases": [
+     "approach"
+    ],
+    "headline": "KJFK: ILS 22L unserviceable (maintenance) until 11 Sep 1600Z (est)",
+    "claims": [
+     {
+      "text": "KJFK \u2014 ILS 22L unserviceable (maintenance) until 11 Sep 1600Z (est).",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "A0912/26",
+        "issued_at": "2026-09-10T21:00:00-07:00",
+        "quote": "ILS RWY 22L U/S DUE MAINT. \u2014 valid 11 Sep 0400Z to 11 Sep 1600Z (estimated)."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9863,
+      "author": "core"
+     },
+     {
+      "text": "3 prior reports with no airport recorded describe similar conditions: \u201cERJ flight crew reported a speed deviation on approach that resulted in a stick shaker followed by a go around\u201d; \u201cA320 Captain reported ambiguity in procedures; AIM guidance; and ATC expectations during missed approaches that occur following a go-around\u2026\u201d; \u201cGlideslope failed during ILS approach. Flight crew converted to LOC only approach procedures; but missed a crossing altitude restriction. To\u2026\u201d.",
+      "citations": [
+       {
+        "kind": "asrs",
+        "ref": "1696596",
+        "issued_at": null,
+        "quote": "Not applying sufficient power to maintain airspeed once on glide slope. Not abandoning the approach sooner and executing the go around earlier.ATC to be more specific if/when expecting us to execute a full procedure ILS. Flight crew do not "
+       },
+       {
+        "kind": "asrs",
+        "ref": "1445626",
+        "issued_at": null,
+        "quote": "Issue: Procedural clarification requested for go-around/missed approach procedures for aircraft on a ILS approach procedure and subsequently cleared for a visual approach. Specifically; precarious situations could rapidly develop during hig"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1317627",
+        "issued_at": null,
+        "quote": "We were on vectors for an ILS approach. When given turn to intercept LOC; ATC informed us that the GS was now Out of Service (OTS) and we were now cleared for the LOC approach instead. In hind sight; at this point I should have discontinued"
+       }
+      ],
+      "verified": null,
+      "entailment_score": null,
+      "author": "core"
+     },
+     {
+      "text": "ILS 22L at KJFK is unserviceable due to maintenance until 11 Sep 1600Z (estimated).",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "A0912/26",
+        "issued_at": "2026-09-10T21:00:00-07:00",
+        "quote": "ILS RWY 22L U/S DUE MAINT. \u2014 valid 11 Sep 0400Z to 11 Sep 1600Z (estimated)."
+       },
+       {
+        "kind": "asrs",
+        "ref": "1696596",
+        "issued_at": null,
+        "quote": "Not applying sufficient power to maintain airspeed once on glide slope. Not abandoning the approach sooner and executing the go around earlier.ATC to be more specific if/when expecting us to execute a full procedure ILS. Flight crew do not "
+       },
+       {
+        "kind": "asrs",
+        "ref": "1445626",
+        "issued_at": null,
+        "quote": "Issue: Procedural clarification requested for go-around/missed approach procedures for aircraft on a ILS approach procedure and subsequently cleared for a visual approach. Specifically; precarious situations could rapidly develop during hig"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1317627",
+        "issued_at": null,
+        "quote": "We were on vectors for an ILS approach. When given turn to intercept LOC; ATC informed us that the GS was now Out of Service (OTS) and we were now cleared for the LOC approach instead. In hind sight; at this point I should have discontinued"
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9751,
+      "author": "llm"
+     }
+    ],
+    "airport": "KJFK"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 82777,
+   "data": {
+    "category": "taxiway",
+    "severity": "MEDIUM",
+    "phases": [
+     "taxi"
+    ],
+    "headline": "KSFO: Taxiway A closed between B and C until 11 Sep 0700Z (est)",
+    "claims": [
+     {
+      "text": "KSFO \u2014 Taxiway A closed between B and C until 11 Sep 0700Z (est).",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "!SFO 09/142",
+        "issued_at": "2026-09-10T16:30:00-07:00",
+        "quote": "TWY A BTN TWY B AND TWY C CLSD \u2014 valid 10 Sep 2330Z to 11 Sep 0700Z (estimated)."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9927,
+      "author": "core"
+     },
+     {
+      "text": "3 prior reports with no airport recorded describe similar conditions: \u201cAir Carrier Flight Crew taxiing 747-8 aircraft reported taxiway incursion on closed taxiway\u201d; \u201cAir Carrier Captain reported a late instruction from ramp control; a miss communication with the push back crew and a momentary loss of cont\u2026\u201d; \u201cLos Angeles Tower Controller reported a runway incursion due to an aircraft taxiing onto the runway while another jet was departing\u201d.",
+      "citations": [
+       {
+        "kind": "asrs",
+        "ref": "1783446",
+        "issued_at": null,
+        "quote": "I overlooked that information largely due to an incorrect expectation bias. I am aware of my ultimate responsibility to digest that information and will make an effort in the future to pay more attention to the 'Plan B' options in addition "
+       },
+       {
+        "kind": "asrs",
+        "ref": "1872787",
+        "issued_at": null,
+        "quote": "I had the FO (First Officer) clarify what the Controllers intentions were; which was to turn into the ABE line; pass [Taxiway]; then exit through Spot XXX. Eventually; proper ground communications were established; we safely released the br"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1464529",
+        "issued_at": null,
+        "quote": "Due to a taxiway closure on the south side of the field; departures from the south side had to make their way across 2 active runways to get to their departure runway. One particular jet was Aircraft X; who I instructed to cross Rwy 25L; an"
+       }
+      ],
+      "verified": null,
+      "entailment_score": null,
+      "author": "core"
+     },
+     {
+      "text": "Taxiway A at KSFO is closed between Taxiway B and Taxiway C until 11 Sep 0700Z (estimated).",
+      "citations": [
+       {
+        "kind": "notam",
+        "ref": "!SFO 09/142",
+        "issued_at": "2026-09-10T16:30:00-07:00",
+        "quote": "TWY A BTN TWY B AND TWY C CLSD \u2014 valid 10 Sep 2330Z to 11 Sep 0700Z (estimated)."
+       },
+       {
+        "kind": "asrs",
+        "ref": "1783446",
+        "issued_at": null,
+        "quote": "I overlooked that information largely due to an incorrect expectation bias. I am aware of my ultimate responsibility to digest that information and will make an effort in the future to pay more attention to the 'Plan B' options in addition "
+       },
+       {
+        "kind": "asrs",
+        "ref": "1872787",
+        "issued_at": null,
+        "quote": "I had the FO (First Officer) clarify what the Controllers intentions were; which was to turn into the ABE line; pass [Taxiway]; then exit through Spot XXX. Eventually; proper ground communications were established; we safely released the br"
+       },
+       {
+        "kind": "asrs",
+        "ref": "1464529",
+        "issued_at": null,
+        "quote": "Due to a taxiway closure on the south side of the field; departures from the south side had to make their way across 2 active runways to get to their departure runway. One particular jet was Aircraft X; who I instructed to cross Rwy 25L; an"
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9961,
+      "author": "llm"
+     }
+    ],
+    "airport": "KSFO"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 82778,
+   "data": {
+    "category": "delay",
+    "severity": "LOW",
+    "phases": [
+     "approach",
+     "landing"
+    ],
+    "headline": "KJFK: typical arrival delay Fri 01:00 local \u2014 median 5 min, 80% within -20\u202685",
+    "claims": [
+     {
+      "text": "Over 44 Fri 01:00 hours in the BTS record (Jun 2025\u2013May 2026), median arrival delay at KJFK was 5 min and 80% of hours fell within -20\u202685 min (~2 arrivals/h). Climatology, not a forecast.",
+      "citations": [
+       {
+        "kind": "forecast",
+        "ref": "climatology:KJFK:Fri01",
+        "issued_at": null,
+        "quote": "BTS On-Time Performance for KJFK, 44 Fri 01:00 hours from Jun 2025 to May 2026: median arrival delay 5 min; 80% of hours fell within -20 to 85 min (10th to 90th percentile); about 2 arrivals per hour. This is climatology \u2014 historical typical values \u2014 not a forecast."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9893,
+      "author": "core"
+     },
+     {
+      "text": "At KJFK, the typical arrival delay on Fridays at 01:00 local time is a median of 5 minutes.",
+      "citations": [
+       {
+        "kind": "forecast",
+        "ref": "climatology:KJFK:Fri01",
+        "issued_at": null,
+        "quote": "BTS On-Time Performance for KJFK, 44 Fri 01:00 hours from Jun 2025 to May 2026: median arrival delay 5 min; 80% of hours fell within -20 to 85 min (10th to 90th percentile); about 2 arrivals per hour. This is climatology \u2014 historical typical values \u2014 not a forecast."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9829,
+      "author": "llm"
+     },
+     {
+      "text": "Eighty percent of arrival delays during this time fell between -20 and 85 minutes over the past year.",
+      "citations": [
+       {
+        "kind": "forecast",
+        "ref": "climatology:KJFK:Fri01",
+        "issued_at": null,
+        "quote": "BTS On-Time Performance for KJFK, 44 Fri 01:00 hours from Jun 2025 to May 2026: median arrival delay 5 min; 80% of hours fell within -20 to 85 min (10th to 90th percentile); about 2 arrivals per hour. This is climatology \u2014 historical typical values \u2014 not a forecast."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.8062,
+      "author": "llm"
+     },
+     {
+      "text": "This data reflects historical patterns, not a forecast.",
+      "citations": [
+       {
+        "kind": "forecast",
+        "ref": "climatology:KJFK:Fri01",
+        "issued_at": null,
+        "quote": "BTS On-Time Performance for KJFK, 44 Fri 01:00 hours from Jun 2025 to May 2026: median arrival delay 5 min; 80% of hours fell within -20 to 85 min (10th to 90th percentile); about 2 arrivals per hour. This is climatology \u2014 historical typical values \u2014 not a forecast."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9966,
+      "author": "llm"
+     }
+    ],
+    "airport": "KJFK"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 82778,
+   "data": {
+    "category": "delay",
+    "severity": "INFO",
+    "phases": [
+     "approach",
+     "landing"
+    ],
+    "headline": "KBOS: typical arrival delay Fri 01:00 local \u2014 median -1 min, 80% within -22\u202658",
+    "claims": [
+     {
+      "text": "Over 49 Fri 01:00 hours in the BTS record (Jun 2025\u2013May 2026), median arrival delay at KBOS was -1 min and 80% of hours fell within -22\u202658 min (~2 arrivals/h). Climatology, not a forecast.",
+      "citations": [
+       {
+        "kind": "forecast",
+        "ref": "climatology:KBOS:Fri01",
+        "issued_at": null,
+        "quote": "BTS On-Time Performance for KBOS, 49 Fri 01:00 hours from Jun 2025 to May 2026: median arrival delay -1 min; 80% of hours fell within -22 to 58 min (10th to 90th percentile); about 2 arrivals per hour. This is climatology \u2014 historical typical values \u2014 not a forecast."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9893,
+      "author": "core"
+     },
+     {
+      "text": "At KBOS, the typical arrival delay on Fridays at 01:00 local time has a median of -1 minute.",
+      "citations": [
+       {
+        "kind": "forecast",
+        "ref": "climatology:KBOS:Fri01",
+        "issued_at": null,
+        "quote": "BTS On-Time Performance for KBOS, 49 Fri 01:00 hours from Jun 2025 to May 2026: median arrival delay -1 min; 80% of hours fell within -22 to 58 min (10th to 90th percentile); about 2 arrivals per hour. This is climatology \u2014 historical typical values \u2014 not a forecast."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9731,
+      "author": "llm"
+     },
+     {
+      "text": "Eighty percent of arrival delays during this time fell between -22 and 58 minutes over the past year.",
+      "citations": [
+       {
+        "kind": "forecast",
+        "ref": "climatology:KBOS:Fri01",
+        "issued_at": null,
+        "quote": "BTS On-Time Performance for KBOS, 49 Fri 01:00 hours from Jun 2025 to May 2026: median arrival delay -1 min; 80% of hours fell within -22 to 58 min (10th to 90th percentile); about 2 arrivals per hour. This is climatology \u2014 historical typical values \u2014 not a forecast."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.7153,
+      "author": "llm"
+     },
+     {
+      "text": "This data reflects historical patterns, not a forecast.",
+      "citations": [
+       {
+        "kind": "forecast",
+        "ref": "climatology:KBOS:Fri01",
+        "issued_at": null,
+        "quote": "BTS On-Time Performance for KBOS, 49 Fri 01:00 hours from Jun 2025 to May 2026: median arrival delay -1 min; 80% of hours fell within -22 to 58 min (10th to 90th percentile); about 2 arrivals per hour. This is climatology \u2014 historical typical values \u2014 not a forecast."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9966,
+      "author": "llm"
+     }
+    ],
+    "airport": "KBOS"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 82778,
+   "data": {
+    "category": "weather",
+    "severity": "INFO",
+    "phases": [
+     "descent",
+     "approach",
+     "landing"
+    ],
+    "headline": "KJFK: VFR \u2014 wind 260/7 kt, vis 10 SM",
+    "claims": [
+     {
+      "text": "KJFK is reporting VFR at 11 Sep 0130Z: wind 260/7 kt, vis 10 SM.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KJFK@110130Z",
+        "issued_at": "2026-09-10T18:30:00-07:00",
+        "quote": "KJFK 110130Z AUTO 26007KT 10SM CLR 27/17 A2987 RMK T02700170 MADISHF \u2014 decoded: KJFK reporting VFR at 11 Sep 0130Z, wind 260/7 kt, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9761,
+      "author": "core"
+     },
+     {
+      "text": "KJFK is reporting VFR conditions at 11 Sep 0130Z.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KJFK@110130Z",
+        "issued_at": "2026-09-10T18:30:00-07:00",
+        "quote": "KJFK 110130Z AUTO 26007KT 10SM CLR 27/17 A2987 RMK T02700170 MADISHF \u2014 decoded: KJFK reporting VFR at 11 Sep 0130Z, wind 260/7 kt, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9917,
+      "author": "llm"
+     },
+     {
+      "text": "The wind at KJFK is blowing from 260 degrees at 7 knots.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KJFK@110130Z",
+        "issued_at": "2026-09-10T18:30:00-07:00",
+        "quote": "KJFK 110130Z AUTO 26007KT 10SM CLR 27/17 A2987 RMK T02700170 MADISHF \u2014 decoded: KJFK reporting VFR at 11 Sep 0130Z, wind 260/7 kt, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.894,
+      "author": "llm"
+     }
+    ],
+    "airport": "KJFK"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 82779,
+   "data": {
+    "category": "weather",
+    "severity": "INFO",
+    "phases": [
+     "approach",
+     "landing"
+    ],
+    "headline": "KBOS: VFR \u2014 wind 260/9 kt, vis 10 SM",
+    "claims": [
+     {
+      "text": "KBOS is reporting VFR at 11 Sep 0130Z: wind 260/9 kt, vis 10 SM.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KBOS@110130Z",
+        "issued_at": "2026-09-10T18:30:00-07:00",
+        "quote": "KBOS 110130Z AUTO 26009KT 10SM CLR 24/11 A2981 RMK T02400110 MADISHF \u2014 decoded: KBOS reporting VFR at 11 Sep 0130Z, wind 260/9 kt, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9761,
+      "author": "core"
+     },
+     {
+      "text": "KBOS is reporting VFR conditions at 11 Sep 0130Z.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KBOS@110130Z",
+        "issued_at": "2026-09-10T18:30:00-07:00",
+        "quote": "KBOS 110130Z AUTO 26009KT 10SM CLR 24/11 A2981 RMK T02400110 MADISHF \u2014 decoded: KBOS reporting VFR at 11 Sep 0130Z, wind 260/9 kt, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9912,
+      "author": "llm"
+     },
+     {
+      "text": "The wind at KBOS is blowing from 260 degrees at 9 knots.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KBOS@110130Z",
+        "issued_at": "2026-09-10T18:30:00-07:00",
+        "quote": "KBOS 110130Z AUTO 26009KT 10SM CLR 24/11 A2981 RMK T02400110 MADISHF \u2014 decoded: KBOS reporting VFR at 11 Sep 0130Z, wind 260/9 kt, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9077,
+      "author": "llm"
+     }
+    ],
+    "airport": "KBOS"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 82779,
+   "data": {
+    "category": "weather",
+    "severity": "INFO",
+    "phases": [
+     "taxi",
+     "takeoff",
+     "climb"
+    ],
+    "headline": "KSFO: VFR \u2014 vis 10 SM",
+    "claims": [
+     {
+      "text": "KSFO is reporting VFR at 11 Sep 0130Z: vis 10 SM.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KSFO@110130Z",
+        "issued_at": "2026-09-10T18:30:00-07:00",
+        "quote": "KSFO 110130Z AUTO /////KT 10SM CLR 19/15 A2991 RMK T01900150 MADISHF \u2014 decoded: KSFO reporting VFR at 11 Sep 0130Z, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9653,
+      "author": "core"
+     },
+     {
+      "text": "KSFO is reporting VFR conditions at 11 September 0130Z.",
+      "citations": [
+       {
+        "kind": "metar",
+        "ref": "KSFO@110130Z",
+        "issued_at": "2026-09-10T18:30:00-07:00",
+        "quote": "KSFO 110130Z AUTO /////KT 10SM CLR 19/15 A2991 RMK T01900150 MADISHF \u2014 decoded: KSFO reporting VFR at 11 Sep 0130Z, vis 10 SM."
+       }
+      ],
+      "verified": true,
+      "entailment_score": 0.9917,
+      "author": "llm"
+     }
+    ],
+    "airport": "KSFO"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 82779,
+   "data": {
+    "category": "forecast",
+    "severity": "INFO",
+    "phases": [
+     "descent",
+     "approach",
+     "landing"
+    ],
+    "headline": "KJFK: TAF valid 11 Sep 0000Z\u201312 Sep 0600Z",
+    "claims": [
+     {
+      "text": "A TAF for KJFK issued 10 Sep 2330Z covers the arrival window.",
+      "citations": [
+       {
+        "kind": "taf",
+        "ref": "KJFK@102330Z",
+        "issued_at": "2026-09-10T16:30:00-07:00",
+        "quote": "TAF KJFK 102330Z 1100/1206 26010KT P6SM SCT050 BKN150 BKN250 FM110400 36006KT P6SM SCT050 BKN150 BKN250 FM111600 31007KT P6SM FEW060 SCT150 SCT250 FM111800 25007KT P6SM FEW060 FEW150 SCT250 FM111900 19009KT P6SM FEW060 FEW250="
+       }
+      ],
+      "verified": false,
+      "entailment_score": 0.0,
+      "author": "core"
+     }
+    ],
+    "airport": "KJFK"
+   }
+  },
+  {
+   "event": "finding",
+   "t_ms": 82779,
+   "data": {
+    "category": "forecast",
+    "severity": "INFO",
+    "phases": [
+     "approach",
+     "landing"
+    ],
+    "headline": "KBOS: TAF valid 11 Sep 0000Z\u201312 Sep 0600Z",
+    "claims": [
+     {
+      "text": "A TAF for KBOS issued 11 Sep 0014Z covers the arrival window.",
+      "citations": [
+       {
+        "kind": "taf",
+        "ref": "KBOS@110014Z",
+        "issued_at": "2026-09-10T17:14:00-07:00",
+        "quote": "TAF AMD KBOS 110014Z 1100/1206 27010KT P6SM FEW090 FM111000 32008KT P6SM SKC FM112300 30005KT P6SM SKC="
+       }
+      ],
+      "verified": false,
+      "entailment_score": 0.0,
+      "author": "core"
+     }
+    ],
+    "airport": "KBOS"
+   }
+  },
+  {
+   "event": "abstention",
+   "t_ms": 82779,
+   "data": {
+    "topic": "KBOS NOTAMs",
+    "reason": "no_coverage",
+    "detail": "No NOTAMs on record for KBOS; the archive does not cover this airport, so NOTAM hazards were not assessed."
+   }
+  },
+  {
+   "event": "done",
+   "t_ms": 82779,
+   "data": {
+    "findings": 10,
+    "abstentions": 1,
+    "sources_considered": 56,
+    "latency_ms": 26758,
+    "generated_at": "2026-09-11T01:30:00+00:00"
+   }
+  }
+ ]
+}

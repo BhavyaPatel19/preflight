@@ -2,6 +2,9 @@
 
 **An agentic route-risk briefing system for flight operations — every claim cited, every capability measured, and explicit about what it doesn't know.**
 
+**[Live demo →](https://bhavyapatel19.github.io/preflight/)** — briefings recorded from a full local run
+(75K reports in pgvector, NLI verifier, local model), replayed in the browser exactly as streamed.
+
 Give it a flight. It reads every NOTAM, weather product and relevant historical incident for that
 route, and returns a ranked hazard briefing where each sentence traces back to a source record.
 

@@ -71,6 +71,7 @@ class Retriever:
         candidates: int | None = None,
         exclude_like: str | None = None,
         icao_strict: bool = False,
+        published_before: date | None = None,
     ) -> list[Hit]:
         """Fused candidates from Postgres, optionally reranked; top ``k``.
 
@@ -87,6 +88,7 @@ class Retriever:
             w_dense=0.0 if mode == "lexical" else 1.0,
             w_lex=0.0 if mode == "dense" else 1.0,
             icao=icao, source=source, exclude_like=exclude_like, icao_strict=icao_strict,
+            published_before=published_before,
         )
         hits = [Hit(*c) for c in found]
         if rerank and self.reranker is not None and hits:

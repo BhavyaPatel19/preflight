@@ -159,7 +159,7 @@ _HNSW_SETTINGS = "SET LOCAL hnsw.ef_search = 1000; SET LOCAL hnsw.iterative_scan
 
 
 def _filters(icao: str | None, source: str | None, exclude_like: str | None,
-             icao_strict: bool) -> str:
+             icao_strict: bool, published_before: date | None = None) -> str:
     """Only the filters actually requested, so the planner sees plain predicates."""
     parts = []
     if icao is not None:
@@ -170,6 +170,9 @@ def _filters(icao: str | None, source: str | None, exclude_like: str | None,
                      "AND d.source = %(source)s)")
     if exclude_like is not None:
         parts.append("AND c.text NOT LIKE %(exclude)s")
+    if published_before is not None:
+        parts.append("AND EXISTS (SELECT 1 FROM documents d WHERE d.id = c.document_id "
+                     "AND d.published < %(before)s)")
     return " ".join(parts)
 
 
@@ -187,20 +190,24 @@ def hybrid_search(
     source: str | None = None,
     exclude_like: str | None = None,
     icao_strict: bool = False,
+    published_before: date | None = None,
 ) -> list[Candidate]:
     """``exclude_like`` drops chunks matching a SQL LIKE pattern — the eval uses it to hide
     synopsis-bearing chunks so a synopsis query has to find the narrative. ``icao_strict``
     makes the airport filter exclude chunks with no airport (by default they are admitted,
-    since an unknown airport is not a different airport)."""
+    since an unknown airport is not a different airport). ``published_before`` keeps only
+    documents dated strictly before that day, so a briefing set in the past cannot cite a
+    report of an event that had not happened yet; undated documents are excluded too."""
     if query_vec is None:
         w_dense = 0.0
-    sql = _HYBRID.format(filters=_filters(icao, source, exclude_like, icao_strict))
+    sql = _HYBRID.format(
+        filters=_filters(icao, source, exclude_like, icao_strict, published_before))
     with conn.transaction():
         conn.execute(_HNSW_SETTINGS)
         rows = conn.execute(sql, {
             "qvec": list(query_vec) if query_vec is not None else [0.0] * settings().embedding_dim,
             "qor": lexical_query(query_text),
-            "icao": icao, "source": source, "exclude": exclude_like,
+            "icao": icao, "source": source, "exclude": exclude_like, "before": published_before,
             "n": candidates, "k": rrf_k, "limit": limit,
             "w_dense": w_dense, "w_lex": w_lex,
         }).fetchall()

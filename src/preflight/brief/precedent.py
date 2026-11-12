@@ -14,6 +14,7 @@ abstention — rather than silently omitting precedent.
 from __future__ import annotations
 
 import re
+from datetime import UTC, date, datetime
 from time import perf_counter
 from typing import Any
 
@@ -131,6 +132,11 @@ def select_precedent(
     return keep
 
 
+def _utc_day(t: datetime) -> date:
+    """The UTC calendar day of ``t``; a naive time is taken as UTC."""
+    return (t if t.tzinfo is None else t.astimezone(UTC)).date()
+
+
 def with_precedent(
     conn: Connection[Any],
     briefing: Briefing,
@@ -168,6 +174,9 @@ def with_precedent(
         rewritten = fan_out(lambda i: rewrite_query(llm, briefing.findings[i]), idx)
         queries.update({i: r for i, r in zip(idx, rewritten, strict=True) if r})
 
+    # Only reports dated before the briefing day: a briefing set in the past (the time-travel
+    # eval) must not cite the very accident it is briefing, or anything after it.
+    before = _utc_day(briefing.generated_at)
     findings: list[Finding] = []
     considered = 0
     seen: set[str] = set()
@@ -178,7 +187,8 @@ def with_precedent(
             continue
         # Ask for more than k: several chunks of one report can rank together, a report is
         # cited once per briefing, and the mechanism gate drops reports off the hazard.
-        hits = retriever.search(conn, q, k=k * (5 if gate else 3), icao=f.airport, rerank=True)
+        hits = retriever.search(conn, q, k=k * (5 if gate else 3), icao=f.airport, rerank=True,
+                                published_before=before)
         considered += len(hits)
         keep = select_precedent(f, hits, k=k, min_score=min_score, gate=gate, seen=seen)
         claim = precedent_claim(keep, f.airport)

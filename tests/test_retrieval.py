@@ -2,6 +2,7 @@
 
 import hashlib
 import math
+from datetime import date
 
 import pytest
 
@@ -206,6 +207,27 @@ def test_hybrid_filters_are_only_the_ones_requested():
     assert "NOT LIKE %(exclude)s" in corpus._filters(None, None, "%Synopsis%", False)
     sql = corpus._HYBRID.format(filters=corpus._filters("KSFO", "ntsb", "%x%", False))
     assert "pool" not in sql and sql.count("c.icao = %(icao)s") == 2    # once per channel
+    assert "d.published < %(before)s" in corpus._filters(None, None, None, False,
+                                                         date(2020, 1, 1))
+
+
+@pytest.mark.db
+def test_published_before_drops_reports_from_the_briefing_day_on(db):
+    """Time travel: a briefing set in the past cannot cite the accident it briefs, or later."""
+    emb = HashEmbedder()
+    text = "Taxiway lights out at night; the crew lined up on the wrong surface."
+    for ext, day in (("past", date(2017, 12, 1)), ("same-day", date(2017, 12, 30)),
+                     ("future", date(2019, 5, 2))):
+        index_document(db, emb, source="ops_note", external_id=f"test-tt-{ext}", text=text,
+                       published=day, metadata={"synthetic": True})
+    r = Retriever(HashEmbedder())
+
+    def refs(**kw):
+        hits = r.search(db, text, rerank=False, source="ops_note", k=10, **kw)
+        return {h.external_id for h in hits if h.external_id.startswith("test-tt-")}
+
+    assert refs() == {"test-tt-past", "test-tt-same-day", "test-tt-future"}
+    assert refs(published_before=date(2017, 12, 30)) == {"test-tt-past"}
 
 
 @pytest.mark.db

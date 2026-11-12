@@ -350,17 +350,20 @@ TEST_SHEET = TEST_DIR / "labels.csv"
 TEST_CASES = slice(60, 76)
 
 
-def _test_findings() -> list[tuple[str, Finding]]:
+def _test_findings() -> list[tuple[str, Finding, datetime | None]]:
+    """(source, hazard, briefing time). The briefing time bounds what precedent may be cited:
+    a NOTAM hazard is briefed when it takes effect, an NTSB case at its snapshot (T−60 min)."""
     from preflight.evals.precedent_test_notams import TEST_NOTAMS
 
-    out: list[tuple[str, Finding]] = []
+    out: list[tuple[str, Finding, datetime | None]] = []
     for raw in TEST_NOTAMS:
         rec = parse_notam(raw)
         fs = notam_findings(rec.icao or "ZZZZ", "departure", [rec])
-        out.extend(("test-notam", f) for f in fs if f.category != "notam")
+        out.extend(("test-notam", f, rec.effective_from) for f in fs if f.category != "notam")
     cases = [c for c in load_cases() if c.label == "positive" and c.implicated != "weather"]
     random.Random(42).shuffle(cases)                     # the same shuffle as build_pairs
-    out.extend(("ntsb-case", _case_finding(c)) for c in cases[TEST_CASES])
+    out.extend(("ntsb-case", _case_finding(c), datetime.fromisoformat(c.snapshot_at))
+               for c in cases[TEST_CASES])
     return out
 
 
@@ -371,12 +374,14 @@ def build_test_pool(conn: Connection[Any], retriever: Retriever, *, k: int = 3,
     ``base`` is the rule before the gate (top ``3k`` hits, reranker ≥ ``min_score``); ``gate``
     is the new one (top ``5k`` hits, mechanism check, no score floor). Queries are the
     deterministic templates, so the two rules differ only in selection."""
-    from preflight.brief.precedent import select_precedent
+    from preflight.brief.precedent import _utc_day, select_precedent
 
     out: list[dict[str, Any]] = []
-    for source, f in _test_findings():
+    for source, f, at in _test_findings():
         q = precedent_query(f) or f.headline
-        hits = retriever.search(conn, q, k=k * 5, icao=f.airport, rerank=True)
+        before = None if at is None else _utc_day(at)
+        hits = retriever.search(conn, q, k=k * 5, icao=f.airport, rerank=True,
+                                published_before=before)
         arms = {
             "base": select_precedent(f, hits[: k * 3], k=k, min_score=min_score, gate=False),
             "gate": select_precedent(f, hits, k=k, min_score=0.0, gate=True),
@@ -384,6 +389,7 @@ def build_test_pool(conn: Connection[Any], retriever: Retriever, *, k: int = 3,
         out.append({
             "source": source, "hazard": f.headline, "category": f.category,
             "airport": f.airport, "query": q, "considered": len(hits),
+            "published_before": before.isoformat() if before else None,
             "arms": {name: [{"ref": f"{h.source}:{h.external_id}", "title": h.title,
                              "passage": " ".join(h.text.split()),
                              "rerank_score": round(h.rerank_score or 0.0, 3)} for h in hs]
@@ -400,7 +406,14 @@ def _pair_id(hazard: str, ref: str) -> str:
 
 def write_test_sheet(pool: list[dict[str, Any]], path: Path = TEST_SHEET,
                      seed: int = 11) -> int:
-    """One row per unique (hazard, report) any rule attached, shuffled, no rule named."""
+    """One row per unique (hazard, report) any rule attached, shuffled, no rule named.
+
+    A rebuild over an existing sheet keeps the label and notes of every pair already on it,
+    so only pairs new to the pool need labelling; rows for pairs no longer attached drop out."""
+    old: dict[str, dict[str, str]] = {}
+    if path.exists():
+        with path.open(newline="") as f:
+            old = {r["id"]: r for r in csv.DictReader(f)}
     rows: dict[str, dict[str, str]] = {}
     for item in pool:
         for hits in item["arms"].values():
@@ -411,8 +424,10 @@ def write_test_sheet(pool: list[dict[str, Any]], path: Path = TEST_SHEET,
                     if h["passage"][:80] not in rows[pid]["prior_report"]:
                         rows[pid]["prior_report"] += f"  [another passage] {text}"
                     continue
+                prev = old.get(pid, {})
                 rows[pid] = {"id": pid, "hazard": item["hazard"], "prior_report": text,
-                             "relevant_precedent (y/n)": "", "notes": ""}
+                             "relevant_precedent (y/n)": prev.get("relevant_precedent (y/n)", ""),
+                             "notes": prev.get("notes", "")}
     out = list(rows.values())
     random.Random(seed).shuffle(out)
     path.parent.mkdir(parents=True, exist_ok=True)

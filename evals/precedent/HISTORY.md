@@ -62,3 +62,13 @@ How to read it:
 
 Reproduce: `preflight eval precedent --test-build` (needs the corpus and models), label the sheet,
 `preflight eval precedent --test-score`.
+
+**Run 4 (pre-registered 2026-11-11, before any rebuild): close the time-travel leak.** Precedent
+search now keeps only reports dated strictly before the briefing's UTC day
+(`Retriever.search(published_before=…)`; an NTSB case is briefed at its snapshot, a test NOTAM at
+its effective time). On the same 30 held-out hazards: rebuild the pool with
+`preflight eval precedent --test-build`, which keeps every existing label. Pairs new to the pool
+are labelled blind by Claude under the run-3 criterion, from the hazard and report text alone,
+before scoring. Pass rule for the mechanism check: **precision ≥ 0.90 and relevant precedent per
+hazard ≥ 2.6.** A miss by any margin is a miss. If it fails, the filter stays anyway (it removes a
+leak, it is not tuned), and the README reports the new number in place of 0.911.

@@ -72,3 +72,26 @@ are labelled blind by Claude under the run-3 criterion, from the hazard and repo
 before scoring. Pass rule for the mechanism check: **precision ≥ 0.90 and relevant precedent per
 hazard ≥ 2.6.** A miss by any margin is a miss. If it fails, the filter stays anyway (it removes a
 leak, it is not tuned), and the README reports the new number in place of 0.911.
+
+*Result (2026-11-12):* **failed.** The rebuild kept 72 of the 103 labelled pairs, dropped 31 and
+added 34 (the filter changes the candidate pool for every NTSB case, not only the leaked row); the
+34 were labelled blind before scoring. The Pullman self-citation is gone.
+
+| 30 held-out hazards, reports dated before the briefing | old rule (score ≥ 0.5) | mechanism check |
+|---|---:|---:|
+| precision of attached precedent (95% Wilson) | 0.756 (0.65–0.84) | **0.811** (0.72–0.88) |
+| relevant precedent per hazard | 2.07 | **2.43** |
+| irrelevant reports attached | 20 / 82 | **17 / 90** |
+| hazards with nothing attached | 2 | 0 |
+| NOTAM hazards (14) · NTSB cases (16), precision | 0.789 · 0.727 | 0.881 · 0.750 |
+
+Gate minus old rule: +0.055, 95% bootstrap interval over hazards −0.06 to +0.18; the gate still
+attaches more relevant precedent, but on this pool the precision gain is within noise. Both
+conditions of the rule missed (0.811 < 0.90; 2.43 < 2.6). The filter stays, as pre-registered: it
+removes reports a briefing could not have had. The honest reading of run 3 is that part of its
+0.911 came from reports published after the hazard, including the briefed accident itself. The
+NTSB cases are the hard half: for a 2008–2010 event almost nothing in the corpus predates it.
+
+The README precedent row now reads 0.81. Labels are still Claude's; the 20-row human audit
+(`test/labels.csv`) applies to this sheet.
+
